@@ -33,6 +33,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="main.css">
 	<link rel="stylesheet" type="text/css" href="replicate-theme.css">
+	<link rel="stylesheet" type="text/css" href="ui-bugfixes.css">
 	<style>
 		:root{
 			--ff:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
@@ -52,7 +53,7 @@
 		.pk_shrtct{
 			font-family:var(--ff-mono)!important;
 			font-variant-numeric:tabular-nums;
-			font-feature-settings:"tnum" 1,"zero" 1;
+			font-feature-settings:"tnum" 1,"zero" 0;
 		}
 	</style>
 	<script>
@@ -68,7 +69,7 @@
 				},
 				set:function (value) {
 					if (typeof value === 'string' && value.indexOf('29px Helvetica') !== -1) {
-						value = '29px ' + geistMono;
+						value = '28px ' + geistMono;
 					}
 					return fontDescriptor.set.call(this, value);
 				}
@@ -106,6 +107,7 @@
 	<script src="lzma.js"></script>
 	<script src="amss-format.js"></script>
 	<script src="multitrack.js"></script>
+	<script src="ui-bugfixes.js"></script>
 	<script>
 		function initAudioMass () {
 			var editor = PKAudioEditor.init ('app');
@@ -117,7 +119,7 @@
 		}
 
 		if (document.fonts && document.fonts.load) {
-			document.fonts.load('29px "Geist Mono"').then(initAudioMass, initAudioMass);
+			document.fonts.load('28px "Geist Mono"').then(initAudioMass, initAudioMass);
 		}
 		else {
 			initAudioMass ();
