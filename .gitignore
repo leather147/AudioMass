@@ -3,3 +3,5 @@
 *.aif
 *.aiff
 *.br
+node_modules/*
+.venv/*

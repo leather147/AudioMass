@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "public": "src",
+  "cleanUrls": true,
+  "routes": [
+    { "src": "/", "dest": "/src/index.html" },
+    { "src": "/about", "dest": "/src/about.html" },
+    { "src": "/eq", "dest": "/src/eq.html" },
+    { "src": "/index.html", "dest": "/src/index.html" },
+    { "src": "/index-cache.html", "dest": "/src/index-cache.html" },
+    { "src": "/index-final.html", "dest": "/src/index-final.html" },
+    { "src": "/(.*)", "dest": "/src/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*).(js|css|svg|png|jpg|jpeg|gif|wasm)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}

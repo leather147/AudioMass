@@ -1548,13 +1548,6 @@
 					// {
 					// 	name:'---'
 					// },
-
-					{
-						name   : 'SourceCode on Github',
-						action : function () {
-							window.open ('https://github.com/pkalogiros/audiomass');
-						}
-					}
 				]
 			}
 		];
