@@ -167,10 +167,211 @@
 
 /* Keep the toolbar scrollable instead of squeezing cards into each other. */
 .pk_tbc{
+	max-width:100vw!important;
 	overflow-x:auto!important;
-	overflow-y:visible!important;
+	overflow-y:hidden!important;
+	-webkit-overflow-scrolling:touch!important;
+	overscroll-behavior-x:contain!important;
+	scrollbar-width:thin!important;
 }
 
 .pk_tb{
+	width:max-content!important;
 	min-width:max-content!important;
+	white-space:nowrap!important;
+}
+
+.pk_timecontainer,
+.pk_btngroup,
+.pk_transport,
+.pk_ctns,
+.pk_selection,
+.pk_mtbeat{
+	flex:0 0 auto!important;
+}
+
+/* ---------- Narrow header and toolbar ---------- */
+@media (max-width:760px){
+	html,
+	body{
+		overflow-x:hidden!important;
+	}
+
+	.pk_app{
+		width:100vw!important;
+		max-width:100vw!important;
+		overflow:hidden!important;
+	}
+
+	.pk_hdr{
+		display:flex!important;
+		align-items:center!important;
+		gap:4px!important;
+		height:40px!important;
+		padding:0 8px!important;
+		overflow-x:auto!important;
+		overflow-y:hidden!important;
+		white-space:nowrap!important;
+		-webkit-overflow-scrolling:touch!important;
+		scrollbar-width:none!important;
+	}
+
+	.pk_hdr::-webkit-scrollbar{
+		display:none!important;
+	}
+
+	.pk_hdr:before{
+		flex:0 0 auto!important;
+		margin-right:8px!important;
+		font-size:13px!important;
+	}
+
+	.pk_hdr:after{
+		display:none!important;
+	}
+
+	.pk_hdr .pk_btn{
+		flex:0 0 auto!important;
+		float:none!important;
+		margin:0!important;
+		min-width:auto!important;
+	}
+
+	.pk_hdr .pk_btn>button,
+	.pk_hdr .pk_btn button{
+		display:inline-flex!important;
+		align-items:center!important;
+		height:28px!important;
+		padding:0 8px!important;
+		font-size:11px!important;
+		line-height:28px!important;
+		white-space:nowrap!important;
+	}
+
+	.pk_hdr .pk_btn .pk_menu{
+		position:fixed!important;
+		top:38px!important;
+		left:8px!important;
+		right:8px!important;
+		width:auto!important;
+		min-width:0!important;
+		max-width:calc(100vw - 16px)!important;
+		max-height:calc(100vh - 48px)!important;
+		overflow:auto!important;
+	}
+
+	.pk_tbc,
+	.pk_mt_on .pk_tbc{
+		width:100vw!important;
+		max-width:100vw!important;
+		padding:0!important;
+		box-sizing:border-box!important;
+	}
+
+	.pk_tb{
+		display:block!important;
+		float:none!important;
+		height:58px!important;
+		min-height:58px!important;
+		padding:8px!important;
+		box-sizing:border-box!important;
+		width:max-content!important;
+		min-width:max-content!important;
+	}
+
+	.pk_timecontainer{
+		width:252px!important;
+		min-width:252px!important;
+		margin-right:8px!important;
+	}
+
+	.pk_transport{
+		padding-right:8px!important;
+		margin-right:8px!important;
+	}
+
+	.pk_tb .pk_btn,
+	.pk_transport .pk_btn,
+	.pk_zoombtn .pk_btn{
+		width:34px!important;
+		height:34px!important;
+		margin:6px 2px!important;
+		border-radius:10px!important;
+	}
+
+	.pk_selection{
+		min-width:352px!important;
+		margin-right:8px!important;
+	}
+
+	.pk_selection .pk_sellist{
+		grid-template-columns:44px 48px 48px 70px 78px!important;
+		gap:6px!important;
+	}
+
+	.pk_sellist .pk_title,
+	.pk_selection .title,
+	.pk_selection .pk_dat,
+	.pk_selection .pk_btn.icon-clearsel:after{
+		font-size:10px!important;
+	}
+
+	.pk_selection .pk_btn.icon-clearsel{
+		width:78px!important;
+		min-width:78px!important;
+	}
+}
+
+@media (max-width:420px){
+	.pk_hdr:before{
+		content:'AM';
+		font-size:13px!important;
+		margin-right:4px!important;
+	}
+
+	.pk_hdr .pk_btn>button,
+	.pk_hdr .pk_btn button{
+		padding:0 7px!important;
+		font-size:10px!important;
+	}
+
+	.pk_timecontainer{
+		width:236px!important;
+		min-width:236px!important;
+	}
+
+	.pk_timing{
+		font-size:26px!important;
+		padding-left:10px!important;
+	}
+
+	.pk_total_dur,
+	.pk_hover_dur{
+		font-size:11px!important;
+		right:8px!important;
+	}
+
+	.pk_tb .pk_btn,
+	.pk_transport .pk_btn,
+	.pk_zoombtn .pk_btn{
+		width:32px!important;
+		height:32px!important;
+		margin:7px 2px!important;
+	}
+
+	.pk_selection{
+		min-width:318px!important;
+		padding:0 6px!important;
+	}
+
+	.pk_selection .pk_sellist{
+		grid-template-columns:38px 43px 43px 62px 68px!important;
+		gap:5px!important;
+	}
+
+	.pk_selection .pk_btn.icon-clearsel{
+		width:68px!important;
+		min-width:68px!important;
+		padding:0 6px!important;
+	}
 }
