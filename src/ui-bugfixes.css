@@ -190,6 +190,78 @@
 	flex:0 0 auto!important;
 }
 
+/* ---------- Subtle map-like recursive multitrack grid ---------- */
+.pk_mt_lanes{
+	--mt-grid-major:192px;
+	--mt-grid-mid:48px;
+	--mt-grid-minor:12px;
+	--mt-grid-micro:3px;
+	--mt-grid-ultra:2px;
+	--mt-grid-fade:.30;
+	background-color:#09090b!important;
+	background-image:
+		linear-gradient(rgba(56,216,255,calc(.105 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(56,216,255,calc(.105 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.062 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.062 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.038 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.038 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.018 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.018 * var(--mt-grid-fade))) 1px,transparent 1px),
+		radial-gradient(circle at 50% 0%,rgba(56,216,255,.028),transparent 42%)!important;
+	background-size:
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-minor) var(--mt-grid-minor),
+		var(--mt-grid-minor) var(--mt-grid-minor),
+		var(--mt-grid-micro) var(--mt-grid-micro),
+		var(--mt-grid-micro) var(--mt-grid-micro),
+		auto!important;
+	background-position:0 0!important;
+}
+
+.pk_mt_lanes.pk_mt_beats{
+	background-color:#09090b!important;
+	background-image:
+		linear-gradient(rgba(56,216,255,calc(.105 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(56,216,255,calc(.105 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.062 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.062 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.038 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.038 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.018 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.018 * var(--mt-grid-fade))) 1px,transparent 1px)!important;
+	background-size:
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-minor) var(--mt-grid-minor),
+		var(--mt-grid-minor) var(--mt-grid-minor),
+		var(--mt-grid-micro) var(--mt-grid-micro),
+		var(--mt-grid-micro) var(--mt-grid-micro)!important;
+}
+
+.pk_mt_lane{
+	background:transparent!important;
+	border-bottom:1px solid rgba(255,255,255,.055)!important;
+}
+
+.pk_mt_lane.pk_mt_sel{
+	background:linear-gradient(90deg,rgba(56,216,255,.045),rgba(56,216,255,.018),transparent 42%)!important;
+}
+
+.pk_mt_clip,
+.pk_mt_region,
+.pk_mt_beatgrid,
+.pk_wave_cursor,
+.pk_wavepoint,
+.pk_mrkrl{
+	position:absolute;
+}
+
 /* ---------- Narrow header and toolbar ---------- */
 @media (max-width:760px){
 	html,
