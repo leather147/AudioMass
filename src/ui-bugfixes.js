@@ -87,10 +87,61 @@
 		w.addEventListener('resize', scheduleGridUpdate, false);
 	}
 
+	function clearTouchMarkerLabels (except) {
+		var active = d.getElementsByClassName('pk_touch_label');
+		for (var i = active.length - 1; i >= 0; --i) {
+			if (active[i] !== except) active[i].classList.remove('pk_touch_label');
+		}
+	}
+
+	function nearestMarker (x, y) {
+		var markers = d.getElementsByClassName('pk_mrkr');
+		var best = null;
+		var bestDist = Infinity;
+		for (var i = 0; i < markers.length; ++i) {
+			var r = markers[i].getBoundingClientRect();
+			var cx = Math.max(r.left - 16, Math.min(x, r.right + 18));
+			var cy = Math.max(r.top - 12, Math.min(y, r.top + 34));
+			var dx = x - cx;
+			var dy = y - cy;
+			var dist = Math.sqrt(dx * dx + dy * dy);
+			if (dist < bestDist && dist <= 22) {
+				bestDist = dist;
+				best = markers[i];
+			}
+		}
+		return best;
+	}
+
+	function attachMarkerTouchLabels () {
+		d.addEventListener('pointerdown', function (ev) {
+			var noHover = w.matchMedia && w.matchMedia('(hover:none)').matches;
+			if (!noHover) return;
+			var marker = ev.target && ev.target.closest && ev.target.closest('.pk_mrkr');
+			if (!marker) marker = nearestMarker(ev.clientX, ev.clientY);
+			if (marker) {
+				clearTouchMarkerLabels(marker);
+				marker.classList.add('pk_touch_label');
+				w.clearTimeout(marker._pkTouchLabelTimer);
+				marker._pkTouchLabelTimer = w.setTimeout(function () {
+					marker.classList.remove('pk_touch_label');
+				}, 2200);
+			}
+			else {
+				clearTouchMarkerLabels();
+			}
+		}, true);
+	}
+
+	function boot () {
+		attachGridWatchers();
+		attachMarkerTouchLabels();
+	}
+
 	if (d.readyState === 'loading') {
-		d.addEventListener('DOMContentLoaded', attachGridWatchers, false);
+		d.addEventListener('DOMContentLoaded', boot, false);
 	}
 	else {
-		attachGridWatchers();
+		boot();
 	}
 })(window, document);
