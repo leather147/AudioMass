@@ -191,19 +191,48 @@
 		w.addEventListener('resize', closePopover);
 	}
 
-	function attachButton () {
-		if (btn && btn.parentNode) return true;
+	function clean (text) {
+		return (text || '').replace(/\s+/g, ' ').trim();
+	}
+
+	function isViewButton (el) {
+		var txt = clean(el.textContent);
+		return txt === 'Вид' || txt === 'View';
+	}
+
+	function findViewMenu () {
 		var hdr = d.getElementsByClassName('pk_hdr')[0];
-		if (!hdr) return false;
+		if (!hdr) return null;
+		var items = hdr.children;
+		for (var i = 0; i < items.length; ++i) {
+			var b = items[i].getElementsByTagName('button')[0];
+			if (b && isViewButton(b)) return items[i].getElementsByClassName('pk_menu')[0] || null;
+		}
+		return null;
+	}
+
+	function removeOldTopButton () {
+		var hdr = d.getElementsByClassName('pk_hdr')[0];
+		if (!hdr) return;
+		var old = hdr.querySelectorAll(':scope > .pk_anim_menu');
+		for (var i = 0; i < old.length; ++i) old[i].parentNode && old[i].parentNode.removeChild(old[i]);
+	}
+
+	function attachButton () {
+		removeOldTopButton();
+		if (btn && btn.parentNode) return true;
+		var menu = findViewMenu();
+		if (!menu) return false;
+
 		btn = d.createElement('div');
-		btn.className = 'pk_btn pk_anim_menu';
+		btn.className = 'pk_menu_el pk_anim_menu';
 		btn.innerHTML = '<button type="button" tabindex="-1">Анимации</button>';
 		btn.onclick = function (e) {
 			e.preventDefault();
 			e.stopPropagation();
 			openPopover();
 		};
-		hdr.appendChild(btn);
+		menu.appendChild(btn);
 		apply();
 		return true;
 	}
