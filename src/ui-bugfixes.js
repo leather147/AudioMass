@@ -19,32 +19,52 @@
 	/*
 	 * Map-like multitrack grid.
 	 * The grid is CSS-only visually, but these variables make it scale with the
-	 * timeline width as horizontal zoom changes. Several nested grid layers then
-	 * create the “square inside square” effect without becoming loud.
+	 * timeline width as horizontal zoom changes. The actual grid now lives on
+	 * .pk_mt_main as a full workspace background so it never stops after tracks.
 	 */
 	function clamp (min, val, max) {
 		return Math.max(min, Math.min(max, val));
 	}
 
+	function setGridVars (el, values) {
+		if (!el) return;
+		for (var key in values) el.style.setProperty(key, values[key]);
+	}
+
 	function updateMultitrackGrid () {
 		var lanes = d.getElementsByClassName('pk_mt_lanes')[0];
-		if (!lanes) return;
+		var main = d.getElementsByClassName('pk_mt_main')[0];
+		if (!lanes && !main) return;
 
-		var wdt = Math.max(800, lanes.offsetWidth || lanes.scrollWidth || 800);
-		var hgt = Math.max(160, lanes.offsetHeight || lanes.scrollHeight || 160);
+		var wdt = Math.max(800,
+			(lanes && (lanes.offsetWidth || lanes.scrollWidth)) ||
+			(main && (main.scrollWidth || main.offsetWidth)) ||
+			800);
+		var hgt = Math.max(160,
+			(lanes && (lanes.offsetHeight || lanes.scrollHeight)) ||
+			(main && (main.scrollHeight || main.offsetHeight)) ||
+			160);
 		var major = clamp(96, wdt / 12, 520);
 		var mid = major / 4;
 		var minor = major / 16;
 		var micro = major / 64;
 		var ultra = major / 256;
+		var left = main ? -(main.scrollLeft || 0) : 0;
+		var top = main ? (24 - (main.scrollTop || 0)) : 24;
+		var values = {
+			'--mt-grid-major': major.toFixed(2) + 'px',
+			'--mt-grid-mid': mid.toFixed(2) + 'px',
+			'--mt-grid-minor': minor.toFixed(2) + 'px',
+			'--mt-grid-micro': micro.toFixed(2) + 'px',
+			'--mt-grid-ultra': Math.max(2, ultra).toFixed(2) + 'px',
+			'--mt-grid-fade': clamp(.18, wdt / 30000, .38).toFixed(3),
+			'--mt-grid-height': hgt + 'px',
+			'--mt-grid-x': left + 'px',
+			'--mt-grid-y': top + 'px'
+		};
 
-		lanes.style.setProperty('--mt-grid-major', major.toFixed(2) + 'px');
-		lanes.style.setProperty('--mt-grid-mid', mid.toFixed(2) + 'px');
-		lanes.style.setProperty('--mt-grid-minor', minor.toFixed(2) + 'px');
-		lanes.style.setProperty('--mt-grid-micro', micro.toFixed(2) + 'px');
-		lanes.style.setProperty('--mt-grid-ultra', Math.max(2, ultra).toFixed(2) + 'px');
-		lanes.style.setProperty('--mt-grid-fade', clamp(.22, wdt / 26000, .52).toFixed(3));
-		lanes.style.setProperty('--mt-grid-height', hgt + 'px');
+		setGridVars(lanes, values);
+		setGridVars(main, values);
 	}
 
 	var raf = 0;
