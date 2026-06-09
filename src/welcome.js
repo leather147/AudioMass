@@ -45,7 +45,7 @@ setTimeout(function () {
             // Диалог приветствия
             var md = new PKSimpleModal({
                 // Заголовок приветственного окна
-                title: '<font style="font-size:15px">Добро пожаловать в AudioMass</font>',
+                title: '<font style="font-size:15px">Добро пожаловать в AM</font>',
 				ondestroy: function( q ) {
 					PKAE.ui.InteractionHandler.on = false;
 					PKAE.ui.KeyHandler.removeCallback ('modalTemp');
@@ -54,7 +54,7 @@ setTimeout(function () {
             body:'<div style="overflow:auto;-webkit-overflow-scrolling:touch;max-width:580px;width:calc(100vw - 40px);max-height:calc(100vh - 340px);min-height:110px;font-size:13px; color:#95c6c6;padding-top:7px;">'+
                 mobile_note+
                 // Основной текст о приложении
-                'AudioMass — это бесплатный, открытый, веб‑редактор аудио и формы волны.<br />Он полностью работает в вашем браузере без сервера и без необходимости в плагинах!'+
+                'AM — это бесплатный, открытый, веб‑редактор аудио и формы волны.<br />Он полностью работает в вашем браузере без сервера и без необходимости в плагинах!'+
                 '<br/><br/>'+
                 body_str+
                 'Вы можете загружать любой тип аудио, который поддерживает ваш браузер, и выполнять операции, такие как плавное появление/затухание, вырезание, обрезка, изменение громкости, '+
