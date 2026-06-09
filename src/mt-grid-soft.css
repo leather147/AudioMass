@@ -46,3 +46,34 @@
 .pk_mt_beatgrid{
 	opacity:.38!important;
 }
+
+/* Active multitrack control colors: M = purple, S = white, R = red. */
+.pk_mt button.pk_mt_mute.pk_act,
+.pk_mt_track button.pk_mt_mute.pk_act,
+.pk_mt_head button.pk_mt_mute.pk_act,
+.pk_mt_channel button.pk_mt_mute.pk_act{
+	background:linear-gradient(180deg,#a78bfa,#7c3aed)!important;
+	border-color:#a78bfa!important;
+	color:#120a22!important;
+	box-shadow:0 0 0 1px rgba(167,139,250,.42),0 0 20px rgba(124,58,237,.28)!important;
+}
+
+.pk_mt button.pk_mt_solo.pk_act,
+.pk_mt_track button.pk_mt_solo.pk_act,
+.pk_mt_head button.pk_mt_solo.pk_act,
+.pk_mt_channel button.pk_mt_solo.pk_act{
+	background:linear-gradient(180deg,#ffffff,#e4e4e7)!important;
+	border-color:#ffffff!important;
+	color:#09090b!important;
+	box-shadow:0 0 0 1px rgba(255,255,255,.40),0 0 18px rgba(255,255,255,.18)!important;
+}
+
+.pk_mt button.pk_mt_rec.pk_act,
+.pk_mt_track button.pk_mt_rec.pk_act,
+.pk_mt_head button.pk_mt_rec.pk_act,
+.pk_mt_channel button.pk_mt_rec.pk_act{
+	background:linear-gradient(180deg,#ff6b7a,#ef233c)!important;
+	border-color:#ff7a8a!important;
+	color:#170004!important;
+	box-shadow:0 0 0 1px rgba(255,122,138,.45),0 0 22px rgba(239,35,60,.30)!important;
+}
