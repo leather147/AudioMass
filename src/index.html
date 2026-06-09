@@ -45,12 +45,35 @@
 		}
 		small,
 		.pk_sloop_meta,
+		.pk_timing,
 		.pk_total_dur,
 		.pk_hover_dur,
 		.pk_shrtct{
-			font-family:var(--ff-mono);
+			font-family:var(--ff-mono)!important;
+			font-variant-numeric:tabular-nums;
+			font-feature-settings:"tnum" 1,"zero" 1;
 		}
 	</style>
+	<script>
+		(function () {
+			var geistMono = '"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace';
+			var fontDescriptor = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'font');
+
+			if (!fontDescriptor || !fontDescriptor.get || !fontDescriptor.set) return;
+
+			Object.defineProperty(CanvasRenderingContext2D.prototype, 'font', {
+				get:function () {
+					return fontDescriptor.get.call(this);
+				},
+				set:function (value) {
+					if (typeof value === 'string' && value.indexOf('29px Helvetica') !== -1) {
+						value = '29px ' + geistMono;
+					}
+					return fontDescriptor.set.call(this, value);
+				}
+			});
+		})();
+	</script>
 </head>
 <body>
 	<div id="app"></div>
@@ -82,11 +105,20 @@
 	<script src="amss-format.js"></script>
 	<script src="multitrack.js"></script>
 	<script>
-		var editor = PKAudioEditor.init ('app');
-		if ('serviceWorker' in navigator) {
-			try {
-			//	navigator.serviceWorker.register( 'sw.js' );
-			} catch ( error ) {}
+		function initAudioMass () {
+			var editor = PKAudioEditor.init ('app');
+			if ('serviceWorker' in navigator) {
+				try {
+				//	navigator.serviceWorker.register( 'sw.js' );
+				} catch ( error ) {}
+			}
+		}
+
+		if (document.fonts && document.fonts.load) {
+			document.fonts.load('29px "Geist Mono"').then(initAudioMass, initAudioMass);
+		}
+		else {
+			initAudioMass ();
 		}
 	</script>
 </body>
