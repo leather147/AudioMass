@@ -1,0 +1,127 @@
+/* =============================================================
+   NumberFlow-like animated numeric text layer
+   ============================================================= */
+
+number-flow,
+.pk_nf,
+.pk_number_flow{
+	display:inline-flex;
+	align-items:baseline;
+	white-space:pre;
+	font-variant-numeric:tabular-nums;
+	font-feature-settings:"tnum" 1,"zero" 0;
+	font-family:inherit;
+	line-height:inherit;
+}
+
+.pk_nf_char{
+	display:inline-block;
+	position:relative;
+	white-space:pre;
+	line-height:inherit;
+	font:inherit;
+}
+
+.pk_nf_digit{
+	min-width:.62em;
+	text-align:center;
+	font-variant-numeric:tabular-nums;
+}
+
+.pk_nf_digit_inner{
+	display:block;
+	will-change:transform,opacity;
+	animation:pkNumberFlowDigit calc(230ms * var(--anim-speed,.82)) cubic-bezier(.16,1,.3,1) both;
+}
+
+.pk_nf_char_inner{
+	display:block;
+	will-change:transform,opacity;
+	animation:pkNumberFlowChar calc(180ms * var(--anim-speed,.82)) cubic-bezier(.2,.8,.2,1) both;
+}
+
+.pk_nf_same .pk_nf_digit_inner,
+.pk_nf_same .pk_nf_char_inner{
+	animation:none;
+}
+
+@keyframes pkNumberFlowDigit{
+	from{
+		opacity:.18;
+		transform:translateY(calc(var(--nf-dir, 1) * .72em)) scale(.96);
+		filter:blur(2px);
+	}
+	62%{
+		opacity:1;
+		filter:blur(0);
+	}
+	to{
+		opacity:1;
+		transform:translateY(0) scale(1);
+		filter:blur(0);
+	}
+}
+
+@keyframes pkNumberFlowChar{
+	from{
+		opacity:.35;
+		transform:translateY(.16em);
+	}
+	to{
+		opacity:1;
+		transform:translateY(0);
+	}
+}
+
+.pk_nf_attr{
+	display:inline-flex!important;
+	align-items:center;
+	justify-content:center;
+	font-family:var(--ff-mono)!important;
+	font-size:9px;
+	font-variant-numeric:tabular-nums;
+	font-feature-settings:"tnum" 1,"zero" 0;
+	pointer-events:none;
+}
+
+.pk_mt_knob.pk_nf_knob:after{
+	content:''!important;
+	display:none!important;
+}
+
+.pk_mt_knob .pk_nf_attr{
+	position:absolute;
+	left:-9px;
+	top:25px;
+	width:42px;
+	height:10px;
+	color:var(--fg-2);
+	line-height:10px;
+	text-align:center;
+}
+
+.pk_mt_track.pk_mt_compact .pk_mt_knob .pk_nf_attr,
+.pk_mt_track.pk_mt_tiny .pk_mt_knob .pk_nf_attr{
+	display:none!important;
+}
+
+.pk_nf_target,
+.pk_timing,
+.pk_total_dur,
+.pk_hover_dur,
+.pk_dat,
+.pk_mt_tick,
+.pk_bpm,
+.pk_val{
+	font-variant-numeric:tabular-nums!important;
+	font-feature-settings:"tnum" 1,"zero" 0!important;
+}
+
+html.pk_anim_off .pk_nf_digit_inner,
+html.pk_anim_off .pk_nf_char_inner,
+html.pk_nf_off .pk_nf_digit_inner,
+html.pk_nf_off .pk_nf_char_inner{
+	animation:none!important;
+	transform:none!important;
+	filter:none!important;
+}
