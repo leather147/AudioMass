@@ -1,0 +1,60 @@
+/* Continuous multitrack grid background.
+   The visible grid belongs to the full workspace, not only to track rows. */
+
+.pk_mt_main{
+	--mt-grid-major:192px;
+	--mt-grid-mid:48px;
+	--mt-grid-minor:12px;
+	--mt-grid-fade:.24;
+	--mt-grid-x:0px;
+	--mt-grid-y:24px;
+	background-color:#09090b!important;
+	background-image:
+		linear-gradient(rgba(255,255,255,calc(.020 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.020 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.012 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.012 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,calc(.006 * var(--mt-grid-fade))) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,calc(.006 * var(--mt-grid-fade))) 1px,transparent 1px)!important;
+	background-size:
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-minor) var(--mt-grid-minor),
+		var(--mt-grid-minor) var(--mt-grid-minor)!important;
+	background-position:
+		var(--mt-grid-x) var(--mt-grid-y),
+		var(--mt-grid-x) var(--mt-grid-y),
+		var(--mt-grid-x) var(--mt-grid-y),
+		var(--mt-grid-x) var(--mt-grid-y),
+		var(--mt-grid-x) var(--mt-grid-y),
+		var(--mt-grid-x) var(--mt-grid-y)!important;
+	background-attachment:local!important;
+}
+
+.pk_mt_lanes,
+.pk_mt_lanes.pk_mt_beats{
+	background:transparent!important;
+	background-image:none!important;
+	background-color:transparent!important;
+}
+
+.pk_mt_empty{
+	z-index:3;
+}
+
+.pk_mt_region,
+.pk_mt_playhead,
+.pk_mt_marker,
+.pk_mt_clip,
+.pk_mt_lane,
+.pk_mt_beatgrid{
+	z-index:2;
+}
+
+.pk_mt_ruler{
+	background:rgba(9,9,11,.88)!important;
+	backdrop-filter:blur(4px);
+	-webkit-backdrop-filter:blur(4px);
+}
