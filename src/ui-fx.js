@@ -2639,7 +2639,7 @@
 
 					  buttons:[
 						{
-							title: is_new ? 'Save' : 'Save As New',
+							title: is_new ? 'Сохранить' : 'Сохранить как новый',
 							clss:'pk_modal_a_accpt',
 							callback: function( q ) {
 								var input = q.el_body.getElementsByTagName ('input')[0];
@@ -2649,7 +2649,7 @@
 
 								if (value.length > 0)
 								{
-									OneUp ('Successfully saved preset!', 1400);
+									OneUp ('Пресет успешно сохранен!', 1400);
 
 									// add preset to localStorage
 									preset_obj.name = value;
@@ -2663,7 +2663,7 @@
 								}
 								else
 								{
-									OneUp ('Name is too short...', 1200);
+									OneUp ('Имя слишком короткое...', 1200);
 								}
 								// -
 							}
@@ -2673,7 +2673,7 @@
 						btn_delete
 					  ],
 					  body:'<label for="k07">Preset Name</label>' +
-						'<input style="width:100%;box-sizing:border-box;min-width:0" maxlength="16" placeholder="Please type a name, eg: My Preset" ' + default_txt + ' class="pk_txt" type="text" id="k07" />',
+						'<input style="width:100%;box-sizing:border-box;min-width:0" maxlength="16" placeholder="Пожалуйста введите имя, например: Мой пресет" ' + default_txt + ' class="pk_txt" type="text" id="k07" />',
 					  setup:function( q ) {
 								// app.fireEvent ('RequestPause');
 
@@ -2948,19 +2948,19 @@
 		app.listenFor ('RequestShowFreqAn', function ( url, args_arr ) {
 
 			if (app.isMobile) {
-				alert ('Currently unsupported on mobile');
+				alert ('В данный момент AudioMass недоступен на мобильных устройствах!');
 				return ;
 			}
 
 			args_arr = args_arr || [];
 			var toggle = args_arr[ 0 ];
 			var type   = args_arr[ 1 ];
-			var title = 'Frequency Analysis';
+			var title = 'Частотный анализ';
 			var curr_win = eq_win[ url ];
 			var is_mix = url === 'mix';
 
-			if (url === 'sp') title = 'Spectrum Analysis';
-			if (is_mix) title = 'Multitrack Mixer';
+			if (url === 'sp') title = "Спектральный анализ";
+			if (is_mix) title = 'Мультитрек Микшер';
 
 			var toggled = false;
 			if (curr_win && toggle)
@@ -3035,7 +3035,7 @@
 							"location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=" + size[0] + ",height=" + size[1] + extra);
 
 					if (!wnd) {
-						OneUp ('Please allow pop-ups for AudioMass!', 3600, 'pk_r');
+						OneUp ('Пожалуйста разрешите pop-up окна для AudioMass!', 3600, 'pk_r');
 						return ;
 					}
 
