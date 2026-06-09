@@ -1,0 +1,20 @@
+/* Extra horizontal room after the end of the multitrack timeline. */
+
+.pk_mt_main{
+	--timeline-extra-scroll:calc(100vw * 2);
+}
+
+.pk_mt_lanes,
+.pk_mt_ruler{
+	box-sizing:border-box!important;
+}
+
+.pk_mt_lanes:after{
+	content:'';
+	position:absolute;
+	left:100%;
+	top:0;
+	width:var(--timeline-extra-scroll);
+	height:100%;
+	pointer-events:none;
+}
