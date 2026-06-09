@@ -1,0 +1,48 @@
+/* Softer multitrack map grid: no visible row borders, no ambient gradients. */
+
+.pk_mt_lanes,
+.pk_mt_lanes.pk_mt_beats{
+	background-color:#09090b!important;
+	background-image:
+		linear-gradient(rgba(255,255,255,.020) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,.020) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px),
+		linear-gradient(rgba(255,255,255,.006) 1px,transparent 1px),
+		linear-gradient(90deg,rgba(255,255,255,.006) 1px,transparent 1px)!important;
+	background-size:
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-major) var(--mt-grid-major),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-mid) var(--mt-grid-mid),
+		var(--mt-grid-minor) var(--mt-grid-minor),
+		var(--mt-grid-minor) var(--mt-grid-minor)!important;
+	background-position:0 0!important;
+}
+
+.pk_mt_lane,
+.pk_mt_lane:not(.pk_mt_sel){
+	background:transparent!important;
+	border:0!important;
+	box-shadow:none!important;
+}
+
+.pk_mt_lane.pk_mt_sel{
+	background:linear-gradient(90deg,rgba(56,216,255,.030),rgba(56,216,255,.014),transparent 58%)!important;
+	border:0!important;
+	box-shadow:
+		inset 0 1px 0 rgba(56,216,255,.16),
+		inset 0 -1px 0 rgba(56,216,255,.12)!important;
+}
+
+.pk_mt_lane.pk_mt_sel:before{
+	content:'';
+	position:absolute;
+	inset:0;
+	pointer-events:none;
+	border-left:1px solid rgba(56,216,255,.18);
+}
+
+.pk_mt_beatgrid{
+	opacity:.38!important;
+}
