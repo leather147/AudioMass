@@ -153,8 +153,22 @@
 		};
 
 		// check if we are mobile and hide tooltips on hover
-		q.isMobile = (/iphone|ipod|ipad|android/).test
-			(navigator.userAgent.toLowerCase ());
+        q.isMobile = (/iphone|ipod|ipad|android/).test
+            (navigator.userAgent.toLowerCase ());
+
+        // Добавляем возможность смены языка. Вызывает перезагрузку страницы, чтобы изменения вступили в силу.
+        // При вызове сохраняет выбранный язык в localStorage.
+        q.setLanguage = function (lang) {
+            try {
+                if (lang) {
+                    window.localStorage.setItem('lang', lang);
+                }
+            } catch (e) {
+                // localStorage может быть недоступен (режим инкогнито, закрытые настройки), игнорируем
+            }
+            // Перезагружаем страницу для применения перевода
+            window.location.reload();
+        };
 	};
 
 	!w.PKAudioList && (w.PKAudioList = []);

@@ -26,35 +26,42 @@ setTimeout(function () {
 			var body_str2 = '';
 			var mobile_note = '';
 
-			if (PKAE.isMobile) {
-				mobile_note = '(Optimized for desktop - sorry)<br/><br/>';
-				body_str = 'Tips:<br/>Please make sure your device is not in silent mode. You might need to physically flip the silent switch. '+
-				'<img src="phone-switch.jpg" style="max-width:224px;max-height:126px;width:40%;margin: 10px auto; display: block;"/>'+
-				'<br/><br/>';
-			}
-			else {
-				body_str = 'Tips:<br/>Please keep in mind that most key shortcuts rely on the <strong>Shift + <u>key</u></strong> combo. (eg Shift+Z for undo, Shift+C copy, Shift+X cut... etc )<br/><br/>';
-				body_str2 = 'Check out the codebase on <a href="https://github.com/pkalogiros/audiomass" target="_blank">Github</a><br/><br/>'; // checkout the code on github
-			}
+            // Локализуем приветственный текст и подсказки на русский язык
+            if (PKAE.isMobile) {
+                // Сообщение для мобильных устройств: оптимизировано под десктоп
+                mobile_note = '(Оптимизировано для десктопа — извините)<br/><br/>';
+                // Подсказка для пользователей мобильных устройств: убедитесь, что выключатель беззвучного режима выключен
+                body_str = 'Советы:<br/>Пожалуйста, убедитесь, что ваше устройство не находится в беззвучном режиме. Возможно, вам нужно физически переключить ползунок беззвучного режима. '+
+                '<img src="phone-switch.jpg" style="max-width:224px;max-height:126px;width:40%;margin: 10px auto; display: block;"/>'+
+                '<br/><br/>';
+            }
+            else {
+                // Подсказка для настольных компьютеров: многие сочетания клавиш используют Shift
+                body_str = 'Советы:<br/>Имейте в виду, что большинство сочетаний клавиш используют комбинацию <strong>Shift + <u>клавиша</u></strong>. (например, Shift+Z — отмена, Shift+C — копирование, Shift+X — вырезание... и т.д.)<br/><br/>';
+                // Ссылка на исходный код на GitHub
+                body_str2 = 'Посмотрите исходный код на <a href="https://github.com/pkalogiros/audiomass" target="_blank">GitHub</a><br/><br/>'; // ссылка на репозиторий
+            }
 
-			// Welcome to AudioMass,
-			var md = new PKSimpleModal({
-				title: '<font style="font-size:15px">Welcome to AudioMass</font>',
+            // Диалог приветствия
+            var md = new PKSimpleModal({
+                // Заголовок приветственного окна
+                title: '<font style="font-size:15px">Добро пожаловать в AudioMass</font>',
 				ondestroy: function( q ) {
 					PKAE.ui.InteractionHandler.on = false;
 					PKAE.ui.KeyHandler.removeCallback ('modalTemp');
 					showScrollHint ();
 			},
-			body:'<div style="overflow:auto;-webkit-overflow-scrolling:touch;max-width:580px;width:calc(100vw - 40px);max-height:calc(100vh - 340px);min-height:110px;font-size:13px; color:#95c6c6;padding-top:7px;">'+
-				mobile_note+
-				'AudioMass is a free, open source, web-based Audio and Waveform Editor.<br />It runs entirely in the browser with no backend and no plugins required!'+
-				'<br/><br/>'+
-				body_str+
-				'You can load any type of audio your browser supports and perform operations such as fade in, cut, trim, change the volume, '+
-				'and apply a plethora of audio effects.<br/><br/>'+
-				body_str2+
-				'I hope you enjoy the little music pieces. I wrote them a long time ago :)'+
-				'</div>',
+            body:'<div style="overflow:auto;-webkit-overflow-scrolling:touch;max-width:580px;width:calc(100vw - 40px);max-height:calc(100vh - 340px);min-height:110px;font-size:13px; color:#95c6c6;padding-top:7px;">'+
+                mobile_note+
+                // Основной текст о приложении
+                'AudioMass — это бесплатный, открытый, веб‑редактор аудио и формы волны.<br />Он полностью работает в вашем браузере без сервера и без необходимости в плагинах!'+
+                '<br/><br/>'+
+                body_str+
+                'Вы можете загружать любой тип аудио, который поддерживает ваш браузер, и выполнять операции, такие как плавное появление/затухание, вырезание, обрезка, изменение громкости, '+
+                'и применять множество аудиоэффектов.<br/><br/>'+
+                body_str2+
+                'Надеюсь, вам понравятся маленькие музыкальные композиции. Я написал их давным‑давно :)'+
+                '</div>',
 			setup:function( q ) {
 					PKAE.ui.InteractionHandler.checkAndSet ('modal');
 					PKAE.ui.KeyHandler.addCallback ('modalTemp', function ( e ) {
@@ -74,7 +81,8 @@ setTimeout(function () {
 				}
 			});
 			md.Show ();
-			document.getElementsByClassName('pk_modal_cancel')[0].innerHTML = '&nbsp; &nbsp; &nbsp; OK &nbsp; &nbsp; &nbsp;';
+            // Заменяем текст кнопки OK на русское «ОК»
+            document.getElementsByClassName('pk_modal_cancel')[0].innerHTML = '&nbsp; &nbsp; &nbsp; ОК &nbsp; &nbsp; &nbsp;';
 	};
 
 	var change = 99;

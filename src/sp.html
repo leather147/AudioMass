@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 	<script>window.update = function(){};</script>
 
-	<title>AudioMass - Spectrum Analyzer</title>
+    <title>AudioMass - Спектральный анализ</title>
 	<style>
 	html,body{height:100%}
 	body{padding:0;margin:0;background:#111;position:relative;z-index:2;overflow:hidden;}
@@ -75,11 +75,12 @@
 </head>
 <body>
 	<canvas id="fr" width="600" height="188" style="width:100%;height:100%;display:block"></canvas>
-	<div>SPECTRUM ANALYSER</div>
+    <div id="title">СПЕКТРАЛЬНЫЙ АНАЛИЗАТОР</div>
 
-	<a id="d" onclick="dock()">DOCK</a>
-	<a id="e" onclick="remove()">X</a>
-	<a id="f" onmousedown="drag(event)"></a>
+    <!-- Кнопки управления: "Окно" для развертывания/сворачивания анализатора -->
+    <a id="d" onclick="dock()">ОКНО</a>
+    <a id="e" onclick="remove()">X</a>
+    <a id="f" onmousedown="drag(event)"></a>
 
 	<script>
 		var d = document;
@@ -88,14 +89,28 @@
 		var canvas = d.getElementById('fr');
 		var ctx = canvas.getContext('2d', {alpha:true, antialias:false});
 
-		w.remove = function (){};
-		if (iframe) {
-			d.body.className = 'b';
-			d.getElementById ('d').textContent = 'UNDOCK';
-			w.remove = function () {
-				w.parent.PKAudioEditor.ui.Dock ('RequestShowFreqAn', 'sp', [1, 1]);
-			};
-		};
+        w.remove = function (){};
+        // локализация заголовка и кнопок в зависимости от выбранного языка
+        (function() {
+            var lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+            var titleEl = d.getElementById('title');
+            if (titleEl) {
+                titleEl.textContent = lang === 'en' ? 'SPECTRAL ANALYSER' : 'СПЕКТРАЛЬНЫЙ АНАЛИЗАТОР';
+            }
+            var dockEl = d.getElementById('d');
+            if (!iframe && dockEl) {
+                dockEl.textContent = lang === 'en' ? 'DOCK' : 'ОКНО';
+            }
+            if (iframe && dockEl) {
+                dockEl.textContent = lang === 'en' ? 'RETURN' : 'ВЕРНУТЬ';
+            }
+        })();
+        if (iframe) {
+            d.body.className = 'b';
+            w.remove = function () {
+                w.parent.PKAudioEditor.ui.Dock ('RequestShowFreqAn', 'sp', [1, 1]);
+            };
+        };
 
 		w.drag = function ( e ) {
 			e.preventDefault ();

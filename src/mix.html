@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-	<title>AudioMass - Multitrack Mixer</title>
+    <title>AudioMass - Микшер мультидорожек</title>
 	<meta charset="utf-8" />
 	<style>
 	html,body{height:100%}
@@ -46,10 +46,11 @@
 	</style>
 </head>
 <body>
-	<div id="m"><div class="empty">MULTITRACK MIXER</div></div>
-	<a id="d" onclick="dock()">DOCK</a>
-	<a id="e" onclick="remove()">X</a>
-	<a id="f" onmousedown="return drag(event)"></a>
+    <div id="m"><div id="empty-text" class="empty">МИКШЕР МУЛЬТИДОРОЖЕК</div></div>
+    <!-- Кнопки управления для микшера: "Окно" открывает/сворачивает панель -->
+    <a id="d" onclick="dock()">ОКНО</a>
+    <a id="e" onclick="remove()">X</a>
+    <a id="f" onmousedown="return drag(event)"></a>
 
 	<script>
 		var d = document;
@@ -60,10 +61,26 @@
 		var els = {};
 		var last = 0;
 
-		if (iframe) {
-			d.body.className = 'b';
-			d.getElementById ('d').textContent = 'UNDOCK';
-		}
+        // локализация заголовка микшера и кнопок в зависимости от выбранного языка
+        (function() {
+            var lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+            // заголовок пустого состояния
+            var et = d.getElementById('empty-text');
+            if (et) {
+                et.textContent = lang === 'en' ? 'MULTITRACK MIXER' : 'МИКШЕР МУЛЬТИДОРОЖЕК';
+            }
+            var dockEl = d.getElementById('d');
+            if (!iframe && dockEl) {
+                dockEl.textContent = lang === 'en' ? 'DOCK' : 'ОКНО';
+            }
+            if (iframe && dockEl) {
+                dockEl.textContent = lang === 'en' ? 'RETURN' : 'ВЕРНУТЬ';
+            }
+        })();
+        if (iframe) {
+            d.body.className = 'b';
+            // Когда микшер открыт в отдельном окне, обработка возврата
+        }
 
 		function host () {
 			return iframe ? w.parent : w.opener;

@@ -241,8 +241,78 @@
 
 
 	//top bar config list
-	function _topbarConfig ( app, ui ) {
-		return [
+function _topbarConfig ( app, ui ) {
+        // Определяем текущий язык интерфейса из localStorage. По умолчанию русский.
+        var currLang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+
+        /*
+         * Меню верхней панели состоит из вложенных объектов. Для удобства локализации
+         * английских пунктов мы определяем словарь translations, где ключ — исходный
+         * английский текст, а значение — русский перевод. Далее функция
+         * translateMenuNames рекурсивно проходит по меню и заменяет английские
+         * названия на русские. Если перевод не найден, оставляет оригинал.
+         */
+        function translateMenuNames(list) {
+            var translations = {
+                'File': 'Файл',
+                'Export / Download': 'Экспорт / Загрузка',
+                'Export': 'Экспорт',
+                'Edit': 'Правка',
+                'Undo': 'Отмена',
+                'Redo': 'Повтор',
+                'Play': 'Воспроизвести',
+                'Stop': 'Стоп',
+                'Select All': 'Выделить всё',
+                'Deselect All': 'Снять выделение',
+                'Channel Info/Flip': 'Информация/Инвертировать',
+                'Seamless Loop': 'Бесшовный цикл',
+                'Effects': 'Эффекты',
+                'Gain': 'Усиление',
+                'Fade In': 'Появление',
+                'Fade Out': 'Затухание',
+                'Compressor': 'Компрессор',
+                'Distortion': 'Дисторшн',
+                'Reverb': 'Реверберация',
+                'Audio Repair': 'Восстановление аудио',
+                'View': 'Вид',
+                'Follow Cursor': 'Следовать за курсором',
+                'Peak Separators': 'Разделители пиков',
+                'Timeline': 'Шкала времени',
+                'Frequency Analyser': 'Частотный анализатор',
+                'Spectrum Analyser': 'Спектральный анализатор',
+                'Multitrack Mixer': 'Мультитрековый микшер',
+                'Tempo Tools': 'Инструменты темпа',
+                'ID3 Tags': 'Теги ID3',
+                'Center to Cursor': 'Центрировать на курсор',
+                'Reset Zoom': 'Сбросить масштаб',
+                'Help': 'Помощь',
+                'About': 'О программе',
+                'See Welcome Message': 'Показать приветствие',
+                'Language': 'Язык'
+                // При необходимости добавляйте сюда дополнительные переводы пунктов меню
+            };
+            list.forEach(function(item) {
+                if (item && item.name) {
+                    // Удаляем все HTML‑теги для получения ключа перевода
+                    var cleanName = item.name.replace(/<[^>]*>/g, '').trim();
+                    // Переводим только первую часть до неразрывного пробела или разделителя
+                    var matched = false;
+                    Object.keys(translations).forEach(function(key) {
+                        if (!matched && cleanName.startsWith(key)) {
+                            // Заменяем только первое вхождение исходного слова на перевод
+                            item.name = item.name.replace(key, translations[key]);
+                            matched = true;
+                        }
+                    });
+                }
+                if (item && item.children) {
+                    translateMenuNames(item.children);
+                }
+            });
+        }
+
+        // Составляем меню. В зависимости от языка позже произведём перевод.
+        var menu = [
 			{
 				name:'File',
 				children : [
@@ -724,29 +794,32 @@
 										'<span>chan: ' + (obj.chans === 1 ? 'mono' : 'stereo') + '</span></div>'+
 										'<div style="padding:2px 0"><img src="' + obj.thumb + '" /></div>';
 
-									new PKSimpleModal ({
-										title : 'Succesfully Stored',
+                                    var _lng = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+                                    var storedTitle = _lng === 'en' ? 'Successfully Stored' : 'Успешно сохранено';
+                                    var openInNew = _lng === 'en' ? 'OPEN IN NEW WINDOW' : 'Открыть в новом окне';
+                                    var askBody = _lng === 'en' ? '<p>Open in new window?</p>' : '<p>Открыть в новом окне?</p>';
+                                    new PKSimpleModal ({
+                                        title : storedTitle,
 
-										ondestroy : function( q ) {
-											app.ui.InteractionHandler.on = false;
-											app.ui.KeyHandler.removeCallback ('modalTempErr');
-										},
+                                        ondestroy : function( q ) {
+                                            app.ui.InteractionHandler.on = false;
+                                            app.ui.KeyHandler.removeCallback ('modalTempErr');
+                                        },
 
-										buttons:[
-											{
-												title:'OPEN IN NEW WINDOW',
-												callback: function( q ) {
-													window.open ( window.location.pathname + '?local=' + name);
+                                        buttons:[
+                                            {
+                                                title: openInNew,
+                                                callback: function( q ) {
+                                                    window.open ( window.location.pathname + '?local=' + name);
+                                                    q.Destroy ();
+                                                }
+                                            }
+                                        ],
 
-													q.Destroy ();
-												}
-											}
-										],
-
-										body:'<p>Open in new window?</p>' + txt,
-										setup:function( q ) {
-											app.fireEvent ('RequestPause');
-											app.fireEvent( 'RequestRegionClear');
+                                        body: askBody + txt,
+                                        setup:function( q ) {
+                                            app.fireEvent ('RequestPause');
+                                            app.fireEvent( 'RequestRegionClear');
 
 											app.ui.InteractionHandler.checkAndSet ('modal');
 											app.ui.KeyHandler.addCallback ('modalTempErr', function ( e ) {
@@ -999,43 +1072,49 @@
 										// --- ask if we want to click the first one
 										if (app.engine.is_ready && !append)
 										{
-											var mm = new PKSimpleModal ({
-												title : 'Open in Existing?',
-												body  : '<div>Open in new window, or in the current one?</div>',
-												buttons:[
-													{
-														title:'OPEN',
-														clss:'pk_modal_a_accpt',
-														callback: function( q ) {
-															overwrite ();
-
-															q.Destroy ();
-														}
-													},
-													{
-														title:'OPEN IN NEW',
-														clss:'pk_modal_a_accpt',
-														callback: function( q ) {
-															window.open (window.location.pathname + '?local=' + name);
-															q.Destroy ();
-														}
-													}
-												],
-												setup: function ( q ) {
-													app.ui.InteractionHandler.checkAndSet ('mm');
-													app.ui.KeyHandler.addCallback ('mmErr', function ( e ) {
-														q.Destroy ();
-													}, [27]);
-												},
-												ondestroy: function ( q ) {
-													overwrite = null;
-													app.ui.InteractionHandler.on = false;
-													app.ui.KeyHandler.removeCallback ('mmErr');
-												}
-											});
-
-											setTimeout(function() { mm.Show (); },0);
-											return ;
+                                            // Локализация модального окна выбора места открытия сессии
+                                            (function() {
+                                                var _lng = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+                                                var openTitle = _lng === 'en' ? 'Open in Existing?' : 'Открыть в текущем окне?';
+                                                var openBody  = _lng === 'en' ? '<div>Open in new window, or in the current one?</div>' : '<div>Открыть в новом окне или в текущем?</div>';
+                                                var openBtnExisting = _lng === 'en' ? 'OPEN' : 'Открыть';
+                                                var openBtnNew = _lng === 'en' ? 'OPEN IN NEW' : 'Открыть в новом';
+                                                var mm = new PKSimpleModal ({
+                                                    title : openTitle,
+                                                    body  : openBody,
+                                                    buttons:[
+                                                        {
+                                                            title: openBtnExisting,
+                                                            clss:'pk_modal_a_accpt',
+                                                            callback: function( q ) {
+                                                                overwrite ();
+                                                                q.Destroy ();
+                                                            }
+                                                        },
+                                                        {
+                                                            title: openBtnNew,
+                                                            clss:'pk_modal_a_accpt',
+                                                            callback: function( q ) {
+                                                                window.open (window.location.pathname + '?local=' + name);
+                                                                q.Destroy ();
+                                                            }
+                                                        }
+                                                    ],
+                                                    setup: function ( q ) {
+                                                        app.ui.InteractionHandler.checkAndSet ('mm');
+                                                        app.ui.KeyHandler.addCallback ('mmErr', function ( e ) {
+                                                            q.Destroy ();
+                                                        }, [27]);
+                                                    },
+                                                    ondestroy: function ( q ) {
+                                                        overwrite = null;
+                                                        app.ui.InteractionHandler.on = false;
+                                                        app.ui.KeyHandler.removeCallback ('mmErr');
+                                                    }
+                                                });
+                                                setTimeout(function() { mm.Show (); },0);
+                                            })();
+                                            return ;
 										}
 
 										overwrite ();
@@ -1549,8 +1628,38 @@
 					// 	name:'---'
 					// },
 				]
-			}
-		];
+            }
+        ,
+        // Кнопка меню для выбора языка интерфейса
+        {
+            name: currLang === 'en' ? 'Language' : 'Язык',
+            children: [
+                {
+                    name: 'English',
+                    action: function () {
+                        // Выбор английского языка
+                        if (window.PKAudioEditor && typeof window.PKAudioEditor.setLanguage === 'function') {
+                            window.PKAudioEditor.setLanguage('en');
+                        }
+                    }
+                },
+                {
+                    name: 'Русский',
+                    action: function () {
+                        // Выбор русского языка
+                        if (window.PKAudioEditor && typeof window.PKAudioEditor.setLanguage === 'function') {
+                            window.PKAudioEditor.setLanguage('ru');
+                        }
+                    }
+                }
+            ]
+        }
+        ];
+        // После составления меню выполняем локализацию и возвращаем меню
+        if (currLang === 'ru') {
+            translateMenuNames(menu);
+        }
+        return menu;
 	};
 
 	// 
@@ -2323,20 +2432,34 @@
 
 		footer.appendChild( volume_parent );
 
-		// change temp message, it's pretty ugly #### TODO
-		var ttmp = d.createElement('div');
-		ttmp.className = 'pk_tmpMsg pk_ed_empty';
-		ttmp.innerHTML = 'Drag n drop an Audio File in this window, or click ' +
-		'<a style="white-space:nowrap;border:1px solid;border-radius:23px;padding:5px 18px;font-size:0.94em;margin-left:5px" '+
-		'onclick="PKAudioEditor.engine.LoadSample()">here to use a sample</a>';
-		main_audio_view.appendChild( ttmp );
+        // Создаём временное сообщение о загрузке/перетаскивании с учётом выбранного языка
+        var ttmp = d.createElement('div');
+        ttmp.className = 'pk_tmpMsg pk_ed_empty';
+        // читаем язык из localStorage (по умолчанию ru)
+        var _lang = (window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+        var dragText;
+        var hereText;
+        if (_lang === 'en') {
+            dragText = 'Drag n drop an Audio File in this window, or click ';
+            hereText = 'here to use a sample';
+        } else {
+            dragText = 'Перетащите аудиофайл в это окно или нажмите ';
+            hereText = 'здесь, чтобы использовать пример';
+        }
+        ttmp.innerHTML = dragText +
+            '<a style="white-space:nowrap;border:1px solid;border-radius:23px;padding:5px 18px;font-size:0.94em;margin-left:5px" '+
+            'onclick="PKAudioEditor.engine.LoadSample()">' + hereText + '</a>';
+        main_audio_view.appendChild( ttmp );
 
-		var ttmp2 = d.createElement('div');
-		ttmp2.className = 'pk_tmpMsg2';
-		ttmp2.innerHTML = '<span>Please Wait...</span><div class="pk_mload"><div></div></div>' + 
-			'<div class="pk_prc"><span>0%</span>' + 
-			'<button tabIndex="-1" class="pk_btn" '+
-			'onclick="PKAudioEditor.fireEvent(\'RequestCancelModal\');">cancel</button></div>';
+        // сообщение загрузки/ожидания с учётом языка
+        var ttmp2 = d.createElement('div');
+        ttmp2.className = 'pk_tmpMsg2';
+        var waitText = _lang === 'en' ? 'Please Wait...' : 'Пожалуйста, подождите...';
+        var cancelText = _lang === 'en' ? 'cancel' : 'Отмена';
+        ttmp2.innerHTML = '<span>' + waitText + '</span><div class="pk_mload"><div></div></div>' +
+            '<div class="pk_prc"><span>0%</span>' +
+            '<button tabIndex="-1" class="pk_btn" ' +
+            'onclick="PKAudioEditor.fireEvent(\'RequestCancelModal\');">' + cancelText + '</button></div>';
 
 		d.body.appendChild( ttmp2 );
 		UI.loaderEl = ttmp2;
@@ -3370,19 +3493,27 @@
 
 		
 		
-		var selection = d.createElement( 'div' );
-		selection.className = 'pk_selection';
-		selection.innerHTML = '<div class="pk_sellist">' + 
-			'<span class="pk_title">Selection:</span>' + 
-			'<div><span class="title">Start:</span><span class="s_s pk_dat">-</span></div>' + 
-			'<div><span class="title">End:</span><span class="s_e pk_dat">-</span></div>' + 
-			'<div><span  class="title">Duration:</span><span class="s_d pk_dat">-</span></div>' +
-		'</div>';
-		
-		var btn_clear_selection = d.createElement ('button');
-		btn_clear_selection.setAttribute('tabIndex', -1);
-		btn_clear_selection.className = 'pk_btn icon-clearsel pk_inact';
-		btn_clear_selection.innerHTML = '<span>Clear Selection (Q key)</span>';
+        var selection = d.createElement( 'div' );
+        selection.className = 'pk_selection';
+        // локализация подписи выделения
+        var _selLang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+        var selTitle   = _selLang === 'en' ? 'Selection:'    : 'Выбор:';
+        var selStart   = _selLang === 'en' ? 'Start:'        : 'Начало:';
+        var selEnd     = _selLang === 'en' ? 'End:'          : 'Конец:';
+        var selDur     = _selLang === 'en' ? 'Duration:'     : 'Длительность:';
+        selection.innerHTML = '<div class="pk_sellist">' +
+            '<span class="pk_title">' + selTitle + '</span>' +
+            '<div><span class="title">' + selStart + '</span><span class="s_s pk_dat">-</span></div>' +
+            '<div><span class="title">' + selEnd + '</span><span class="s_e pk_dat">-</span></div>' +
+            '<div><span  class="title">' + selDur + '</span><span class="s_d pk_dat">-</span></div>' +
+        '</div>';
+
+        var btn_clear_selection = d.createElement ('button');
+        btn_clear_selection.setAttribute('tabIndex', -1);
+        btn_clear_selection.className = 'pk_btn icon-clearsel pk_inact';
+        // локализация кнопки очистки выделения
+        var selClearText = _selLang === 'en' ? 'Clear Selection (Q key)' : 'Очистить выделение (клавиша Q)';
+        btn_clear_selection.innerHTML = '<span>' + selClearText + '</span>';
 
 		var sel_spans = selection.getElementsByClassName('pk_dat');
 		var sb = null, sr = null, sd = 0;

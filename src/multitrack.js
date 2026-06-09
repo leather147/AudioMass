@@ -296,12 +296,49 @@
 		}
 
 		function pushState ( prev, desc ) {
-			app.fireEvent ('StateRequestPush', {
-				type: 'mult',
-				desc: desc,
-				mt: prev,
-				data: app.engine.wavesurfer.backend.buffer
-			});
+            // Прежде чем отправить описание действия, локализуем его при необходимости
+            try {
+                var lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+                if (lang !== 'en') {
+                    var tmapDesc = {
+                        'Add Channel': 'Добавить канал',
+                        'Rename Channel': 'Переименовать канал',
+                        'Arm Channel': 'Подготовить канал',
+                        'Remove Channel': 'Удалить канал',
+                        'Volume Channel': 'Громкость канала',
+                        'Pan Channel': 'Панорама канала',
+                        'Resize Channel': 'Изменить размер канала',
+                        'Reorder Channel': 'Изменить порядок каналов',
+                        'Move Channel Up': 'Переместить канал вверх',
+                        'Move Channel Down': 'Переместить канал вниз',
+                        'Add Tracks': 'Добавить дорожки',
+                        'Add Clip': 'Добавить клип',
+                        'Rename Clip': 'Переименовать клип',
+                        'Duplicate Clip': 'Дублировать клип',
+                        'Move Clip': 'Переместить клип',
+                        'Trim Clip': 'Обрезать клип',
+                        'Fade Clip': 'Сделать фейд клипа',
+                        'Remove Crossfade': 'Удалить кроссфейд',
+                        'Crossfade Clip': 'Кроссфейд клипа',
+                        'Add Tracks': 'Добавить дорожки',
+                        'Toggle Beat Markers': 'Переключить маркеры бита',
+                        'Snap to Beat Markers': 'Привязать к маркерам бита',
+                        'Time Signature': 'Размер',
+                        'Mute': 'Беззвучие',
+                        'Solo': 'Соло',
+                        'Rec Trigger': 'Триггер записи'
+                    };
+                    if (tmapDesc[desc]) {
+                        desc = tmapDesc[desc];
+                    }
+                }
+            } catch (e) {}
+            app.fireEvent ('StateRequestPush', {
+                type: 'mult',
+                desc: desc,
+                mt: prev,
+                data: app.engine.wavesurfer.backend.buffer
+            });
 		}
 
 		function cloneXfades () {
@@ -597,22 +634,31 @@
 
 		function build () {
 			var footer = app.el.getElementsByClassName ('pk_ftr')[0];
-			el = d.createElement ('div');
-			el.className = 'pk_mt pk_noselect';
-			el.innerHTML =
-				'<div class="pk_mt_side">' +
-					'<div class="pk_mt_head"></div>' +
-					'<div class="pk_mt_tracks_wrap"><div class="pk_mt_tracks"></div></div>' +
-				'</div>' +
-				'<div class="pk_mt_main">' +
-					'<div class="pk_mt_ruler"></div>' +
-					'<div class="pk_mt_lanes"></div>' +
-					'<div class="pk_tmpMsg pk_mt_empty">Drag and Drop Audio Files in this window, or click ' +
-					'<a>here to use a sample</a></div>' +
-					'<div class="pk_mt_region wavesurfer-region"></div>' +
-					'<div class="pk_mt_playhead"></div>' +
-					'<div class="pk_mt_marker"></div>' +
-				'</div>';
+            el = d.createElement ('div');
+            el.className = 'pk_mt pk_noselect';
+            // Создаём сообщение для пустого мультитрекового редактора в зависимости от языка
+            var _lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+            var emptyMsg;
+            if (_lang === 'ru') {
+                emptyMsg = 'Перетащите аудиофайлы в это окно или нажмите ' +
+                    '<a style="white-space:nowrap;border:1px solid;border-radius:23px;padding:5px 18px;font-size:0.94em;margin-left:5px">здесь, чтобы использовать пример</a>';
+            } else {
+                emptyMsg = 'Drag and Drop Audio Files in this window, or click ' +
+                    '<a style="white-space:nowrap;border:1px solid;border-radius:23px;padding:5px 18px;font-size:0.94em;margin-left:5px">here to use a sample</a>';
+            }
+            el.innerHTML =
+                '<div class="pk_mt_side">' +
+                    '<div class="pk_mt_head"></div>' +
+                    '<div class="pk_mt_tracks_wrap"><div class="pk_mt_tracks"></div></div>' +
+                '</div>' +
+                '<div class="pk_mt_main">' +
+                    '<div class="pk_mt_ruler"></div>' +
+                    '<div class="pk_mt_lanes"></div>' +
+                    '<div class="pk_tmpMsg pk_mt_empty">' + emptyMsg + '</div>' +
+                    '<div class="pk_mt_region wavesurfer-region"></div>' +
+                    '<div class="pk_mt_playhead"></div>' +
+                    '<div class="pk_mt_marker"></div>' +
+                '</div>';
 
 			app.el.insertBefore ( el, footer );
 
@@ -672,7 +718,9 @@
 			var label = d.createElement ('span');
 			var add = makeButton ('+', 'Add Channel', false, 'pk_mt_add');
 
-			label.textContent = 'Channels';
+            // Локализация названия секции
+            var _lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+            label.textContent = (_lang === 'en') ? 'Channels' : 'Каналы';
 			btn_clear_mute = makeButton ('M', 'Clear Mute', false, 'pk_mt_clear pk_mt_mute pk_inact');
 			btn_clear_solo = makeButton ('S', 'Clear Solo', false, 'pk_mt_clear pk_mt_solo pk_inact');
 
@@ -694,12 +742,14 @@
 
 		function addTrack ( index ) {
 			var prev = cloneState ();
-			var tr = makeTrack ();
-			tr.name = 'Channel ' + (tracks.length + 1);
+            var tr = makeTrack ();
+            var _lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+            tr.name = (_lang === 'en' ? 'Channel ' : 'Канал ') + (tracks.length + 1);
 			if (index === undefined) tracks.push ( tr );
 			else tracks.splice ( Math.max (0, Math.min (index, tracks.length)), 0, tr );
 			selected_track = tr.id;
-			pushState ( prev, 'Add Channel' );
+            // Добавляем в историю действия локализованное название
+            pushState ( prev, (_lang === 'en') ? 'Add Channel' : 'Добавить канал' );
 			render ();
 			scrollTrackIntoView ( tr.id );
 			app.fireEvent ('DidUpdateMultitrack');
@@ -712,7 +762,9 @@
 			btn_toggle = d.createElement ('button');
 			btn_toggle.setAttribute ('tabIndex', -1);
 			btn_toggle.className = 'pk_mt_topbtn';
-			btn_toggle.innerHTML = 'MultiTrack<em>Beta</em>';
+		// Локализация названия кнопки мультидорожки
+		var _lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+		btn_toggle.innerHTML = (_lang === 'en' ? 'MultiTrack<em>Beta</em>' : 'Мультитрек<em>Бета</em>');
 			btn_toggle.onclick = function () {
 				Toggle ();
 				this.blur ();
@@ -728,19 +780,23 @@
 
 			beat_bar = d.createElement ('div');
 			beat_bar.className = 'pk_mtbeat';
-			btn_beat = makeButton ('BEAT', 'Toggle Beat Markers', beat_on, 'pk_btn pk_mtbeat_btn');
-			btn_snap = makeButton ('SNAP', 'Snap to Beat Markers', false, 'pk_btn pk_mtbeat_btn pk_mtbeat_snap');
-			btn_sig = makeButton (beat_sig, 'Time Signature', false, 'pk_btn pk_mtbeat_sig');
-			bpm_input = d.createElement ('input');
-			var lbl = d.createElement ('b');
-
-			bpm_input.className = 'pk_mtbeat_bpm pk_bpm';
-			bpm_input.type = 'text';
-			bpm_input.inputMode = 'numeric';
-			bpm_input.pattern = '[0-9]*';
-			bpm_input.title = 'BPM';
-			bpm_input.value = beat_bpm;
-			lbl.textContent = 'BPM';
+		// Локализация подписи элементов панели ритма
+		var _lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+		var beatLabel = _lang === 'en' ? 'BEAT' : 'БИТ';
+		var snapLabel = _lang === 'en' ? 'SNAP' : 'СНАП';
+		var bpmTitle  = _lang === 'en' ? 'BPM'  : 'БПМ';
+		btn_beat = makeButton (beatLabel, 'Toggle Beat Markers', beat_on, 'pk_btn pk_mtbeat_btn');
+		btn_snap = makeButton (snapLabel, 'Snap to Beat Markers', false, 'pk_btn pk_mtbeat_btn pk_mtbeat_snap');
+		btn_sig = makeButton (beat_sig, 'Time Signature', false, 'pk_btn pk_mtbeat_sig');
+		bpm_input = d.createElement ('input');
+		var lbl = d.createElement ('b');
+		bpm_input.className = 'pk_mtbeat_bpm pk_bpm';
+		bpm_input.type = 'text';
+		bpm_input.inputMode = 'numeric';
+		bpm_input.pattern = '[0-9]*';
+		bpm_input.title = bpmTitle;
+		bpm_input.value = beat_bpm;
+		lbl.textContent = bpmTitle;
 
 			btn_beat.onclick = function ( e ) {
 				e.stopPropagation ();
@@ -915,9 +971,28 @@
 			b.type = 'button';
 			b.tabIndex = -1;
 			b.className = (cls || '') + (active ? ' pk_act' : '');
-			b.appendChild ( d.createTextNode ( text ) );
-			addTip ( b, title );
-			return b;
+            b.appendChild ( d.createTextNode ( text ) );
+            // Переводим подсказку для кнопки, если выбран русский язык
+            var translated = title;
+            try {
+                var lang = (window && window.localStorage && window.localStorage.getItem('lang')) || 'ru';
+                if (lang !== 'en') {
+                    var tmap = {
+                        'Add Channel': 'Добавить канал',
+                        'Clear Mute': 'Очистить беззвучие',
+                        'Clear Solo': 'Очистить соло',
+                        'Toggle Beat Markers': 'Переключить маркеры бита',
+                        'Snap to Beat Markers': 'Привязка к маркерам бита',
+                        'Time Signature': 'Размер',
+                        'Mute': 'Беззвучие',
+                        'Solo': 'Соло',
+                        'Rec Trigger': 'Триггер записи'
+                    };
+                    if (tmap[title]) translated = tmap[title];
+                }
+            } catch (e) {}
+            addTip ( b, translated );
+            return b;
 		}
 
 		function addRegionHandles () {
