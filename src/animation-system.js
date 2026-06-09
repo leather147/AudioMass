@@ -11,6 +11,7 @@
 		ui:true,
 		surfaces:true,
 		drag:true,
+		numberFlow:true,
 		ease:'cubic-bezier(.2,.8,.2,1)',
 		pop:'cubic-bezier(.16,1,.3,1)'
 	};
@@ -47,6 +48,7 @@
 		root.classList.toggle('pk_anim_ui', !!settings.ui);
 		root.classList.toggle('pk_anim_surfaces', !!settings.surfaces);
 		root.classList.toggle('pk_anim_drag', !!settings.drag);
+		root.classList.toggle('pk_nf_off', !settings.numberFlow);
 		root.style.setProperty('--anim-speed', settings.speed);
 		root.style.setProperty('--anim-distance', (settings.distance || 8) + 'px');
 		root.style.setProperty('--anim-ease', settings.ease || defaults.ease);
@@ -161,6 +163,9 @@
 		})));
 		pop.appendChild(row('Перетаскивание', 'Клипы, маркеры и перемещения', sw(settings.drag, function (v) {
 			settings.drag = v; saveApply();
+		})));
+		pop.appendChild(row('Number Flow', 'Плавное перетекание цифр в динамическом тексте', sw(settings.numberFlow, function (v) {
+			settings.numberFlow = v; saveApply();
 		})));
 
 		var actions = d.createElement('div');
