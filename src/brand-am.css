@@ -1,0 +1,11 @@
+/* Visible brand rename: AudioMass -> AM. */
+
+.pk_hdr:before{
+	content:'AM'!important;
+}
+
+@media (max-width:420px){
+	.pk_hdr:before{
+		content:'AM'!important;
+	}
+}
