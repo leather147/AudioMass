@@ -158,9 +158,10 @@
 	}
 }
 
-/* Marker labels are hover-only, including active markers. */
+/* Marker labels: hover on desktop, tap-near-marker on touch devices. */
 .pk_mrkr b,
-.pk_mrkr.pk_act b{
+.pk_mrkr.pk_act b,
+.pk_mrkr.pk_touch_label b{
 	display:none!important;
 	opacity:0;
 	transform:translateY(2px) scale(.985);
@@ -168,7 +169,8 @@
 }
 
 .pk_mrkr:hover b,
-.pk_mrkr:focus-visible b{
+.pk_mrkr:focus-visible b,
+.pk_mrkr.pk_touch_label b{
 	display:block!important;
 	opacity:1;
 	transform:translateY(0) scale(1);
@@ -179,6 +181,12 @@
 	.pk_mrkr.pk_act b{
 		display:none!important;
 		opacity:0;
+	}
+
+	.pk_mrkr.pk_touch_label b{
+		display:block!important;
+		opacity:1;
+		transform:translateY(0) scale(1);
 	}
 }
 
