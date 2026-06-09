@@ -48,8 +48,6 @@ label[for],
 .pk_mt_resize,
 .pk_mt_clip,
 .pk_clip,
-.pk_mt_trim,
-.pk_mt_fade,
 .pk_mt_region,
 .pk_mt_region .wavesurfer-handle,
 .pk_mt_lane,
@@ -69,6 +67,24 @@ label[for],
 .pk_tb .pk_btn,
 .pk_zoombtn .pk_btn{
 	cursor:pointer!important;
+}
+
+/* Clip edge/fade handles behave like horizontal window resize handles. */
+.pk_mt_trim,
+.pk_mt_trim *,
+.pk_mt_fade,
+.pk_mt_fade *,
+.pk_mt_clip .pk_mt_trim,
+.pk_mt_clip .pk_mt_fade,
+.pk_clip .pk_mt_trim,
+.pk_clip .pk_mt_fade{
+	cursor:ew-resize!important;
+}
+
+/* Track height resize keeps the vertical resize cursor. */
+.pk_mt_resize,
+.pk_mt_resize *{
+	cursor:ns-resize!important;
 }
 
 /* Text-editing surfaces keep text cursor. */
