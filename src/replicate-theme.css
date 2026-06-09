@@ -1,0 +1,587 @@
+/* =============================================================
+   Replicate-inspired theme for AudioMass
+   Minimal, editorial, high-contrast, monochrome UI.
+   No Replicate assets or trademarks are used.
+   ============================================================= */
+
+:root{
+	--bg-0:#ffffff;
+	--bg-1:#fafafa;
+	--bg-2:#ffffff;
+	--bg-3:#f4f4f4;
+	--bg-4:#ececec;
+
+	--fg-0:#111111;
+	--fg-1:#555555;
+	--fg-2:#767676;
+	--fg-3:#b7b7b7;
+
+	--ac:#111111;
+	--ac-2:#555555;
+	--ac-soft:rgba(0,0,0,.045);
+	--ac-glow:rgba(0,0,0,0);
+	--ac-ink:#ffffff;
+
+	--rec:#d92d20;
+	--rec-glow:rgba(217,45,32,.16);
+	--solo:#111111;
+	--solo-glow:rgba(0,0,0,.08);
+	--warn:#8a5a00;
+	--ok:#0f7b3f;
+	--pl:#111111;
+
+	--bd:rgba(0,0,0,.12);
+	--bd-s:rgba(0,0,0,.08);
+	--bd-h:rgba(0,0,0,.28);
+
+	--r:0px;
+	--r-md:6px;
+	--r-lg:10px;
+
+	--glow:none;
+	--inset-hi:none;
+}
+
+html,body{
+	background:#fff!important;
+	color:var(--fg-0)!important;
+}
+
+body{
+	letter-spacing:-.01em;
+}
+
+::selection{
+	background:#111;
+	color:#fff;
+}
+
+/* ---------- App shell ---------- */
+.pk_app{
+	background:#fff;
+}
+
+.pk_hdr{
+	height:38px;
+	padding:0 12px;
+	background:#fff;
+	border-bottom:1px solid #dedede;
+	box-shadow:none;
+}
+
+.pk_hdr:before{
+	content:'AudioMass';
+	display:flex;
+	align-items:center;
+	height:100%;
+	margin-right:22px;
+	font-family:var(--ff-heading);
+	font-size:14px;
+	font-weight:650;
+	letter-spacing:-.03em;
+	color:#111;
+}
+
+.pk_hdr .pk_btn{
+	margin:0 4px;
+	min-width:0;
+	border-radius:6px;
+	color:#111;
+}
+
+.pk_hdr .pk_btn>button,
+.pk_hdr .pk_btn button{
+	padding:6px 9px;
+	font-family:var(--ff-mono);
+	font-size:12px;
+	letter-spacing:-.02em;
+	border-radius:6px;
+	color:#111;
+}
+
+.pk_hdr .pk_btn:hover,
+.pk_hdr .pk_btn:hover>button{
+	background:#f4f4f4;
+	color:#111;
+	text-shadow:none;
+}
+
+.pk_hdr .pk_btn.pk_act,
+.pk_hdr .pk_btn.pk_act>button{
+	background:#111;
+	color:#fff;
+	box-shadow:none;
+}
+
+.pk_hdr .pk_btn .pk_menu{
+	top:34px;
+	left:0;
+	min-width:224px;
+	padding:6px;
+	background:#fff;
+	border:1px solid #d9d9d9;
+	border-radius:8px;
+	box-shadow:0 12px 32px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.06);
+}
+
+.pk_hdr .pk_btn .pk_menu_el button{
+	padding:8px 10px;
+	border-radius:6px;
+	font-size:12px;
+	line-height:1.25;
+	color:#111;
+}
+
+.pk_hdr .pk_btn .pk_menu_el:hover button,
+.pk_hdr .pk_btn .pk_menu_el .pk_act{
+	background:#f2f2f2;
+	color:#111;
+}
+
+.pk_hdr .pk_btn .pk_shrtct{
+	color:#8a8a8a;
+	font-size:11px;
+}
+
+/* ---------- Toolbar ---------- */
+.pk_tbc,
+.pk_mt_on .pk_tbc{
+	background:#fff;
+	border-bottom:1px solid #dedede;
+}
+
+.pk_tb{
+	min-height:50px;
+	height:50px;
+	padding:8px 0 8px 12px;
+	background:#fff;
+	border-bottom:0;
+	box-shadow:none;
+}
+
+.pk_btngroup,
+.pk_transport,
+.pk_ctns,
+.pk_selection{
+	background:transparent!important;
+}
+
+.pk_tb .pk_btn,
+.pk_ftr .pk_btn,
+.pk_zoombtn .pk_btn,
+.pk_transport .pk_btn,
+.pk_modal_a_bottom,
+.pk_prc button{
+	background:#fff!important;
+	color:#111!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:7px!important;
+	box-shadow:none!important;
+	text-shadow:none!important;
+	transition:background 120ms ease,border-color 120ms ease,color 120ms ease,transform 120ms ease;
+}
+
+.pk_tb .pk_btn:hover,
+.pk_ftr .pk_btn:hover,
+.pk_zoombtn .pk_btn:hover,
+.pk_transport .pk_btn:hover,
+.pk_modal_a_bottom:hover,
+.pk_prc button:hover{
+	background:#f4f4f4!important;
+	border-color:#bcbcbc!important;
+	color:#111!important;
+	transform:none!important;
+}
+
+.pk_tb .pk_btn.pk_act,
+.pk_ftr .pk_btn.pk_act,
+.pk_transport .pk_btn.pk_act,
+.pk_modal_a_accpt{
+	background:#111!important;
+	border-color:#111!important;
+	color:#fff!important;
+}
+
+.pk_inact,
+.pk_app .pk_inact,
+.pk_btn.pk_inact{
+	opacity:.42;
+	filter:grayscale(1);
+}
+
+.pk_tb .pk_btn span,
+.pk_ftr .pk_btn span,
+.pk_zoom_in_h span,
+.pk_zoom_out_h span,
+.pk_zoom_reset span,
+.pk_zoom_in_v span,
+.pk_zoom_out_v span{
+	background:#111!important;
+	color:#fff!important;
+	border:1px solid #111!important;
+	border-radius:7px!important;
+	box-shadow:none!important;
+	font-family:var(--ff-mono)!important;
+	font-size:11px!important;
+	letter-spacing:-.02em;
+}
+
+.pk_tbhint{
+	background:#111;
+	color:#fff;
+	box-shadow:none;
+}
+
+/* ---------- Time display ---------- */
+.pk_timecontainer{
+	width:236px;
+	height:46px;
+	margin-right:12px;
+	background:#050505;
+	border:1px solid #111;
+	border-radius:8px;
+	box-shadow:none;
+	color:#fff;
+}
+
+.pk_timing{
+	font-family:var(--ff-mono)!important;
+	font-weight:500;
+	letter-spacing:-.05em;
+	color:#fff;
+}
+
+.pk_total_dur,
+.pk_hover_dur{
+	font-family:var(--ff-mono)!important;
+	font-size:12px;
+	letter-spacing:-.025em;
+	color:#9ee8ff;
+}
+
+.pk_hover_dur{
+	color:#d8d8d8;
+}
+
+/* ---------- Waveform and workspace ---------- */
+.pk_av_cont,
+.pk_av,
+.pk_ftr{
+	background:#fff!important;
+}
+
+.pk_av_cont{
+	border-bottom:1px solid #dedede;
+}
+
+.pk_av{
+	background:
+		linear-gradient(#f3f3f3 1px,transparent 1px),
+		linear-gradient(90deg,#f3f3f3 1px,transparent 1px),
+		#fff!important;
+	background-size:24px 24px,24px 24px,auto!important;
+}
+
+wave,
+wave wave,
+#waveform,
+.pk_waveform{
+	background:transparent!important;
+}
+
+.pk_ftr{
+	border-top:1px solid #dedede;
+	box-shadow:none;
+}
+
+.pk_wavescroll{
+	background:#f7f7f7!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:8px!important;
+	box-shadow:none!important;
+}
+
+.pk_wavedrag{
+	background:rgba(0,0,0,.08)!important;
+	border:1px solid rgba(0,0,0,.18)!important;
+	border-radius:6px!important;
+	box-shadow:none!important;
+}
+
+.pk_wavedrag_l,
+.pk_wavedrag_r,
+.pk_wavepoint{
+	background:#111!important;
+	box-shadow:none!important;
+}
+
+.pk_panner,
+.pk_pan_left,
+.pk_pan_right{
+	background:transparent!important;
+}
+
+.pk_pan_btn{
+	background:#fff!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:7px!important;
+	color:#111!important;
+	box-shadow:none!important;
+}
+
+.pk_pan_btn:hover{
+	background:#f4f4f4!important;
+}
+
+.pk_pan_btn strong{
+	font-family:var(--ff-heading);
+	font-weight:650;
+}
+
+/* ---------- Modals ---------- */
+.pk_modal_back{
+	background:rgba(255,255,255,.74)!important;
+	backdrop-filter:blur(8px);
+	-webkit-backdrop-filter:blur(8px);
+}
+
+.pk_modal{
+	background:#fff!important;
+	border:1px solid #d6d6d6!important;
+	border-radius:12px!important;
+	box-shadow:0 24px 80px rgba(0,0,0,.14),0 4px 14px rgba(0,0,0,.08)!important;
+	color:#111!important;
+	overflow:hidden;
+}
+
+.pk_modal_title{
+	min-height:44px;
+	padding:0 16px!important;
+	background:#fff!important;
+	border-bottom:1px solid #e3e3e3!important;
+	color:#111!important;
+	font-family:var(--ff-heading)!important;
+	font-size:15px!important;
+	font-weight:650;
+	letter-spacing:-.03em;
+	text-shadow:none!important;
+}
+
+.pk_modal_title span,
+.pk_modal_title font{
+	font-family:var(--ff-heading)!important;
+	font-size:15px!important;
+	font-weight:650;
+	color:#111!important;
+}
+
+.pk_modal_main{
+	background:#fff!important;
+	color:#222!important;
+}
+
+.pk_modal_bottom{
+	background:#fafafa!important;
+	border-top:1px solid #e3e3e3!important;
+}
+
+.pk_modal_a_top{
+	background:#fff!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:7px!important;
+	color:#111!important;
+	box-shadow:none!important;
+}
+
+.pk_modal_a_top:hover,
+.pk_modal_a_top.pk_act{
+	background:#111!important;
+	border-color:#111!important;
+	color:#fff!important;
+}
+
+.pk_row{
+	border-color:#e8e8e8!important;
+	color:#222!important;
+}
+
+.pk_row label,
+.pk_modal label{
+	color:#555!important;
+	font-family:var(--ff-mono)!important;
+	font-size:12px;
+}
+
+.pk_txt,
+.pk_modal input[type='text'],
+.pk_modal input[type='number'],
+.pk_modal select,
+.pk_modal textarea,
+.pk_mtbeat_bpm{
+	background:#fff!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:7px!important;
+	color:#111!important;
+	box-shadow:none!important;
+	font-family:var(--ff-mono)!important;
+}
+
+.pk_txt:focus,
+.pk_modal input:focus,
+.pk_modal select:focus,
+.pk_modal textarea:focus{
+	border-color:#111!important;
+	outline:2px solid rgba(0,0,0,.08)!important;
+}
+
+.pk_val{
+	background:#f5f5f5!important;
+	border:1px solid #e0e0e0!important;
+	border-radius:7px!important;
+	color:#111!important;
+	font-family:var(--ff-mono)!important;
+}
+
+.pk_horiz,
+input[type='range']{
+	accent-color:#111;
+}
+
+.pk_check{
+	accent-color:#111;
+}
+
+/* ---------- Context menus / popovers ---------- */
+.pk_contextMenu,
+.pk_ctx,
+.pk_pgeq_freq{
+	background:#fff!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:8px!important;
+	box-shadow:0 12px 32px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.06)!important;
+	color:#111!important;
+}
+
+.pk_contextMenu div,
+.pk_ctx div,
+.pk_pgeq_freq div{
+	color:#111!important;
+}
+
+.pk_contextMenu div:hover,
+.pk_ctx div:hover{
+	background:#f3f3f3!important;
+	color:#111!important;
+}
+
+.pk_tmpMsg{
+	color:#111!important;
+	text-shadow:none!important;
+	font-family:var(--ff-heading)!important;
+	font-weight:650;
+}
+
+.pk_tmpMsg2{
+	background:rgba(255,255,255,.8)!important;
+	color:#111!important;
+}
+
+.pk_mload{
+	background:#efefef!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:999px!important;
+}
+
+.pk_mload>div:before{
+	background:#111!important;
+	box-shadow:none!important;
+}
+
+/* ---------- Multitrack ---------- */
+.pk_mt,
+.pk_mt_root,
+.pk_mt_timeline,
+.pk_mt_tracks,
+.pk_mt_track,
+.pk_mt_track_head,
+.pk_mt_mixer,
+.pk_mt_channel,
+.pk_dck{
+	background:#fff!important;
+	color:#111!important;
+	border-color:#dedede!important;
+	box-shadow:none!important;
+}
+
+.pk_mt_track,
+.pk_mt_channel{
+	border:1px solid #dedede!important;
+	border-radius:8px!important;
+	margin-bottom:8px;
+}
+
+.pk_mt_clip,
+.pk_clip{
+	background:#f4f4f4!important;
+	border:1px solid #cfcfcf!important;
+	border-radius:7px!important;
+	color:#111!important;
+	box-shadow:none!important;
+}
+
+.pk_mt_clip.pk_act,
+.pk_clip.pk_act{
+	border-color:#111!important;
+	box-shadow:0 0 0 2px rgba(0,0,0,.08)!important;
+}
+
+.pk_mt_btn,
+.pk_mt_track button,
+.pk_mt_channel button{
+	background:#fff!important;
+	border:1px solid #d8d8d8!important;
+	border-radius:7px!important;
+	color:#111!important;
+	box-shadow:none!important;
+}
+
+.pk_mt_btn:hover,
+.pk_mt_track button:hover,
+.pk_mt_channel button:hover{
+	background:#f4f4f4!important;
+}
+
+.pk_mt_btn.pk_act,
+.pk_mt_track button.pk_act,
+.pk_mt_channel button.pk_act{
+	background:#111!important;
+	border-color:#111!important;
+	color:#fff!important;
+}
+
+/* ---------- Links and status ---------- */
+a{
+	color:#111!important;
+	text-decoration:underline;
+	text-decoration-thickness:1px;
+	text-underline-offset:3px;
+}
+
+a:hover{
+	color:#555!important;
+	text-shadow:none!important;
+}
+
+.pk_dis{
+	color:#aaa!important;
+}
+
+.pk_act{
+	text-shadow:none!important;
+}
+
+/* Preserve icon font glyphs */
+[class^='icon-']:before,
+[class*=' icon-']:before{
+	font-family:'icomoon'!important;
+}
