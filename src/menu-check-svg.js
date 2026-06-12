@@ -64,7 +64,9 @@
 	}
 
 	function replaceCheckmark (btn) {
-		if (!btn || !btn.textContent || !CHECK_RE.test (btn.textContent)) return ;
+		if (!btn || !btn.textContent) return ;
+		CHECK_RE.lastIndex = 0;
+		if (!CHECK_RE.test (btn.textContent)) return ;
 		CHECK_RE.lastIndex = 0;
 		stripTextCheckmarks (btn);
 		if (!btn.querySelector ('.pk_menu_check_svg')) {
