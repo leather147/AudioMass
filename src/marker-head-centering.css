@@ -1,0 +1,70 @@
+/* Final alignment pass for timeline marker heads.
+   The marker/playhead line itself is 2px wide, so its visual center is +1px
+   from the element origin. Center the circles and triangles on that centerline. */
+
+.pk_mt_playhead,
+.pk_mt_marker{
+	--marker-line-width:2px;
+	--marker-line-center:calc(var(--marker-line-width) / 2);
+}
+
+/* Playhead cursor head: circle centered on the vertical cursor line. */
+.pk_mt_playhead:before,
+.pk_mt_on .pk_mt_playhead:before{
+	left:var(--marker-line-center)!important;
+	transform:translateX(-50%)!important;
+	width:11px!important;
+	height:11px!important;
+	box-sizing:border-box!important;
+}
+
+/* Single timeline marker head: circle centered on the dashed marker line. */
+.pk_mt_marker:before,
+.pk_mt_on .pk_mt_marker:before{
+	left:var(--marker-line-center)!important;
+	transform:translateX(-50%)!important;
+	width:11px!important;
+	height:11px!important;
+	box-sizing:border-box!important;
+}
+
+/* Named markers from markers.js: keep the vertical line centered at x + 1px. */
+.pk_mt_ruler .pk_mrkr:after,
+.pk_mt_main .pk_mrkr:after,
+.pk_mt_on .pk_mt_ruler .pk_mrkr:after,
+.pk_mt_on .pk_mt_main .pk_mrkr:after{
+	left:0!important;
+	width:2px!important;
+	transform:none!important;
+}
+
+/* Triangle marker head: its zero-width box must sit exactly on the centerline. */
+.pk_mt_ruler .pk_mrkr:before,
+.pk_mt_main .pk_mrkr:before,
+.pk_mt_on .pk_mt_ruler .pk_mrkr:before,
+.pk_mt_on .pk_mt_main .pk_mrkr:before{
+	left:1px!important;
+	transform:translateX(-50%)!important;
+	border-left-width:6px!important;
+	border-right-width:6px!important;
+	border-top-width:9px!important;
+}
+
+/* Marker label should also be centered on the same vertical line. */
+.pk_mt_ruler .pk_mrkr b,
+.pk_mt_main .pk_mrkr b,
+.pk_mt_on .pk_mt_ruler .pk_mrkr b,
+.pk_mt_on .pk_mt_main .pk_mrkr b{
+	left:1px!important;
+	transform:translateX(-50%)!important;
+	text-align:center!important;
+	white-space:nowrap!important;
+}
+
+/* Editor-level marker/cursor fallback, for non-multitrack views. */
+.pk_wave_cursor:before,
+.pk_wavepoint:before,
+.pk_mark1:before{
+	left:50%!important;
+	transform:translateX(-50%)!important;
+}
