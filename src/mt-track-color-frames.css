@@ -49,3 +49,102 @@
 .pk_mt_clip.pk_mt_clip_muted span{
 	filter:saturate(.65);
 }
+
+/* Final marker + lower scrollbar overrides. This file is loaded before several
+   other theme layers, so selectors below intentionally use higher specificity
+   and !important to win over later marker/scrollbar fixes. */
+.pk_app.pk_mt_on .pk_mt_region{
+	z-index:8450!important;
+	background:rgba(67,228,220,.135)!important;
+	border-left:1px solid rgba(142,241,236,.72)!important;
+	border-right:1px solid rgba(142,241,236,.72)!important;
+	box-shadow:inset 0 0 0 1px rgba(142,241,236,.18),0 0 32px rgba(67,228,220,.08)!important;
+	mix-blend-mode:normal!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_playhead{
+	z-index:8500!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_marker,
+.pk_app.pk_mt_on .pk_mt_ruler .pk_mrkrl,
+.pk_app.pk_mt_on .pk_mt_main .pk_mrkrl,
+.pk_app.pk_mt_on .pk_mt_ruler .pk_mrkr,
+.pk_app.pk_mt_on .pk_mt_main .pk_mrkr{
+	z-index:8320!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_marker{
+	--marker-color:#f59e0b;
+	border-left:2px dashed var(--marker-color)!important;
+	box-shadow:0 0 14px color-mix(in srgb,var(--marker-color) 54%,transparent)!important;
+	filter:drop-shadow(0 0 7px color-mix(in srgb,var(--marker-color) 65%,transparent))!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_marker:before{
+	background:var(--marker-color)!important;
+	box-shadow:0 0 20px color-mix(in srgb,var(--marker-color) 72%,transparent)!important;
+}
+
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 1){color:#9dff6a!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 2){color:#5af2ff!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 3){color:#f557d2!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 4){color:#ffd15c!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 5){color:#ff8c35!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 6){color:#b9c6ff!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 7){color:#ff6b8a!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 8){color:#7cffb2!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 9){color:#c084fc!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 10){color:#fb7185!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 11){color:#38bdf8!important}
+
+.pk_app.pk_mt_on .pk_mrkr:after{
+	background:currentColor!important;
+	opacity:.88!important;
+	box-shadow:0 0 10px currentColor!important;
+}
+
+.pk_app.pk_mt_on .pk_mrkr:before{
+	border-top-color:currentColor!important;
+	filter:drop-shadow(0 0 7px currentColor)!important;
+}
+
+.pk_app.pk_mt_on .pk_mrkr b{
+	border-color:currentColor!important;
+	box-shadow:0 10px 24px rgba(0,0,0,.38),0 0 13px currentColor!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main{
+	overflow-x:scroll!important;
+	overflow-y:auto!important;
+	scrollbar-gutter:stable both-edges!important;
+	scrollbar-width:thin!important;
+	scrollbar-color:rgba(142,241,236,.55) rgba(255,255,255,.055)!important;
+	padding-bottom:20px!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar{
+	width:13px!important;
+	height:15px!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-track{
+	background:rgba(255,255,255,.045)!important;
+	border-top:1px solid rgba(255,255,255,.09)!important;
+	border-radius:999px!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb{
+	background:linear-gradient(90deg,rgba(67,228,220,.72),rgba(142,241,236,.52))!important;
+	border:4px solid rgba(7,9,11,.94)!important;
+	border-radius:999px!important;
+	box-shadow:0 0 18px rgba(67,228,220,.18)!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb:hover{
+	background:linear-gradient(90deg,#43e4dc,#8ef1ec)!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-corner{
+	background:#07090b!important;
+}
