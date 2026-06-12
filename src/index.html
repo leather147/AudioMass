@@ -77,6 +77,7 @@
 	<script>
 		(function () {
 			var geistMono = '"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace';
+			if (!window.CanvasRenderingContext2D || !CanvasRenderingContext2D.prototype) return;
 			var fontDescriptor = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'font');
 
 			if (!fontDescriptor || !fontDescriptor.get || !fontDescriptor.set) return;
@@ -121,7 +122,16 @@
 	<script src="fx-auto.js"></script>
 	<script src="local.js"></script>
 	<script src="id3.js"></script>
+	<script src="lzma.js"></script>
 	<script src="amss-format.js"></script>
 	<script src="multitrack.js"></script>
+	<script>
+		var editor = PKAudioEditor.init('app');
+		if ('serviceWorker' in navigator) {
+			try {
+				// navigator.serviceWorker.register('sw.js');
+			} catch (error) {}
+		}
+	</script>
 </body>
 </html>
