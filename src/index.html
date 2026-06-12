@@ -28,6 +28,7 @@
 	<meta name="twitter:description" content="AM is a free full-featured web-based audio &amp; waveform editing tool">
 	<meta name="twitter:image" content="https://audiomass.co/icon.jpg">
 
+
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -49,6 +50,7 @@
 	<link rel="stylesheet" type="text/css" href="timeline-extra-scroll.css">
 	<link rel="stylesheet" type="text/css" href="toolbar-fluid-fix.css">
 	<link rel="stylesheet" type="text/css" href="selection-panel-final-fix.css">
+	<link rel="stylesheet" type="text/css" href="marker-head-centering.css">
 	<style>
 		:root{
 			--ff:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
@@ -77,23 +79,21 @@
 			var fontDescriptor = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'font');
 
 			if (!fontDescriptor || !fontDescriptor.get || !fontDescriptor.set) return;
-
 			Object.defineProperty(CanvasRenderingContext2D.prototype, 'font', {
-				get:function () {
-					return fontDescriptor.get.call(this);
-				},
-				set:function (value) {
-					if (typeof value === 'string' && value.indexOf('29px Helvetica') !== -1) {
-						value = '28px ' + geistMono;
+				get: fontDescriptor.get,
+				set: function (value) {
+					if (typeof value === 'string') {
+						value = value
+							.replace(/Arial\s*,\s*sans-serif/gi, geistMono)
+							.replace(/Arial/gi, geistMono)
+							.replace(/sans-serif/gi, geistMono)
+							.replace(/monospace/gi, geistMono);
 					}
-					return fontDescriptor.set.call(this, value);
+					fontDescriptor.set.call(this, value);
 				}
 			});
 		})();
 	</script>
-	<script src="animation-system.js"></script>
-	<script src="i18n-ru.js"></script>
-	<script src="i18n-ru-extra.js"></script>
 </head>
 <body>
 	<div id="app"></div>
@@ -115,38 +115,12 @@
 	<script src="actions.js"></script>
 	<script src="drag.js"></script>
 	<script src="recorder.js"></script>
-
 	<script src="welcome.js"></script>
 	<script src="fx-pg-eq.js"></script>
 	<script src="fx-auto.js"></script>
 	<script src="local.js"></script>
 	<script src="id3.js"></script>
-	<script src="lzma.js"></script>
 	<script src="amss-format.js"></script>
 	<script src="multitrack.js"></script>
-	<script src="mt-infinite-grid.js"></script>
-	<script src="ui-bugfixes.js"></script>
-	<script src="tooltip-layer.js"></script>
-	<script src="mt-add-channel-bottom.js"></script>
-	<script src="floating-safe-placement.js"></script>
-	<script src="menu-dialog-chain.js"></script>
-	<script src="timeline-extra-scroll.js"></script>
-	<script>
-		function initAudioMass () {
-			var editor = PKAudioEditor.init ('app');
-			if ('serviceWorker' in navigator) {
-				try {
-				//	navigator.serviceWorker.register( 'sw.js' );
-				} catch ( error ) {}
-			}
-		}
-
-		if (document.fonts && document.fonts.load) {
-			document.fonts.load('28px "Geist Mono"').then(initAudioMass, initAudioMass);
-		}
-		else {
-			initAudioMass ();
-		}
-	</script>
 </body>
 </html>
