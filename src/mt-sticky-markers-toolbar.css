@@ -1,0 +1,218 @@
+/* Multitrack marker visibility + floating controls/ruler.
+   This file is loaded last and intentionally overrides earlier theme layers. */
+
+:root{
+	--mt-floating-z:7800;
+	--mt-ruler-z:7600;
+	--mt-marker-z:8200;
+	--mt-playhead:#5af2ff;
+	--mt-marker:#ffd15c;
+}
+
+/* ---------- Floating top controls ---------- */
+.pk_mt_on .pk_hdr{
+	position:sticky!important;
+	top:0!important;
+	z-index:calc(var(--mt-floating-z) + 20)!important;
+	background:rgba(8,10,12,.86)!important;
+	backdrop-filter:blur(18px) saturate(1.25)!important;
+	-webkit-backdrop-filter:blur(18px) saturate(1.25)!important;
+	border-bottom:1px solid rgba(255,255,255,.085)!important;
+	box-shadow:0 10px 34px rgba(0,0,0,.32)!important;
+}
+
+.pk_mt_on .pk_tbc{
+	position:sticky!important;
+	top:26px!important;
+	z-index:var(--mt-floating-z)!important;
+	background:transparent!important;
+	overflow-x:auto!important;
+	overflow-y:visible!important;
+	backdrop-filter:blur(16px) saturate(1.18)!important;
+	-webkit-backdrop-filter:blur(16px) saturate(1.18)!important;
+	box-shadow:0 14px 44px rgba(0,0,0,.26)!important;
+}
+
+.pk_mt_on .pk_tb{
+	position:relative!important;
+	z-index:calc(var(--mt-floating-z) + 1)!important;
+	background:rgba(9,10,12,.80)!important;
+	border:1px solid rgba(255,255,255,.08)!important;
+	border-left:0!important;
+	border-right:0!important;
+	box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 16px 40px rgba(0,0,0,.24)!important;
+}
+
+/* Leave enough visual air below the floating toolbar. */
+.pk_mt_on .pk_mt{
+	position:relative!important;
+}
+
+/* ---------- Floating / sticky time ruler above multitrack ---------- */
+.pk_mt_on .pk_mt_main{
+	position:relative!important;
+	overflow:auto!important;
+	isolation:isolate!important;
+}
+
+.pk_mt_on .pk_mt_ruler{
+	position:sticky!important;
+	top:0!important;
+	left:0!important;
+	right:auto!important;
+	z-index:var(--mt-ruler-z)!important;
+	height:26px!important;
+	min-height:26px!important;
+	overflow:visible!important;
+	background:rgba(8,10,12,.84)!important;
+	backdrop-filter:blur(14px) saturate(1.16)!important;
+	-webkit-backdrop-filter:blur(14px) saturate(1.16)!important;
+	border-bottom:1px solid rgba(255,255,255,.10)!important;
+	box-shadow:0 16px 36px rgba(0,0,0,.28)!important;
+}
+
+/* Timeline tick labels remain readable while the ruler floats. */
+.pk_mt_on .pk_mt_ruler canvas,
+.pk_mt_on .pk_mt_ruler .pk_markers,
+.pk_mt_on .pk_mt_ruler .pk_mark1{
+	position:relative!important;
+	z-index:calc(var(--mt-ruler-z) + 1)!important;
+}
+
+/* ---------- Restore marker visibility ---------- */
+.pk_mt_on .pk_mt_playhead,
+.pk_mt_on .pk_mt_marker{
+	position:absolute!important;
+	display:block!important;
+	visibility:visible!important;
+	opacity:1!important;
+	top:0!important;
+	bottom:auto!important;
+	width:0!important;
+	height:100%!important;
+	min-height:100%!important;
+	pointer-events:none!important;
+	transform-origin:top left!important;
+	mix-blend-mode:screen!important;
+}
+
+.pk_mt_on .pk_mt_playhead{
+	z-index:calc(var(--mt-marker-z) + 5)!important;
+	border-left:2px solid var(--mt-playhead)!important;
+	background:transparent!important;
+	box-shadow:0 0 0 1px rgba(255,255,255,.18),0 0 18px rgba(90,242,255,.55),0 0 44px rgba(90,242,255,.28)!important;
+}
+
+.pk_mt_on .pk_mt_playhead:before{
+	content:""!important;
+	position:absolute!important;
+	top:0!important;
+	left:-5px!important;
+	width:10px!important;
+	height:10px!important;
+	border-radius:999px!important;
+	background:var(--mt-playhead)!important;
+	box-shadow:0 0 22px rgba(90,242,255,.72)!important;
+}
+
+.pk_mt_on .pk_mt_marker{
+	z-index:calc(var(--mt-marker-z) + 4)!important;
+	margin-left:0!important;
+	border-right:0!important;
+	border-left:2px dashed var(--mt-marker)!important;
+	background:transparent!important;
+	box-shadow:0 0 18px rgba(255,209,92,.42),0 0 38px rgba(255,209,92,.18)!important;
+}
+
+.pk_mt_on .pk_mt_marker:before{
+	content:""!important;
+	position:absolute!important;
+	top:0!important;
+	left:-5px!important;
+	width:10px!important;
+	height:10px!important;
+	border-radius:999px!important;
+	background:var(--mt-marker)!important;
+	box-shadow:0 0 20px rgba(255,209,92,.68)!important;
+}
+
+/* Named markers from markers.js live inside .pk_mt_ruler; their line must extend
+   through the multitrack body and stay above clips/grid. */
+.pk_mt_on .pk_mrkrl{
+	position:absolute!important;
+	left:0!important;
+	right:0!important;
+	top:0!important;
+	bottom:auto!important;
+	height:26px!important;
+	overflow:visible!important;
+	z-index:calc(var(--mt-marker-z) + 20)!important;
+	pointer-events:none!important;
+	contain:none!important;
+}
+
+.pk_mt_on .pk_mrkr{
+	position:absolute!important;
+	display:block!important;
+	visibility:visible!important;
+	opacity:1!important;
+	left:0!important;
+	top:0!important;
+	width:11px!important;
+	height:26px!important;
+	z-index:calc(var(--mt-marker-z) + 22)!important;
+	pointer-events:auto!important;
+	cursor:pointer!important;
+	filter:drop-shadow(0 0 8px currentColor)!important;
+}
+
+.pk_mt_on .pk_mrkr:before{
+	content:""!important;
+	position:absolute!important;
+	left:-5px!important;
+	top:17px!important;
+	width:0!important;
+	height:0!important;
+	border-left:5px solid transparent!important;
+	border-right:5px solid transparent!important;
+	border-top:8px solid currentColor!important;
+	opacity:1!important;
+}
+
+.pk_mt_on .pk_mrkr:after{
+	content:""!important;
+	position:absolute!important;
+	left:0!important;
+	top:25px!important;
+	width:2px!important;
+	height:max(var(--m, 100vh), calc(100vh - 170px))!important;
+	min-height:calc(100vh - 170px)!important;
+	background:currentColor!important;
+	opacity:.95!important;
+	box-shadow:0 0 12px currentColor!important;
+}
+
+.pk_mt_on .pk_mrkr b{
+	z-index:calc(var(--mt-marker-z) + 24)!important;
+	background:rgba(8,10,12,.92)!important;
+	border:1px solid currentColor!important;
+	box-shadow:0 10px 24px rgba(0,0,0,.35),0 0 14px color-mix(in srgb,currentColor 34%,transparent)!important;
+}
+
+/* Do not let previous grid/theme files turn marker layers into relative blocks. */
+.pk_mt_on .pk_wave_cursor,
+.pk_mt_on .pk_wavepoint{
+	position:absolute!important;
+	visibility:visible!important;
+	opacity:1!important;
+	z-index:calc(var(--mt-marker-z) + 10)!important;
+}
+
+@media (max-width:760px){
+	.pk_mt_on .pk_tbc{
+		top:40px!important;
+	}
+	.pk_mt_on .pk_mt_ruler{
+		top:0!important;
+	}
+}
