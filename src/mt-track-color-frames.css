@@ -1,0 +1,51 @@
+/* Multitrack clip color accents
+   Only the clip outline and the filename footer use the track color.
+   The clip body remains neutral/dark to avoid filling the whole card with color. */
+
+.pk_mt_clip{
+	background:linear-gradient(180deg,rgba(255,255,255,.030),rgba(255,255,255,.010)),#050607!important;
+	border:1px solid var(--mt-br,#2f7b75)!important;
+	box-shadow:
+		inset 0 1px 0 rgba(255,255,255,.08),
+		inset 0 0 0 1px color-mix(in srgb,var(--mt-br,#2f7b75) 18%,transparent),
+		0 10px 28px rgba(0,0,0,.24)!important;
+}
+
+.pk_mt_clip canvas{
+	background:#050607!important;
+}
+
+.pk_mt_clip.pk_mt_clip_sel{
+	border-color:color-mix(in srgb,var(--mt-br,#2f7b75) 78%,#f6f7f8)!important;
+	box-shadow:
+		0 0 0 1px color-mix(in srgb,var(--mt-br,#2f7b75) 70%,#f6f7f8),
+		0 18px 48px color-mix(in srgb,var(--mt-br,#2f7b75) 18%,transparent),
+		inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+
+.pk_mt_clip.pk_mt_clip_xf{
+	border-color:var(--mt-br,#2f7b75)!important;
+}
+
+.pk_mt_clip span{
+	left:0!important;
+	right:0!important;
+	bottom:0!important;
+	box-sizing:border-box!important;
+	height:15px!important;
+	padding:1px 7px 0!important;
+	line-height:13px!important;
+	background:
+		linear-gradient(90deg,
+			color-mix(in srgb,var(--mt-br,#2f7b75) 58%,#050607) 0%,
+			color-mix(in srgb,var(--mt-br,#2f7b75) 30%,#050607) 52%,
+			rgba(5,6,7,.92) 100%)!important;
+	border-top:1px solid color-mix(in srgb,var(--mt-br,#2f7b75) 80%,#050607)!important;
+	color:#f6f7f8!important;
+	text-shadow:0 1px 0 rgba(0,0,0,.75)!important;
+	z-index:4!important;
+}
+
+.pk_mt_clip.pk_mt_clip_muted span{
+	filter:saturate(.65);
+}
