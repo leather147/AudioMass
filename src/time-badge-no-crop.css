@@ -1,0 +1,145 @@
+/* =============================================================
+   Time badge no-crop fix
+   Purpose:
+   - keep the main timecode fully visible;
+   - stop the right secondary time labels from overlapping the canvas;
+   - make the first toolbar badge a real two-column flexible layout.
+   ============================================================= */
+
+:root{
+	--am-time-main-w:156px;
+	--am-time-side-w:94px;
+}
+
+.pk_timecontainer,
+.pk_mt_on .pk_timecontainer{
+	position:relative!important;
+	flex:0 0 292px!important;
+	width:292px!important;
+	min-width:292px!important;
+	max-width:292px!important;
+	height:48px!important;
+	min-height:48px!important;
+	max-height:48px!important;
+	padding:4px 12px!important;
+	box-sizing:border-box!important;
+	display:grid!important;
+	grid-template-columns:var(--am-time-main-w) var(--am-time-side-w)!important;
+	grid-template-rows:1fr 1fr!important;
+	align-items:center!important;
+	justify-content:start!important;
+	column-gap:10px!important;
+	overflow:visible!important;
+	contain:none!important;
+}
+
+/* Chrome uses a canvas for the big time digits. Keep it as a grid item,
+   not as an absolutely-positioned element that can be clipped by later cards. */
+.pk_timecontainer .pk_timingcnv,
+.pk_mt_on .pk_timecontainer .pk_timingcnv{
+	position:static!important;
+	left:auto!important;
+	top:auto!important;
+	transform:none!important;
+	display:block!important;
+	grid-column:1!important;
+	grid-row:1 / span 2!important;
+	justify-self:start!important;
+	align-self:center!important;
+	width:150px!important;
+	min-width:150px!important;
+	max-width:150px!important;
+	height:40px!important;
+	min-height:40px!important;
+	max-height:40px!important;
+	margin:0!important;
+	overflow:visible!important;
+}
+
+/* Fallback text timer for non-Chrome engines. */
+.pk_timecontainer .pk_timing,
+.pk_mt_on .pk_timecontainer .pk_timing{
+	position:static!important;
+	left:auto!important;
+	top:auto!important;
+	transform:none!important;
+	display:block!important;
+	grid-column:1!important;
+	grid-row:1 / span 2!important;
+	justify-self:start!important;
+	align-self:center!important;
+	width:var(--am-time-main-w)!important;
+	min-width:var(--am-time-main-w)!important;
+	max-width:var(--am-time-main-w)!important;
+	padding:0!important;
+	margin:0!important;
+	font-size:27px!important;
+	letter-spacing:-.08em!important;
+	line-height:1!important;
+	white-space:nowrap!important;
+	overflow:visible!important;
+	text-overflow:clip!important;
+}
+
+.pk_timecontainer .pk_total_dur,
+.pk_timecontainer .pk_hover_dur,
+.pk_mt_on .pk_timecontainer .pk_total_dur,
+.pk_mt_on .pk_timecontainer .pk_hover_dur{
+	position:static!important;
+	right:auto!important;
+	top:auto!important;
+	display:block!important;
+	grid-column:2!important;
+	width:var(--am-time-side-w)!important;
+	min-width:var(--am-time-side-w)!important;
+	max-width:var(--am-time-side-w)!important;
+	padding:0!important;
+	margin:0!important;
+	font-size:12px!important;
+	line-height:1.05!important;
+	text-align:left!important;
+	white-space:nowrap!important;
+	overflow:visible!important;
+	text-overflow:clip!important;
+}
+
+.pk_timecontainer .pk_total_dur,
+.pk_mt_on .pk_timecontainer .pk_total_dur{
+	grid-row:1!important;
+	align-self:end!important;
+}
+
+.pk_timecontainer .pk_hover_dur,
+.pk_mt_on .pk_timecontainer .pk_hover_dur{
+	grid-row:2!important;
+	align-self:start!important;
+}
+
+/* Keep the next toolbar card from visually cutting into the timer. */
+.pk_tb,
+.pk_mt_on .pk_tb{
+	padding-left:12px!important;
+	gap:8px!important;
+}
+
+@media (max-width:760px){
+	.pk_timecontainer,
+	.pk_mt_on .pk_timecontainer{
+		flex-basis:280px!important;
+		width:280px!important;
+		min-width:280px!important;
+		max-width:280px!important;
+		grid-template-columns:150px 88px!important;
+		column-gap:8px!important;
+	}
+
+	.pk_timecontainer .pk_total_dur,
+	.pk_timecontainer .pk_hover_dur,
+	.pk_mt_on .pk_timecontainer .pk_total_dur,
+	.pk_mt_on .pk_timecontainer .pk_hover_dur{
+		width:88px!important;
+		min-width:88px!important;
+		max-width:88px!important;
+		font-size:11px!important;
+	}
+}
