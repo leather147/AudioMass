@@ -76,77 +76,11 @@
 		});
 	}
 
-	var trackPalette = [
-		{bg:'rgba(56,216,255,.15)', bg2:'rgba(56,216,255,.075)', hi:'rgba(56,216,255,.24)', br:'rgba(56,216,255,.58)', br2:'rgba(115,237,255,.88)', glow:'rgba(56,216,255,.20)', txt:'#c9f7ff'},
-		{bg:'rgba(52,211,153,.15)', bg2:'rgba(52,211,153,.075)', hi:'rgba(52,211,153,.23)', br:'rgba(52,211,153,.56)', br2:'rgba(125,246,194,.86)', glow:'rgba(52,211,153,.19)', txt:'#c9ffe9'},
-		{bg:'rgba(167,139,250,.16)', bg2:'rgba(167,139,250,.078)', hi:'rgba(167,139,250,.25)', br:'rgba(167,139,250,.58)', br2:'rgba(205,190,255,.88)', glow:'rgba(167,139,250,.20)', txt:'#eee9ff'},
-		{bg:'rgba(250,204,21,.14)', bg2:'rgba(250,204,21,.070)', hi:'rgba(250,204,21,.22)', br:'rgba(250,204,21,.52)', br2:'rgba(255,230,112,.82)', glow:'rgba(250,204,21,.16)', txt:'#fff4bf'},
-		{bg:'rgba(244,114,182,.16)', bg2:'rgba(244,114,182,.075)', hi:'rgba(244,114,182,.25)', br:'rgba(244,114,182,.58)', br2:'rgba(255,181,218,.88)', glow:'rgba(244,114,182,.20)', txt:'#ffe1f0'},
-		{bg:'rgba(96,165,250,.16)', bg2:'rgba(96,165,250,.078)', hi:'rgba(96,165,250,.25)', br:'rgba(96,165,250,.58)', br2:'rgba(166,207,255,.88)', glow:'rgba(96,165,250,.20)', txt:'#dcecff'},
-		{bg:'rgba(251,146,60,.15)', bg2:'rgba(251,146,60,.072)', hi:'rgba(251,146,60,.23)', br:'rgba(251,146,60,.55)', br2:'rgba(255,190,128,.85)', glow:'rgba(251,146,60,.18)', txt:'#ffe5cf'},
-		{bg:'rgba(45,212,191,.15)', bg2:'rgba(45,212,191,.075)', hi:'rgba(45,212,191,.23)', br:'rgba(45,212,191,.56)', br2:'rgba(130,246,234,.86)', glow:'rgba(45,212,191,.19)', txt:'#d4fffb'}
-	];
-
-	function setColorVars (el, color) {
-		if (!el || !color) return;
-		el.style.setProperty('--trk-bg', color.bg);
-		el.style.setProperty('--trk-bg-2', color.bg2);
-		el.style.setProperty('--trk-hi', color.hi);
-		el.style.setProperty('--trk-br', color.br);
-		el.style.setProperty('--trk-br-strong', color.br2);
-		el.style.setProperty('--trk-glow', color.glow);
-		el.style.setProperty('--trk-text', color.txt);
-		el.style.setProperty('--mt-bg', color.bg);
-		el.style.setProperty('--mt-br', color.br);
-	}
-
-	function syncTrackClipColors () {
-		var rows = Array.prototype.slice.call(d.querySelectorAll('.pk_mt_tracks .pk_mt_track[data-track]'));
-		if (!rows.length) return;
-
-		var byTrack = {};
-		rows.forEach(function (row, index) {
-			var id = row.getAttribute('data-track');
-			var color = trackPalette[index % trackPalette.length];
-			byTrack[id] = color;
-			row.setAttribute('data-track-color', index % trackPalette.length);
-			setColorVars(row, color);
-		});
-
-		var lanes = d.querySelectorAll('.pk_mt_lane[data-track]');
-		for (var i = 0; i < lanes.length; ++i) {
-			var tid = lanes[i].getAttribute('data-track');
-			setColorVars(lanes[i], byTrack[tid] || trackPalette[i % trackPalette.length]);
-		}
-
-		var clips = d.querySelectorAll('.pk_mt_lane[data-track] .pk_mt_clip');
-		for (i = 0; i < clips.length; ++i) {
-			var lane = clips[i].closest('.pk_mt_lane[data-track]');
-			if (!lane) continue;
-			tid = lane.getAttribute('data-track');
-			clips[i].setAttribute('data-track', tid);
-			setColorVars(clips[i], byTrack[tid] || trackPalette[0]);
-		}
-	}
-
-	var colorRaf = 0;
-	function scheduleTrackColorSync () {
-		if (colorRaf) return;
-		colorRaf = w.requestAnimationFrame(function () {
-			colorRaf = 0;
-			syncTrackClipColors();
-		});
-	}
-
 	function attachGridWatchers () {
 		updateMultitrackGrid();
-		syncTrackClipColors();
 
 		if (w.ResizeObserver) {
-			var ro = new ResizeObserver(function () {
-				scheduleGridUpdate();
-				scheduleTrackColorSync();
-			});
+			var ro = new ResizeObserver(scheduleGridUpdate);
 			var bind = function () {
 				var lanes = d.getElementsByClassName('pk_mt_lanes')[0];
 				var main = d.getElementsByClassName('pk_mt_main')[0];
@@ -163,21 +97,14 @@
 			new MutationObserver(function () {
 				bind();
 				scheduleGridUpdate();
-				scheduleTrackColorSync();
 			}).observe(d.documentElement, {childList:true, subtree:true});
 		}
 		else {
-			w.setInterval(function () {
-				updateMultitrackGrid();
-				syncTrackClipColors();
-			}, 350);
+			w.setInterval(updateMultitrackGrid, 350);
 		}
 
 		d.addEventListener('scroll', scheduleGridUpdate, true);
-		w.addEventListener('resize', function () {
-			scheduleGridUpdate();
-			scheduleTrackColorSync();
-		}, false);
+		w.addEventListener('resize', scheduleGridUpdate, false);
 	}
 
 	function clearTouchMarkerLabels (except) {
