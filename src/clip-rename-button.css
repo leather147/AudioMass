@@ -122,3 +122,50 @@
 		display:none!important;
 	}
 }
+
+/* Final primary modal button contrast fix.
+   The cyan primary button used by the marker and clip-name dialogs inherited
+   faint link text from older modal styles, making “Сохранить” almost invisible. */
+.pk_rename_clip_modal .pk_modal_bottom .pk_modal_a_accpt,
+.pk_new_marker_modal .pk_modal_bottom .pk_modal_a_accpt{
+	display:inline-flex!important;
+	align-items:center!important;
+	justify-content:center!important;
+	min-width:112px!important;
+	height:34px!important;
+	box-sizing:border-box!important;
+	padding:0 18px!important;
+	border-radius:999px!important;
+	border:1px solid rgba(90,242,255,.70)!important;
+	background:linear-gradient(180deg,#70fff7 0%,#34d9d1 100%)!important;
+	color:#031014!important;
+	font:800 11px/1 var(--ff-mono,"Geist Mono",monospace)!important;
+	letter-spacing:.01em!important;
+	text-transform:none!important;
+	text-decoration:none!important;
+	text-shadow:none!important;
+	opacity:1!important;
+	filter:none!important;
+	box-shadow:0 12px 30px rgba(52,217,209,.20),inset 0 1px 0 rgba(255,255,255,.56)!important;
+}
+
+.pk_rename_clip_modal .pk_modal_bottom .pk_modal_a_accpt:hover,
+.pk_new_marker_modal .pk_modal_bottom .pk_modal_a_accpt:hover{
+	background:linear-gradient(180deg,#8afff9 0%,#45eee6 100%)!important;
+	color:#020b0f!important;
+	border-color:rgba(144,255,249,.92)!important;
+	box-shadow:0 16px 36px rgba(52,217,209,.28),inset 0 1px 0 rgba(255,255,255,.70)!important;
+}
+
+.pk_rename_clip_modal .pk_modal_bottom .pk_modal_a_accpt:active,
+.pk_new_marker_modal .pk_modal_bottom .pk_modal_a_accpt:active{
+	transform:translateY(1px)!important;
+}
+
+.pk_rename_clip_modal .pk_modal_bottom .pk_modal_cancel,
+.pk_new_marker_modal .pk_modal_bottom .pk_modal_cancel{
+	color:#eaf7ff!important;
+	font-weight:700!important;
+	opacity:.92!important;
+	text-decoration:none!important;
+}
