@@ -123,13 +123,13 @@
 
 	function applyWaveGlow(ctx, args) {
 		var focus = !!d.querySelector('.pk_app.pk_single_wave_focus:not(.pk_mt_on)');
-		var outer = focus ? 'rgba(80,235,255,.58)' : 'rgba(90,220,255,.44)';
-		var inner = focus ? 'rgba(205,252,255,.62)' : 'rgba(190,245,255,.46)';
+		var outer = focus ? 'rgba(80,235,255,.28)' : 'rgba(90,220,255,.18)';
+		var inner = focus ? 'rgba(205,252,255,.32)' : 'rgba(190,245,255,.20)';
 
 		try {
 			ctx.save();
 			ctx.shadowColor = outer;
-			ctx.shadowBlur = focus ? 22 : 16;
+			ctx.shadowBlur = focus ? 10 : 7;
 			ctx.shadowOffsetX = 0;
 			ctx.shadowOffsetY = 0;
 			originalFill.apply(ctx, args);
@@ -137,7 +137,7 @@
 
 			ctx.save();
 			ctx.shadowColor = inner;
-			ctx.shadowBlur = focus ? 7 : 5;
+			ctx.shadowBlur = focus ? 3 : 2;
 			ctx.shadowOffsetX = 0;
 			ctx.shadowOffsetY = 0;
 			originalFill.apply(ctx, args);
