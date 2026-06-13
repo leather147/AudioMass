@@ -81,31 +81,6 @@
 		return true;
 	}
 
-	function smoothstep(t) {
-		t = Math.max(0, Math.min(1, t));
-		return t * t * (3 - 2 * t);
-	}
-
-	function focusGain(x, canvas, channel) {
-		var width = Math.max(1, canvas && canvas.width || 1);
-		var nx = Math.max(0, Math.min(1, x / width));
-
-		var distFromCenter = Math.abs(nx - 0.5) * 2;
-		var edge = 1 - distFromCenter;
-		var quietInset = channel === 1 ? 0.26 : 0.22;
-		var shaped = smoothstep((edge - quietInset) / (1 - quietInset));
-		var t = Math.pow(shaped, channel === 1 ? 1.30 : 1.42);
-
-		if (channel === 1) {
-			var breath = 0.972 + 0.028 * Math.cos(distFromCenter * Math.PI * 2);
-			t *= breath;
-		}
-
-		var floor = channel === 1 ? 0.008 : 0.004;
-		var gain = floor + (1 - floor) * t;
-		return Math.max(floor, Math.min(1, gain));
-	}
-
 	function patchCanvasWaveformDraw() {
 		if (canvasPatched || !w.CanvasRenderingContext2D) return;
 		var proto = w.CanvasRenderingContext2D.prototype;
@@ -115,23 +90,16 @@
 		originalMoveTo = proto.moveTo;
 		originalLineTo = proto.lineTo;
 
+		/* Keep the patch intentionally neutral for focus mode. The live waveform below
+		   now draws real in-place peak heights itself, without x-mask/envelope clipping. */
 		proto.moveTo = function (x, y) {
 			if (wavePathState && isFocusWaveCanvas(this)) {
-				var h = this.canvas && this.canvas.height || 1;
-				var channel = y > h * 0.52 ? 1 : 0;
-				wavePathState.set(this, { base: y, active: y > 24, channel: channel });
+				wavePathState.set(this, null);
 			}
 			return originalMoveTo.call(this, x, y);
 		};
 
 		proto.lineTo = function (x, y) {
-			if (wavePathState && isFocusWaveCanvas(this)) {
-				var st = wavePathState.get(this);
-				if (st && st.active && Math.abs(y - st.base) > 0.25) {
-					var g = focusGain(x, this.canvas, st.channel || 0);
-					y = st.base + (y - st.base) * g;
-				}
-			}
 			return originalLineTo.call(this, x, y);
 		};
 	}
@@ -159,6 +127,7 @@
 		var prevFollow = null;
 		var liveRaf = 0;
 		var lastLiveAt = -1;
+		var livePeakCache = [null, null];
 
 		function label(mode) {
 			return mode === 'focus' ? 'Фокус' : 'Обычный';
@@ -198,16 +167,36 @@
 			return [max, min];
 		}
 
+		function ensurePeakCache(channel, points) {
+			var c = livePeakCache[channel];
+			if (!c || c.count !== points) {
+				c = { count: points, up: [], down: [] };
+				for (var i = 0; i <= points; ++i) {
+					c.up[i] = 0;
+					c.down[i] = 0;
+				}
+				livePeakCache[channel] = c;
+			}
+			return c;
+		}
+
+		function animatePeak(current, target) {
+			var speed = target > current ? 0.46 : 0.22;
+			return current + (target - current) * speed;
+		}
+
 		function drawFocusChannel(ctx, canvas, buffer, channel, top, height, now, width) {
 			var data = buffer.getChannelData(Math.min(channel, buffer.numberOfChannels - 1));
 			var len = data.length;
 			var sr = buffer.sampleRate;
 			var base = top + height * 0.5;
 			var half = height * (channel === 1 ? 0.37 : 0.40);
-			var step = Math.max(2, Math.round(width / 210));
-			var points = Math.ceil(width / step) + 1;
-			var liveWindow = channel === 1 ? 0.46 : 0.40;
-			var sampleRadius = Math.max(12, Math.round(sr * liveWindow / points * 0.55));
+			var step = Math.max(3, Math.round(width / 180));
+			var points = Math.ceil(width / step);
+			var liveWindow = channel === 1 ? 0.50 : 0.44;
+			var sampleRadius = Math.max(10, Math.round(sr * liveWindow / points * 0.50));
+			var cache = ensurePeakCache(channel, points);
+			var boost = channel === 1 ? 1.55 : 1.70;
 
 			ctx.beginPath();
 			ctx.moveTo(0, base);
@@ -218,10 +207,9 @@
 				var lookup = now + rel * liveWindow;
 				var idx = Math.max(0, Math.min(len - 1, Math.round(lookup * sr)));
 				var pk = samplePeak(data, idx, sampleRadius, len);
-				var amp = Math.max(Math.abs(pk[0]), Math.abs(pk[1]));
-				var gain = focusGain(x, canvas, channel);
-				var y = base - Math.min(1, amp * 1.7) * half * gain;
-				ctx.lineTo(x, y);
+				var targetUp = Math.min(1, Math.abs(pk[0]) * boost);
+				cache.up[p] = animatePeak(cache.up[p] || 0, targetUp);
+				ctx.lineTo(x, base - cache.up[p] * half);
 			}
 
 			for (var q = points; q >= 0; --q) {
@@ -230,10 +218,9 @@
 				var blookup = now + brel * liveWindow;
 				var bidx = Math.max(0, Math.min(len - 1, Math.round(blookup * sr)));
 				var bpk = samplePeak(data, bidx, sampleRadius, len);
-				var bamp = Math.max(Math.abs(bpk[0]), Math.abs(bpk[1]));
-				var bgain = focusGain(bx, canvas, channel);
-				var by = base + Math.min(1, bamp * 1.7) * half * bgain;
-				ctx.lineTo(bx, by);
+				var targetDown = Math.min(1, Math.abs(bpk[1]) * boost);
+				cache.down[q] = animatePeak(cache.down[q] || 0, targetDown);
+				ctx.lineTo(bx, base + cache.down[q] * half);
 			}
 
 			ctx.closePath();
@@ -254,7 +241,7 @@
 			var ctx = live.ctx;
 			var buffer = ws.backend.buffer;
 			var now = Math.max(0, Math.min(buffer.duration || 0, ws.getCurrentTime ? ws.getCurrentTime() : 0));
-			if (!force && Math.abs(now - lastLiveAt) < 0.012 && ws.isPlaying && ws.isPlaying()) return;
+			if (!force && Math.abs(now - lastLiveAt) < 0.008 && ws.isPlaying && ws.isPlaying()) return;
 			lastLiveAt = now;
 
 			var width = canvas.width || 1;
@@ -305,7 +292,7 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: пики статичны и обновляются на месте' :
+						'Вид waveform: пики растут на месте без маски' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
@@ -354,7 +341,7 @@
 		}
 
 		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { scheduleLiveFocusWave(true); }, 0); });
-		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
+		editor.listenFor && editor.listenFor('DidUnloadFile', function () { livePeakCache = [null, null]; apply(); });
 		editor.listenFor && editor.listenFor('DidAudioProcess', function () {
 			if (getSingleWaveMode() === 'focus') {
 				keepFocusPeaksStatic('focus');
