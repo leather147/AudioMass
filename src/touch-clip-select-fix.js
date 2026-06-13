@@ -2,6 +2,10 @@
 	'use strict';
 
 	var SINGLE_WAVE_KEY = 'pk_single_wave_view';
+	var canvasPatched = false;
+	var originalMoveTo = null;
+	var originalLineTo = null;
+	var wavePathState = typeof WeakMap !== 'undefined' ? new WeakMap() : null;
 
 	function closestClip(node) {
 		while (node && node !== d && node.nodeType === 1) {
@@ -40,9 +44,6 @@
 			clientY: t.clientY,
 			screenX: t.screenX,
 			screenY: t.screenY,
-			/* Important: multitrack.js does not move the playhead/cursor on clip mouseup
-			   when shiftKey is true. We use that existing path so touch-tap selects the
-			   clip but does not trigger cursor/range placement. */
 			shiftKey: true
 		});
 	}
@@ -70,10 +71,72 @@
 		d.head.appendChild(link);
 	}
 
+	function isFocusWaveCanvas(ctx) {
+		var canvas = ctx && ctx.canvas;
+		if (!canvas || !canvas.parentNode) return false;
+		var app = d.querySelector('.pk_app.pk_single_wave_focus:not(.pk_mt_on)');
+		if (!app) return false;
+		if (!canvas.closest || !canvas.closest('.pk_av')) return false;
+		if (canvas.closest('.pk_mt')) return false;
+		return true;
+	}
+
+	function focusGain(x, canvas) {
+		var width = Math.max(1, canvas && canvas.width || 1);
+		var nx = Math.max(0, Math.min(1, x / width));
+		var edge = Math.min(nx, 1 - nx);
+		var t = Math.max(0, Math.min(1, edge / 0.34));
+		/* Smoothstep: the actual waveform geometry falls almost to silence at the
+		   viewport edges and returns to the original amplitude in the center. */
+		t = t * t * (3 - 2 * t);
+		return 0.035 + 0.965 * t;
+	}
+
+	function patchCanvasWaveformDraw() {
+		if (canvasPatched || !w.CanvasRenderingContext2D) return;
+		var proto = w.CanvasRenderingContext2D.prototype;
+		if (!proto || !proto.moveTo || !proto.lineTo) return;
+
+		canvasPatched = true;
+		originalMoveTo = proto.moveTo;
+		originalLineTo = proto.lineTo;
+
+		proto.moveTo = function (x, y) {
+			if (wavePathState && isFocusWaveCanvas(this)) {
+				wavePathState.set(this, { base: y, active: y > 24 });
+			}
+			return originalMoveTo.call(this, x, y);
+		};
+
+		proto.lineTo = function (x, y) {
+			if (wavePathState && isFocusWaveCanvas(this)) {
+				var st = wavePathState.get(this);
+				if (st && st.active && Math.abs(y - st.base) > 0.25) {
+					var g = focusGain(x, this.canvas);
+					y = st.base + (y - st.base) * g;
+				}
+			}
+			return originalLineTo.call(this, x, y);
+		};
+	}
+
+	function redrawWave(editor) {
+		if (!editor || !editor.engine || !editor.engine.wavesurfer) return;
+		var ws = editor.engine.wavesurfer;
+		try {
+			if (ws.drawBuffer) ws.drawBuffer();
+			else if (ws.drawer && ws.backend && ws.backend.buffer && ws.drawer.drawPeaks) {
+				ws.drawer.drawPeaks(ws.backend.getPeaks(ws.drawer.width), ws.getDuration());
+			}
+		} catch (e) {}
+		try { editor.fireEvent && editor.fireEvent('RequestResize'); } catch (e2) {}
+	}
+
 	function installSingleWaveView(editor) {
 		if (!editor || !editor.el || editor.__amSingleWaveViewMode) return;
 		editor.__amSingleWaveViewMode = true;
 		injectSingleWaveCss();
+		patchCanvasWaveformDraw();
 
 		var root = editor.el;
 		var btn = null;
@@ -95,7 +158,7 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: края уходят в тишину, центр обычный' :
+						'Вид waveform: сама волна затухает к краям, центр обычный' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
@@ -104,7 +167,7 @@
 		function choose(mode) {
 			setSingleWaveMode(mode);
 			apply(mode);
-			if (editor.fireEvent) editor.fireEvent('RequestResize');
+			redrawWave(editor);
 		}
 
 		function makeButton() {
@@ -139,6 +202,9 @@
 				if (makeButton() || ++tries > 30) w.clearInterval(timer);
 			}, 120);
 		}
+
+		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); }, 0); });
+		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
 	}
 
 	function install(editor) {
@@ -162,19 +228,10 @@
 			if (!clip || clip.classList.contains('pk_mt_rec_clip')) return;
 
 			var t = e.touches[0];
-			active = {
-				id: t.identifier,
-				clip: clip,
-				target: e.target,
-				moved: false
-			};
+			active = { id: t.identifier, clip: clip, target: e.target, moved: false };
 
 			e.preventDefault();
 			e.stopPropagation();
-
-			/* Route through the app's own mouse selection/drag logic. For an unselected
-			   clip this selects it only; for an already selected clip this still allows
-			   touch-drag movement, while shiftKey prevents cursor relocation on tap. */
 			clip.dispatchEvent(mouseEvent('mousedown', t, clip));
 		}
 
