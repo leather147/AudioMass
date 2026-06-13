@@ -92,6 +92,17 @@
 	filter:saturate(1.06) contrast(1.04)!important;
 }
 
+/* In focus waveform mode the vertical playhead/cursor should not be visible.
+   This affects only the single-waveform focus view; normal waveform mode and
+   multitrack keep their cursors. */
+.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_wave_cursor,
+.pk_app:not(.pk_mt_on).pk_single_wave_focus #pk_prgwv,
+.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_wavepoint{
+	display:none!important;
+	opacity:0!important;
+	visibility:hidden!important;
+}
+
 @media (max-width:820px){
 	.pk_wave_view_toggle{
 		min-width:44px!important;
