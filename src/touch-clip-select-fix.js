@@ -73,7 +73,7 @@
 
 	function isFocusWaveCanvas(ctx) {
 		var canvas = ctx && ctx.canvas;
-		if (!canvas || !canvas.parentNode) return false;
+		if (!canvas || !canvas.parentNode || ctx.__amFocusLiveDraw) return false;
 		var app = d.querySelector('.pk_app.pk_single_wave_focus:not(.pk_mt_on)');
 		if (!app) return false;
 		if (!canvas.closest || !canvas.closest('.pk_av')) return false;
@@ -157,6 +157,8 @@
 		var root = editor.el;
 		var btn = null;
 		var prevFollow = null;
+		var liveRaf = 0;
+		var lastLiveAt = -1;
 
 		function label(mode) {
 			return mode === 'focus' ? 'Фокус' : 'Обычный';
@@ -176,6 +178,119 @@
 			}
 		}
 
+		function liveEntry() {
+			var ws = editor.engine && editor.engine.wavesurfer;
+			var drawer = ws && ws.drawer;
+			var entry = drawer && drawer.canvases && drawer.canvases[0];
+			return entry && entry.waveCtx ? { ws: ws, ctx: entry.waveCtx, canvas: entry.waveCtx.canvas } : null;
+		}
+
+		function samplePeak(data, center, radius, len) {
+			var start = Math.max(0, center - radius) | 0;
+			var end = Math.min(len - 1, center + radius) | 0;
+			var min = 0;
+			var max = 0;
+			for (var i = start; i <= end; i += 2) {
+				var v = data[i] || 0;
+				if (v > max) max = v;
+				else if (v < min) min = v;
+			}
+			return [max, min];
+		}
+
+		function drawFocusChannel(ctx, canvas, buffer, channel, top, height, now, width) {
+			var data = buffer.getChannelData(Math.min(channel, buffer.numberOfChannels - 1));
+			var len = data.length;
+			var sr = buffer.sampleRate;
+			var base = top + height * 0.5;
+			var half = height * (channel === 1 ? 0.37 : 0.40);
+			var step = Math.max(2, Math.round(width / 210));
+			var points = Math.ceil(width / step) + 1;
+			var liveWindow = channel === 1 ? 0.46 : 0.40;
+			var sampleRadius = Math.max(12, Math.round(sr * liveWindow / points * 0.55));
+
+			ctx.beginPath();
+			ctx.moveTo(0, base);
+
+			for (var p = 0; p <= points; ++p) {
+				var x = Math.min(width, p * step);
+				var rel = x / Math.max(1, width) - 0.5;
+				var lookup = now + rel * liveWindow;
+				var idx = Math.max(0, Math.min(len - 1, Math.round(lookup * sr)));
+				var pk = samplePeak(data, idx, sampleRadius, len);
+				var amp = Math.max(Math.abs(pk[0]), Math.abs(pk[1]));
+				var gain = focusGain(x, canvas, channel);
+				var y = base - Math.min(1, amp * 1.7) * half * gain;
+				ctx.lineTo(x, y);
+			}
+
+			for (var q = points; q >= 0; --q) {
+				var bx = Math.min(width, q * step);
+				var brel = bx / Math.max(1, width) - 0.5;
+				var blookup = now + brel * liveWindow;
+				var bidx = Math.max(0, Math.min(len - 1, Math.round(blookup * sr)));
+				var bpk = samplePeak(data, bidx, sampleRadius, len);
+				var bamp = Math.max(Math.abs(bpk[0]), Math.abs(bpk[1]));
+				var bgain = focusGain(bx, canvas, channel);
+				var by = base + Math.min(1, bamp * 1.7) * half * bgain;
+				ctx.lineTo(bx, by);
+			}
+
+			ctx.closePath();
+			ctx.fill();
+
+			ctx.globalAlpha = 0.18;
+			ctx.fillRect(0, base - 0.5, width, 1);
+			ctx.globalAlpha = 1;
+		}
+
+		function drawLiveFocusWave(force) {
+			if (getSingleWaveMode() !== 'focus' || root.classList.contains('pk_mt_on')) return;
+			var live = liveEntry();
+			if (!live || !live.ws.backend || !live.ws.backend.buffer) return;
+
+			var ws = live.ws;
+			var canvas = live.canvas;
+			var ctx = live.ctx;
+			var buffer = ws.backend.buffer;
+			var now = Math.max(0, Math.min(buffer.duration || 0, ws.getCurrentTime ? ws.getCurrentTime() : 0));
+			if (!force && Math.abs(now - lastLiveAt) < 0.012 && ws.isPlaying && ws.isPlaying()) return;
+			lastLiveAt = now;
+
+			var width = canvas.width || 1;
+			var height = canvas.height || 1;
+			var topPad = ws.drawer && ws.drawer.params && ws.drawer.params.timeline ? 24 : 0;
+			var usable = Math.max(20, height - topPad);
+			var laneH = usable / 2;
+
+			ctx.__amFocusLiveDraw = true;
+			try {
+				ctx.fillStyle = '#000';
+				ctx.fillRect(0, 0, width, height);
+				ctx.fillStyle = ws.drawer && ws.drawer.params && ws.drawer.params.waveColor || '#99c2c6';
+				drawFocusChannel(ctx, canvas, buffer, 0, topPad, laneH, now, width);
+				ctx.fillStyle = ws.drawer && ws.drawer.params && ws.drawer.params.ActiveChannels && ws.drawer.params.ActiveChannels[1] === false ?
+					(ws.drawer.params.waveDisabledColor || 'rgba(153,194,198,.35)') :
+					(ws.drawer && ws.drawer.params && ws.drawer.params.waveColor || '#99c2c6');
+				drawFocusChannel(ctx, canvas, buffer, buffer.numberOfChannels > 1 ? 1 : 0, topPad + laneH, laneH, now, width);
+			}
+			finally {
+				ctx.__amFocusLiveDraw = false;
+			}
+		}
+
+		function scheduleLiveFocusWave(force) {
+			if (liveRaf) return;
+			liveRaf = w.requestAnimationFrame(function () {
+				liveRaf = 0;
+				drawLiveFocusWave(!!force);
+				var ws = editor.engine && editor.engine.wavesurfer;
+				if (getSingleWaveMode() === 'focus' && ws && ws.isPlaying && ws.isPlaying()) {
+					scheduleLiveFocusWave(false);
+				}
+			});
+		}
+
 		function apply(mode) {
 			mode = mode || getSingleWaveMode();
 			root.classList.toggle('pk_single_wave_focus', mode === 'focus');
@@ -190,16 +305,19 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: пики статичны, почти полная тишина у краёв' :
+						'Вид waveform: пики статичны и обновляются на месте' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
+
+			if (mode === 'focus') scheduleLiveFocusWave(true);
 		}
 
 		function choose(mode) {
 			setSingleWaveMode(mode);
 			apply(mode);
-			redrawWave(editor);
+			if (mode === 'focus') scheduleLiveFocusWave(true);
+			else redrawWave(editor);
 		}
 
 		function makeButton() {
@@ -235,10 +353,13 @@
 			}, 120);
 		}
 
-		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); }, 0); });
+		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { scheduleLiveFocusWave(true); }, 0); });
 		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
 		editor.listenFor && editor.listenFor('DidAudioProcess', function () {
-			if (getSingleWaveMode() === 'focus') keepFocusPeaksStatic('focus');
+			if (getSingleWaveMode() === 'focus') {
+				keepFocusPeaksStatic('focus');
+				scheduleLiveFocusWave(false);
+			}
 		});
 		editor.listenFor && editor.listenFor('DidViewFollowCursorToggle', function () {
 			if (getSingleWaveMode() === 'focus') keepFocusPeaksStatic('focus');
