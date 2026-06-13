@@ -90,23 +90,22 @@
 		var width = Math.max(1, canvas && canvas.width || 1);
 		var nx = Math.max(0, Math.min(1, x / width));
 
-		/* Strictly symmetrical envelope: only the distance from the center matters,
-		   so left and right sides decay identically. */
+		/* Symmetrical real-time-style envelope: edges stay almost silent for a
+		   visible margin, then the waveform rises into a tighter center peak. */
 		var distFromCenter = Math.abs(nx - 0.5) * 2; // 0 center, 1 edges
 		var edge = 1 - distFromCenter;
-		var edgeZone = channel === 1 ? 0.40 : 0.34;
-		var t = smoothstep(edge / edgeZone);
+		var quietInset = channel === 1 ? 0.26 : 0.22;
+		var shaped = smoothstep((edge - quietInset) / (1 - quietInset));
+		var t = Math.pow(shaped, channel === 1 ? 1.30 : 1.42);
 
-		/* Lower stereo channel is intentionally a little different: slightly wider
-		   fade and a very soft symmetrical breathing curve. It is not a copy of the
-		   top channel, but it still remains balanced left-to-right. */
+		/* The lower stereo channel remains slightly different but still perfectly
+		   symmetrical: broader quiet edge, softer center, tiny balanced breathing. */
 		if (channel === 1) {
-			t = Math.pow(t, 0.92);
-			var breath = 0.982 + 0.018 * Math.cos(distFromCenter * Math.PI * 2);
+			var breath = 0.972 + 0.028 * Math.cos(distFromCenter * Math.PI * 2);
 			t *= breath;
 		}
 
-		var floor = channel === 1 ? 0.055 : 0.035;
+		var floor = channel === 1 ? 0.008 : 0.004;
 		var gain = floor + (1 - floor) * t;
 		return Math.max(floor, Math.min(1, gain));
 	}
@@ -179,7 +178,7 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: сама волна симметрично затухает к краям' :
+						'Вид waveform: почти полная тишина у краёв, пик ближе к центру' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
