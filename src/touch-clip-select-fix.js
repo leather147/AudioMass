@@ -72,6 +72,34 @@
 		d.head.appendChild(link);
 	}
 
+	function injectSiteCctvOverlay() {
+		if (d.querySelector('.am_cctv_site_filter')) return;
+		var overlay = d.createElement('div');
+		overlay.className = 'am_cctv_site_filter';
+		overlay.setAttribute('aria-hidden', 'true');
+		d.body.appendChild(overlay);
+	}
+
+	function fullscreenElement() {
+		return d.fullscreenElement || d.webkitFullscreenElement || d.mozFullScreenElement || d.msFullscreenElement || null;
+	}
+
+	function requestFullscreen(el) {
+		el = el || d.documentElement;
+		var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+		if (fn) return fn.call(el);
+	}
+
+	function exitFullscreen() {
+		var fn = d.exitFullscreen || d.webkitExitFullscreen || d.mozCancelFullScreen || d.msExitFullscreen;
+		if (fn) return fn.call(d);
+	}
+
+	function toggleFullscreen() {
+		if (fullscreenElement()) exitFullscreen();
+		else requestFullscreen(d.documentElement);
+	}
+
 	function isSingleWaveCanvas(ctx) {
 		var canvas = ctx && ctx.canvas;
 		if (!canvas || !canvas.parentNode) return false;
@@ -204,10 +232,12 @@
 		if (!editor || !editor.el || editor.__amSingleWaveViewMode) return;
 		editor.__amSingleWaveViewMode = true;
 		injectSingleWaveCss();
+		injectSiteCctvOverlay();
 		patchCanvasWaveformDraw();
 
 		var root = editor.el;
 		var btn = null;
+		var fullscreenBtn = null;
 
 		function label(mode) {
 			return mode === 'focus' ? 'Фокус' : 'Обычный';
@@ -232,6 +262,34 @@
 			}
 		}
 
+		function updateFullscreenButton() {
+			if (!fullscreenBtn) return;
+			var active = !!fullscreenElement();
+			fullscreenBtn.classList.toggle('pk_act', active);
+			fullscreenBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+			var txt = fullscreenBtn.querySelector('b');
+			var tip = fullscreenBtn.querySelector('span');
+			if (txt) txt.textContent = active ? 'Окно' : 'Экран';
+			if (tip) tip.textContent = active ? 'Выйти из полноэкранного режима' : 'Открыть сайт на весь экран';
+		}
+
+		function installFullscreenButton(toolbar, before) {
+			if (fullscreenBtn && fullscreenBtn.parentNode) return;
+			fullscreenBtn = d.createElement('button');
+			fullscreenBtn.type = 'button';
+			fullscreenBtn.tabIndex = -1;
+			fullscreenBtn.className = 'pk_btn pk_fullscreen_toggle';
+			fullscreenBtn.innerHTML = '<b>Экран</b><span>Открыть сайт на весь экран</span>';
+			fullscreenBtn.onclick = function () {
+				toggleFullscreen();
+				this.blur();
+				setTimeout(updateFullscreenButton, 80);
+			};
+			if (before) toolbar.insertBefore(fullscreenBtn, before);
+			else toolbar.appendChild(fullscreenBtn);
+			updateFullscreenButton();
+		}
+
 		function choose(mode) {
 			setSingleWaveMode(mode);
 			apply(mode);
@@ -239,26 +297,28 @@
 		}
 
 		function makeButton() {
-			if (btn && btn.parentNode) return true;
 			var toolbar = root.querySelector('.pk_tb');
 			if (!toolbar) return false;
-
-			btn = d.createElement('button');
-			btn.type = 'button';
-			btn.tabIndex = -1;
-			btn.className = 'pk_btn pk_wave_view_toggle';
-			btn.innerHTML = '<b></b><span></span>';
-			btn.onclick = function () {
-				choose(getSingleWaveMode() === 'focus' ? 'normal' : 'focus');
-				this.blur();
-			};
 
 			var before = toolbar.querySelector('.pk_composition_wave_badge') ||
 				toolbar.querySelector('.pk_marker_create_btn') ||
 				toolbar.querySelector('.pk_selection');
-			if (before) toolbar.insertBefore(btn, before);
-			else toolbar.appendChild(btn);
 
+			if (!btn || !btn.parentNode) {
+				btn = d.createElement('button');
+				btn.type = 'button';
+				btn.tabIndex = -1;
+				btn.className = 'pk_btn pk_wave_view_toggle';
+				btn.innerHTML = '<b></b><span></span>';
+				btn.onclick = function () {
+					choose(getSingleWaveMode() === 'focus' ? 'normal' : 'focus');
+					this.blur();
+				};
+				if (before) toolbar.insertBefore(btn, before);
+				else toolbar.appendChild(btn);
+			}
+
+			installFullscreenButton(toolbar, before);
 			apply();
 			return true;
 		}
@@ -271,6 +331,8 @@
 			}, 120);
 		}
 
+		d.addEventListener('fullscreenchange', updateFullscreenButton);
+		d.addEventListener('webkitfullscreenchange', updateFullscreenButton);
 		setTimeout(function () { redrawWave(editor); }, 80);
 		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); }, 0); });
 		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
