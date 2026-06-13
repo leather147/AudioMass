@@ -136,6 +136,7 @@
 	<script src="mt-scroll-ruler-final-fix.js"></script>
 	<script src="marker-create-button.js"></script>
 	<script src="clip-rename-button.js"></script>
+	<script src="touch-clip-select-fix.js"></script>
 	<script>
 		var editor = PKAudioEditor.init('app');
 		if (window.AMInstallMtScrollRulerFinalFix) {
@@ -146,6 +147,9 @@
 		}
 		if (window.AMInstallClipRenameButton) {
 			window.AMInstallClipRenameButton(editor);
+		}
+		if (window.AMInstallTouchClipSelectFix) {
+			window.AMInstallTouchClipSelectFix(editor);
 		}
 		if ('serviceWorker' in navigator) {
 			try {
