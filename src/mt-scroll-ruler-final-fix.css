@@ -1,0 +1,73 @@
+/* Final multitrack scroll/ruler fix.
+   The previous CSS-only extra-scroll layer created a visual extension but did
+   not extend the real ruler width consistently. It also left the old single
+   waveform footer scrollbar visible, so multitrack showed two horizontal bars.
+*/
+
+/* In multitrack mode keep only the real multitrack horizontal scrollbar.
+   The footer waveform overview belongs to the single-waveform editor and is
+   visually confusing here. */
+.pk_mt_on .pk_ftr .pk_wavescroll,
+.pk_mt_on .pk_ftr .pk_markers{
+	display:none!important;
+}
+
+.pk_mt_on .pk_ftr{
+	padding-top:6px!important;
+}
+
+/* The multitrack viewport owns horizontal/vertical scrolling. */
+.pk_mt_on .pk_mt_main{
+	overflow-x:auto!important;
+	overflow-y:auto!important;
+	scrollbar-gutter:stable!important;
+	overscroll-behavior:contain!important;
+}
+
+/* Do not use a pseudo element to fake extra width: pseudo elements do not make
+   the real scrollWidth/ruler math reliable. The runtime JS extends actual
+   element widths instead. */
+.pk_mt_on .pk_mt_lanes:after{
+	display:none!important;
+	content:none!important;
+}
+
+.pk_mt_on .pk_mt_lanes,
+.pk_mt_on .pk_mt_ruler{
+	min-width:100%!important;
+	box-sizing:border-box!important;
+}
+
+/* Keep the one remaining scrollbar readable and aligned with the timeline. */
+.pk_mt_on .pk_mt_main::-webkit-scrollbar{
+	width:12px!important;
+	height:12px!important;
+}
+
+.pk_mt_on .pk_mt_main::-webkit-scrollbar-track{
+	background:#080a0d!important;
+	border-top:1px solid rgba(255,255,255,.075)!important;
+}
+
+.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb{
+	background:linear-gradient(90deg,rgba(67,228,220,.44),rgba(67,228,220,.22))!important;
+	border:3px solid #080a0d!important;
+	border-radius:999px!important;
+}
+
+.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb:hover{
+	background:linear-gradient(90deg,rgba(67,228,220,.70),rgba(67,228,220,.38))!important;
+}
+
+/* Sticky ruler should fill the extended timeline width and not show a hard
+   cutoff at the end of the last clip. */
+.pk_mt_on .pk_mt_ruler{
+	overflow:visible!important;
+	background:rgba(8,10,12,.90)!important;
+}
+
+.pk_mt_on .pk_mt_timeline{
+	position:absolute!important;
+	top:0!important;
+	pointer-events:none!important;
+}
