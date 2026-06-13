@@ -55,6 +55,7 @@
 	<link rel="stylesheet" type="text/css" href="composition-waveform-badge.css">
 	<link rel="stylesheet" type="text/css" href="toolbar-time-transport-final-fix.css">
 	<link rel="stylesheet" type="text/css" href="time-badge-no-crop.css">
+	<link rel="stylesheet" type="text/css" href="mt-scroll-ruler-final-fix.css">
 	<style>
 		:root{
 			--ff:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
@@ -129,8 +130,12 @@
 	<script src="amss-format.js"></script>
 	<script src="multitrack.js"></script>
 	<script src="composition-waveform-badge.js"></script>
+	<script src="mt-scroll-ruler-final-fix.js"></script>
 	<script>
 		var editor = PKAudioEditor.init('app');
+		if (window.AMInstallMtScrollRulerFinalFix) {
+			window.AMInstallMtScrollRulerFinalFix(editor);
+		}
 		if ('serviceWorker' in navigator) {
 			try {
 				// navigator.serviceWorker.register('sw.js');
