@@ -1,6 +1,8 @@
 (function (w, d) {
 	'use strict';
 
+	var SINGLE_WAVE_KEY = 'pk_single_wave_view';
+
 	function closestClip(node) {
 		while (node && node !== d && node.nodeType === 1) {
 			if (node.classList && node.classList.contains('pk_mt_clip')) return node;
@@ -45,9 +47,104 @@
 		});
 	}
 
+	function getSingleWaveMode() {
+		try {
+			var saved = w.localStorage && w.localStorage.getItem(SINGLE_WAVE_KEY);
+			return saved === 'normal' || saved === 'focus' ? saved : 'focus';
+		} catch (e) {
+			return 'focus';
+		}
+	}
+
+	function setSingleWaveMode(mode) {
+		try { w.localStorage && w.localStorage.setItem(SINGLE_WAVE_KEY, mode); }
+		catch (e) {}
+	}
+
+	function injectSingleWaveCss() {
+		if (d.querySelector('link[href="single-waveform-view-mode.css"]')) return;
+		var link = d.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = 'single-waveform-view-mode.css';
+		d.head.appendChild(link);
+	}
+
+	function installSingleWaveView(editor) {
+		if (!editor || !editor.el || editor.__amSingleWaveViewMode) return;
+		editor.__amSingleWaveViewMode = true;
+		injectSingleWaveCss();
+
+		var root = editor.el;
+		var btn = null;
+
+		function label(mode) {
+			return mode === 'focus' ? 'Фокус' : 'Обычный';
+		}
+
+		function apply(mode) {
+			mode = mode || getSingleWaveMode();
+			root.classList.toggle('pk_single_wave_focus', mode === 'focus');
+			root.classList.toggle('pk_single_wave_normal', mode === 'normal');
+
+			if (btn) {
+				btn.classList.toggle('pk_act', mode === 'focus');
+				btn.setAttribute('aria-pressed', mode === 'focus' ? 'true' : 'false');
+				var txt = btn.querySelector('b');
+				var tip = btn.querySelector('span');
+				if (txt) txt.textContent = label(mode);
+				if (tip) {
+					tip.textContent = mode === 'focus' ?
+						'Вид waveform: края уходят в тишину, центр обычный' :
+						'Вид waveform: обычная полная волна';
+				}
+			}
+		}
+
+		function choose(mode) {
+			setSingleWaveMode(mode);
+			apply(mode);
+			if (editor.fireEvent) editor.fireEvent('RequestResize');
+		}
+
+		function makeButton() {
+			if (btn && btn.parentNode) return true;
+			var toolbar = root.querySelector('.pk_tb');
+			if (!toolbar) return false;
+
+			btn = d.createElement('button');
+			btn.type = 'button';
+			btn.tabIndex = -1;
+			btn.className = 'pk_btn pk_wave_view_toggle';
+			btn.innerHTML = '<b></b><span></span>';
+			btn.onclick = function () {
+				choose(getSingleWaveMode() === 'focus' ? 'normal' : 'focus');
+				this.blur();
+			};
+
+			var before = toolbar.querySelector('.pk_composition_wave_badge') ||
+				toolbar.querySelector('.pk_marker_create_btn') ||
+				toolbar.querySelector('.pk_selection');
+			if (before) toolbar.insertBefore(btn, before);
+			else toolbar.appendChild(btn);
+
+			apply();
+			return true;
+		}
+
+		apply();
+		if (!makeButton()) {
+			var tries = 0;
+			var timer = w.setInterval(function () {
+				if (makeButton() || ++tries > 30) w.clearInterval(timer);
+			}, 120);
+		}
+	}
+
 	function install(editor) {
 		if (!editor || editor.__amTouchClipSelectFix) return;
 		editor.__amTouchClipSelectFix = true;
+		installSingleWaveView(editor);
 
 		var active = null;
 
