@@ -58,6 +58,7 @@
 	<link rel="stylesheet" type="text/css" href="mt-scroll-ruler-final-fix.css">
 	<link rel="stylesheet" type="text/css" href="selection-panel-responsive-fix.css">
 	<link rel="stylesheet" type="text/css" href="marker-create-button.css">
+	<link rel="stylesheet" type="text/css" href="clip-rename-button.css">
 	<style>
 		:root{
 			--ff:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
@@ -134,6 +135,7 @@
 	<script src="composition-waveform-badge.js"></script>
 	<script src="mt-scroll-ruler-final-fix.js"></script>
 	<script src="marker-create-button.js"></script>
+	<script src="clip-rename-button.js"></script>
 	<script>
 		var editor = PKAudioEditor.init('app');
 		if (window.AMInstallMtScrollRulerFinalFix) {
@@ -141,6 +143,9 @@
 		}
 		if (window.AMInstallMarkerCreateButton) {
 			window.AMInstallMarkerCreateButton(editor);
+		}
+		if (window.AMInstallClipRenameButton) {
+			window.AMInstallClipRenameButton(editor);
 		}
 		if ('serviceWorker' in navigator) {
 			try {
