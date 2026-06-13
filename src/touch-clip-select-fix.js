@@ -238,9 +238,63 @@
 		var root = editor.el;
 		var btn = null;
 		var fullscreenBtn = null;
+		var focusCenterRaf = 0;
+		var lastCenteredLeft = -1;
+		var lastCenteredTime = -1;
 
 		function label(mode) {
 			return mode === 'focus' ? 'Фокус' : 'Обычный';
+		}
+
+		function focusModeActive() {
+			return getSingleWaveMode() === 'focus' && !(root.classList && root.classList.contains('pk_mt_on'));
+		}
+
+		function centerFocusCursor(force) {
+			if (!focusModeActive()) return;
+			var ws = editor.engine && editor.engine.wavesurfer;
+			if (!ws || !ws.getDuration) return;
+			var dur = ws.getDuration();
+			if (!dur) return;
+
+			var now = ws.getCurrentTime ? ws.getCurrentTime() : lastCenteredTime;
+			if (typeof now !== 'number' || isNaN(now)) now = 0;
+			now = Math.max(0, Math.min(dur, now));
+
+			var visible = ws.VisibleDuration || (ws.ZoomFactor ? dur / ws.ZoomFactor : dur);
+			if (!visible || visible <= 0 || visible > dur) visible = dur;
+
+			var maxLeft = Math.max(0, dur - visible);
+			var left = Math.max(0, Math.min(maxLeft, now - visible * 0.5));
+			var jumpedBack = lastCenteredTime >= 0 && now + 0.08 < lastCenteredTime;
+			var threshold = Math.max(0.006, visible * 0.0012);
+
+			if (force || jumpedBack || Math.abs((ws.LeftProgress || 0) - left) > threshold || Math.abs(lastCenteredLeft - left) > threshold) {
+				ws.LeftProgress = left;
+				lastCenteredLeft = left;
+				try { ws.ForceDraw && ws.ForceDraw(); } catch (e) {}
+				try {
+					editor.fireEvent && editor.fireEvent('DidZoom', [
+						ws.ZoomFactor,
+						(left / dur) * 100,
+						ws.params && ws.params.verticalZoom
+					]);
+				} catch (e2) {}
+			}
+
+			lastCenteredTime = now;
+		}
+
+		function scheduleFocusCursorCenter(force) {
+			if (focusCenterRaf) return;
+			focusCenterRaf = w.requestAnimationFrame(function () {
+				focusCenterRaf = 0;
+				centerFocusCursor(!!force);
+				var ws = editor.engine && editor.engine.wavesurfer;
+				if (focusModeActive() && ws && ws.isPlaying && ws.isPlaying()) {
+					scheduleFocusCursorCenter(false);
+				}
+			});
 		}
 
 		function apply(mode) {
@@ -256,10 +310,12 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: почти полная тишина у краёв, пик ближе к центру' :
+						'Вид waveform: курсор удерживается по центру экрана' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
+
+			if (mode === 'focus') scheduleFocusCursorCenter(true);
 		}
 
 		function updateFullscreenButton() {
@@ -294,6 +350,7 @@
 			setSingleWaveMode(mode);
 			apply(mode);
 			redrawWave(editor);
+			if (mode === 'focus') scheduleFocusCursorCenter(true);
 		}
 
 		function makeButton() {
@@ -333,9 +390,15 @@
 
 		d.addEventListener('fullscreenchange', updateFullscreenButton);
 		d.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-		setTimeout(function () { redrawWave(editor); }, 80);
-		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); }, 0); });
-		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
+		setTimeout(function () { redrawWave(editor); scheduleFocusCursorCenter(true); }, 80);
+		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); scheduleFocusCursorCenter(true); }, 0); });
+		editor.listenFor && editor.listenFor('DidUnloadFile', function () { lastCenteredTime = -1; lastCenteredLeft = -1; apply(); });
+		editor.listenFor && editor.listenFor('DidAudioProcess', function () {
+			if (focusModeActive()) scheduleFocusCursorCenter(false);
+		});
+		editor.listenFor && editor.listenFor('DidStopPlay', function () {
+			if (focusModeActive()) scheduleFocusCursorCenter(true);
+		});
 	}
 
 	function install(editor) {
