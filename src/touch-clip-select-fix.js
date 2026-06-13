@@ -90,12 +90,16 @@
 		var width = Math.max(1, canvas && canvas.width || 1);
 		var nx = Math.max(0, Math.min(1, x / width));
 
-		var distFromCenter = Math.abs(nx - 0.5) * 2;
+		/* Symmetrical real-time-style envelope: edges stay almost silent for a
+		   visible margin, then the waveform rises into a tighter center peak. */
+		var distFromCenter = Math.abs(nx - 0.5) * 2; // 0 center, 1 edges
 		var edge = 1 - distFromCenter;
 		var quietInset = channel === 1 ? 0.26 : 0.22;
 		var shaped = smoothstep((edge - quietInset) / (1 - quietInset));
 		var t = Math.pow(shaped, channel === 1 ? 1.30 : 1.42);
 
+		/* The lower stereo channel remains slightly different but still perfectly
+		   symmetrical: broader quiet edge, softer center, tiny balanced breathing. */
 		if (channel === 1) {
 			var breath = 0.972 + 0.028 * Math.cos(distFromCenter * Math.PI * 2);
 			t *= breath;
@@ -156,31 +160,15 @@
 
 		var root = editor.el;
 		var btn = null;
-		var prevFollow = null;
 
 		function label(mode) {
 			return mode === 'focus' ? 'Фокус' : 'Обычный';
-		}
-
-		function keepFocusPeaksStatic(mode) {
-			var ws = editor.engine && editor.engine.wavesurfer;
-			if (!ws) return;
-
-			if (mode === 'focus') {
-				if (prevFollow === null) prevFollow = ws.FollowCursor;
-				ws.FollowCursor = 0;
-			}
-			else if (prevFollow !== null) {
-				ws.FollowCursor = prevFollow;
-				prevFollow = null;
-			}
 		}
 
 		function apply(mode) {
 			mode = mode || getSingleWaveMode();
 			root.classList.toggle('pk_single_wave_focus', mode === 'focus');
 			root.classList.toggle('pk_single_wave_normal', mode === 'normal');
-			keepFocusPeaksStatic(mode);
 
 			if (btn) {
 				btn.classList.toggle('pk_act', mode === 'focus');
@@ -190,7 +178,7 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: пики статичны, почти полная тишина у краёв' :
+						'Вид waveform: почти полная тишина у краёв, пик ближе к центру' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
@@ -237,12 +225,6 @@
 
 		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); }, 0); });
 		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
-		editor.listenFor && editor.listenFor('DidAudioProcess', function () {
-			if (getSingleWaveMode() === 'focus') keepFocusPeaksStatic('focus');
-		});
-		editor.listenFor && editor.listenFor('DidViewFollowCursorToggle', function () {
-			if (getSingleWaveMode() === 'focus') keepFocusPeaksStatic('focus');
-		});
 	}
 
 	function install(editor) {
