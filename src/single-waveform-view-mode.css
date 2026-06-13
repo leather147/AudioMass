@@ -1,7 +1,8 @@
 /* Single-waveform view modes.
-   Works only outside multitrack. The default mode is a focused stereo view:
-   left/right edges visually taper into silence, while the center keeps the
-   normal waveform amplitude/readability. */
+   The focus mode is rendered by JavaScript while WaveSurfer draws the actual
+   canvas path: waveform amplitude is reduced toward the left/right edges.
+   This CSS only styles the toolbar toggle and does not fake the waveform with
+   overlays, gradients, or masks. */
 
 .pk_wave_view_toggle{
 	position:relative!important;
@@ -84,56 +85,11 @@
 }
 
 .pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av_cont{
-	position:relative!important;
-	background:radial-gradient(circle at 50% 45%,rgba(90,242,255,.055),transparent 34%),#07080a!important;
-}
-
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av{
-	position:relative!important;
-	isolation:isolate!important;
-	overflow:hidden!important;
-}
-
-/* Fixed viewport overlay: the audio is still fully usable, but the visible
-   waveform edges fade into quiet zones and the center remains readable. */
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av:before,
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av:after{
-	content:''!important;
-	position:absolute!important;
-	top:0!important;
-	bottom:0!important;
-	width:28%!important;
-	z-index:18!important;
-	pointer-events:none!important;
-}
-
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av:before{
-	left:0!important;
-	background:linear-gradient(90deg,rgba(7,8,10,.92),rgba(7,8,10,.72) 42%,rgba(7,8,10,0))!important;
-}
-
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av:after{
-	right:0!important;
-	background:linear-gradient(270deg,rgba(7,8,10,.92),rgba(7,8,10,.72) 42%,rgba(7,8,10,0))!important;
+	background:radial-gradient(circle at 50% 45%,rgba(90,242,255,.045),transparent 34%),#07080a!important;
 }
 
 .pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av wave{
 	filter:saturate(1.06) contrast(1.04)!important;
-}
-
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av wave canvas{
-	-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.20) 0%,rgba(0,0,0,.48) 16%,#000 35%,#000 65%,rgba(0,0,0,.48) 84%,rgba(0,0,0,.20) 100%)!important;
-	mask-image:linear-gradient(90deg,rgba(0,0,0,.20) 0%,rgba(0,0,0,.48) 16%,#000 35%,#000 65%,rgba(0,0,0,.48) 84%,rgba(0,0,0,.20) 100%)!important;
-}
-
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av .wavesurfer-region,
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av region,
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_av .wavesurfer-handle{
-	z-index:25!important;
-}
-
-.pk_app:not(.pk_mt_on).pk_single_wave_focus .pk_panner{
-	z-index:26!important;
 }
 
 @media (max-width:820px){
