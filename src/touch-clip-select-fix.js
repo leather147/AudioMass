@@ -81,15 +81,34 @@
 		return true;
 	}
 
-	function focusGain(x, canvas) {
+	function smoothstep(t) {
+		t = Math.max(0, Math.min(1, t));
+		return t * t * (3 - 2 * t);
+	}
+
+	function focusGain(x, canvas, channel) {
 		var width = Math.max(1, canvas && canvas.width || 1);
 		var nx = Math.max(0, Math.min(1, x / width));
-		var edge = Math.min(nx, 1 - nx);
-		var t = Math.max(0, Math.min(1, edge / 0.34));
-		/* Smoothstep: the actual waveform geometry falls almost to silence at the
-		   viewport edges and returns to the original amplitude in the center. */
-		t = t * t * (3 - 2 * t);
-		return 0.035 + 0.965 * t;
+
+		/* Strictly symmetrical envelope: only the distance from the center matters,
+		   so left and right sides decay identically. */
+		var distFromCenter = Math.abs(nx - 0.5) * 2; // 0 center, 1 edges
+		var edge = 1 - distFromCenter;
+		var edgeZone = channel === 1 ? 0.40 : 0.34;
+		var t = smoothstep(edge / edgeZone);
+
+		/* Lower stereo channel is intentionally a little different: slightly wider
+		   fade and a very soft symmetrical breathing curve. It is not a copy of the
+		   top channel, but it still remains balanced left-to-right. */
+		if (channel === 1) {
+			t = Math.pow(t, 0.92);
+			var breath = 0.982 + 0.018 * Math.cos(distFromCenter * Math.PI * 2);
+			t *= breath;
+		}
+
+		var floor = channel === 1 ? 0.055 : 0.035;
+		var gain = floor + (1 - floor) * t;
+		return Math.max(floor, Math.min(1, gain));
 	}
 
 	function patchCanvasWaveformDraw() {
@@ -103,7 +122,9 @@
 
 		proto.moveTo = function (x, y) {
 			if (wavePathState && isFocusWaveCanvas(this)) {
-				wavePathState.set(this, { base: y, active: y > 24 });
+				var h = this.canvas && this.canvas.height || 1;
+				var channel = y > h * 0.52 ? 1 : 0;
+				wavePathState.set(this, { base: y, active: y > 24, channel: channel });
 			}
 			return originalMoveTo.call(this, x, y);
 		};
@@ -112,7 +133,7 @@
 			if (wavePathState && isFocusWaveCanvas(this)) {
 				var st = wavePathState.get(this);
 				if (st && st.active && Math.abs(y - st.base) > 0.25) {
-					var g = focusGain(x, this.canvas);
+					var g = focusGain(x, this.canvas, st.channel || 0);
 					y = st.base + (y - st.base) * g;
 				}
 			}
@@ -158,7 +179,7 @@
 				if (txt) txt.textContent = label(mode);
 				if (tip) {
 					tip.textContent = mode === 'focus' ?
-						'Вид waveform: сама волна затухает к краям, центр обычный' :
+						'Вид waveform: сама волна симметрично затухает к краям' :
 						'Вид waveform: обычная полная волна';
 				}
 			}
