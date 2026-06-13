@@ -5,6 +5,7 @@
 	var canvasPatched = false;
 	var originalMoveTo = null;
 	var originalLineTo = null;
+	var originalFill = null;
 	var wavePathState = typeof WeakMap !== 'undefined' ? new WeakMap() : null;
 
 	function closestClip(node) {
@@ -71,6 +72,16 @@
 		d.head.appendChild(link);
 	}
 
+	function isSingleWaveCanvas(ctx) {
+		var canvas = ctx && ctx.canvas;
+		if (!canvas || !canvas.parentNode) return false;
+		var app = d.querySelector('.pk_app:not(.pk_mt_on)');
+		if (!app) return false;
+		if (!canvas.closest || !canvas.closest('.pk_av')) return false;
+		if (canvas.closest('.pk_mt')) return false;
+		return true;
+	}
+
 	function isFocusWaveCanvas(ctx) {
 		var canvas = ctx && ctx.canvas;
 		if (!canvas || !canvas.parentNode) return false;
@@ -110,17 +121,46 @@
 		return Math.max(floor, Math.min(1, gain));
 	}
 
+	function applyWaveGlow(ctx, args) {
+		var focus = !!d.querySelector('.pk_app.pk_single_wave_focus:not(.pk_mt_on)');
+		var outer = focus ? 'rgba(80,235,255,.58)' : 'rgba(90,220,255,.44)';
+		var inner = focus ? 'rgba(205,252,255,.62)' : 'rgba(190,245,255,.46)';
+
+		try {
+			ctx.save();
+			ctx.shadowColor = outer;
+			ctx.shadowBlur = focus ? 22 : 16;
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			originalFill.apply(ctx, args);
+			ctx.restore();
+
+			ctx.save();
+			ctx.shadowColor = inner;
+			ctx.shadowBlur = focus ? 7 : 5;
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			originalFill.apply(ctx, args);
+			ctx.restore();
+		} catch (e) {
+			try { ctx.restore(); } catch (e2) {}
+		}
+
+		return originalFill.apply(ctx, args);
+	}
+
 	function patchCanvasWaveformDraw() {
 		if (canvasPatched || !w.CanvasRenderingContext2D) return;
 		var proto = w.CanvasRenderingContext2D.prototype;
-		if (!proto || !proto.moveTo || !proto.lineTo) return;
+		if (!proto || !proto.moveTo || !proto.lineTo || !proto.fill) return;
 
 		canvasPatched = true;
 		originalMoveTo = proto.moveTo;
 		originalLineTo = proto.lineTo;
+		originalFill = proto.fill;
 
 		proto.moveTo = function (x, y) {
-			if (wavePathState && isFocusWaveCanvas(this)) {
+			if (wavePathState && isSingleWaveCanvas(this)) {
 				var h = this.canvas && this.canvas.height || 1;
 				var channel = y > h * 0.52 ? 1 : 0;
 				wavePathState.set(this, { base: y, active: y > 24, channel: channel });
@@ -137,6 +177,14 @@
 				}
 			}
 			return originalLineTo.call(this, x, y);
+		};
+
+		proto.fill = function () {
+			var st = wavePathState && wavePathState.get(this);
+			if (st && st.active && isSingleWaveCanvas(this)) {
+				return applyWaveGlow(this, arguments);
+			}
+			return originalFill.apply(this, arguments);
 		};
 	}
 
@@ -223,6 +271,7 @@
 			}, 120);
 		}
 
+		setTimeout(function () { redrawWave(editor); }, 80);
 		editor.listenFor && editor.listenFor('DidUpdateLen', function () { setTimeout(function () { redrawWave(editor); }, 0); });
 		editor.listenFor && editor.listenFor('DidUnloadFile', function () { apply(); });
 	}
