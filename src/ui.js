@@ -53,6 +53,17 @@
 			!!(app.engine && app.engine.is_ready);
 	}
 
+	function setMenuItemChecked (button, checked) {
+		if (!button) return ;
+		if (w.AMMenuChecks && w.AMMenuChecks.set) {
+			w.AMMenuChecks.set (button, checked);
+			return ;
+		}
+		button.classList.toggle ('pk_menu_checked', !!checked);
+		button.setAttribute ('role', 'menuitemcheckbox');
+		button.setAttribute ('aria-checked', checked ? 'true' : 'false');
+	}
+
 	function seekMarkerEdgeFor ( app, dir ) {
 		return !!(app.mrk && app.mrk.edge && app.mrk.edge (dir));
 	}
@@ -1226,12 +1237,12 @@ function _topbarConfig ( app, ui ) {
 
 					{
 						name: 'Zero Cross Selection',
+						checkable: true,
 						action: function () {
 							app.fireEvent ('RequestSnapSelDrag');
 						},
 						setup: function ( obj ) {
-							var txt = 'Zero Cross Selection';
-							function set ( val ) { obj.innerHTML = txt + (val ? ' &#10004;' : ''); }
+							function set ( val ) { setMenuItemChecked (obj, val); }
 							set (!w.localStorage || w.localStorage.pk_snapzc !== '0');
 							app.listenFor ('DidSnapSelDrag', set);
 						}
@@ -1382,103 +1393,78 @@ function _topbarConfig ( app, ui ) {
 				name:'View',
 				children:[
 					{
-						name:'Follow Cursor  &#10004;',
+						name:'Follow Cursor',
+						checkable:true,
+						checked:true,
 						action: function ( obj ) {
 							app.fireEvent ('RequestViewFollowCursorToggle');
 						},
 						setup: function ( obj ) {
 							// perhaps read from stored settings?
 
-							app.listenFor ('DidViewFollowCursorToggle', function ( val ) {
-								var txt = 'Follow Cursor';
-
-								if (val) {
-									obj.innerHTML = txt + ' &#10004;';
-								} else {
-									obj.textContent = txt;
-								}
-							});
+							app.listenFor ('DidViewFollowCursorToggle', function ( val ) { setMenuItemChecked (obj, val); });
 						}
 					},
 
 					{
-						name:'Peak Separators &#10004;',
+						name:'Peak Separators',
+						checkable:true,
+						checked:true,
 						action: function ( obj ) {
 							app.fireEvent ('RequestViewPeakSeparatorToggle');
 						},
 						setup: function ( obj ) {
-							app.listenFor ('DidViewPeakSeparatorToggle', function ( val ) {
-								var txt = 'Peak Separators';
-								if (val) {
-									obj.innerHTML = txt + ' &#10004;';
-								} else {
-									obj.textContent = txt;
-								}
-							});
+							app.listenFor ('DidViewPeakSeparatorToggle', function ( val ) { setMenuItemChecked (obj, val); });
 						}
 					},
 
 					{
-						name:'Timeline &#10004;',
+						name:'Timeline',
+						checkable:true,
+						checked:true,
 						action: function ( obj ) {
 							app.fireEvent ('RequestViewTimelineToggle');
 						},
 						setup: function ( obj ) {
-							app.listenFor ('DidViewTimelineToggle', function ( val ) {
-								var txt = 'Timeline';
-								if (val) {
-									obj.innerHTML = txt + ' &#10004;';
-								} else {
-									obj.textContent = txt;
-								}
-							});
+							app.listenFor ('DidViewTimelineToggle', function ( val ) { setMenuItemChecked (obj, val); });
 						}
 					},
 
 					{
-						name:'---'
+						separator:true
 					},
 
 					{
 						name:'Frequency Analyser',
+						checkable:true,
 						action: function ( obj ) {
 							app.fireEvent ('RequestShowFreqAn', 'eq', [1]);
 						},
 						setup: function ( obj ) {
 							app.listenFor ('DidToggleFreqAn', function ( url, val ) {
 								if (url !== 'eq') return ;
-
-								var txt = 'Frequency Analyser';
-								if (val) {
-									obj.innerHTML = txt + ' &#10004;';
-								} else {
-									obj.textContent = txt;
-								}
+								setMenuItemChecked (obj, val);
 							});
 						}
 					},
 
 					{
 						name:'Spectrum Analyser',
+						checkable:true,
 						action: function ( obj ) {
 							app.fireEvent ('RequestShowFreqAn', 'sp', [1]);
 						},
 						setup: function ( obj ) {
 							app.listenFor ('DidToggleFreqAn', function ( url, val ) {
 								if (url !== 'sp') return ;
-
-								var txt = 'Spectrum Analyser';
-								if (val) {
-									obj.innerHTML = txt + ' &#10004;';
-								} else {
-									obj.textContent = txt;
-								}
+								setMenuItemChecked (obj, val);
 							});
 						}
 					},
 
 					{
 						name:'Multitrack Mixer',
+						checkable:true,
 						action: function ( obj ) {
 							var mt = app.multitrack;
 							if (mt && mt.IsOn && !mt.IsOn ()) mt.Toggle ( true );
@@ -1487,13 +1473,7 @@ function _topbarConfig ( app, ui ) {
 						setup: function ( obj ) {
 							app.listenFor ('DidToggleFreqAn', function ( url, val ) {
 								if (url !== 'mix') return ;
-
-								var txt = 'Multitrack Mixer';
-								if (val) {
-									obj.innerHTML = txt + ' &#10004;';
-								} else {
-									obj.textContent = txt;
-								}
+								setMenuItemChecked (obj, val);
 							});
 						}
 					},
@@ -1513,7 +1493,7 @@ function _topbarConfig ( app, ui ) {
 					},
 
 					{
-						name:'---'
+						separator:true
 					},
 
 					{
@@ -1601,7 +1581,7 @@ function _topbarConfig ( app, ui ) {
 					},
 
 					{
-						name:'---'
+						separator:true
 					},
 
 					{
@@ -1685,6 +1665,14 @@ function _topbarConfig ( app, ui ) {
 			{
 				var btn_container = d.createElement ( 'div' );
 				var curr_obj = tree_obj[i];
+
+				if (level > 0 && curr_obj.separator)
+				{
+					btn_container.className = 'pk_menu_separator';
+					btn_container.setAttribute ('role', 'separator');
+					parent_el.appendChild (btn_container);
+					continue ;
+				}
 				
 				if (level === 0)
 				{
@@ -1700,7 +1688,14 @@ function _topbarConfig ( app, ui ) {
 					btn.className = 'pk_opt ' + (curr_obj.clss ? curr_obj.clss : '');
 					btn.setAttribute ( 'tab-index', '-1' );
 					btn.setAttribute ( 'data-index', i );
-					btn.innerHTML = curr_obj.name;
+					if (curr_obj.checkable && w.AMMenuChecks && w.AMMenuChecks.prepare)
+					{
+						w.AMMenuChecks.prepare (btn, curr_obj.name, curr_obj.checked);
+					}
+					else
+					{
+						btn.innerHTML = curr_obj.name;
+					}
 					btn_container.appendChild ( btn );
 
 					if (curr_obj.action)
@@ -2951,25 +2946,23 @@ function _topbarConfig ( app, ui ) {
 		pk_timingcnv.width = 150;
 		pk_timingcnv.height = 40;
 		var pk_timingnum = '00:00:000';
-		var pk_timingctx = pk_timingcnv.getContext('2d', {alpha:false});
+		var pk_timingctx = pk_timingcnv.getContext('2d');
 		var timing_caches = {};
 
 		if (is_chrome)
 		{
 			timing.appendChild( pk_timingcnv );
-			pk_timingctx.fillStyle = "#000";
-			pk_timingctx.fillRect(0, 0, 150, 40);
+			pk_timingctx.clearRect(0, 0, 150, 40);
 
 			for (var ii = 0; ii < 11; ++ii)
 			{
 				var curr_cache = d.createElement('canvas');
 				curr_cache.width = 18;
 				curr_cache.height = 26;
-				var curr_ctx = curr_cache.getContext('2d', {alpha:false});
+				var curr_ctx = curr_cache.getContext('2d');
 				curr_ctx.font = "29px Helvetica, Arial, sans-serif";
 				curr_ctx.textAlign = "center";
-				curr_ctx.fillStyle = "#000";
-				curr_ctx.fillRect(0, 0, 18, 26);
+				curr_ctx.clearRect(0, 0, 18, 26);
 				curr_ctx.fillStyle = "#fff";
 				curr_ctx.textBaseline = 'middle';
 
@@ -2993,6 +2986,30 @@ function _topbarConfig ( app, ui ) {
 				}
 			})(pk_timingctx, timing_caches);
 		}
+
+		function refreshTimingTheme () {
+			if (!is_chrome || !w.AMTheme) return ;
+			var fg = w.AMTheme.color ('foreground', '#fff');
+			pk_timingctx.clearRect (0, 0, 150, 40);
+			for (var key in timing_caches) {
+				if (!Object.prototype.hasOwnProperty.call (timing_caches, key)) continue ;
+				var cache = timing_caches[key];
+				var cache_ctx = cache.getContext ('2d');
+				cache_ctx.clearRect (0, 0, 18, 26);
+				cache_ctx.fillStyle = fg;
+				cache_ctx.font = '29px Helvetica, Arial, sans-serif';
+				cache_ctx.textAlign = 'center';
+				cache_ctx.textBaseline = 'middle';
+				cache_ctx.fillText (key, key === ':' ? 8 : 9, 14);
+			}
+			for (var ti = 0; ti < pk_timingnum.length; ++ti) {
+				pk_timingctx.drawImage (timing_caches[pk_timingnum[ti]], ti * 16, 10);
+			}
+		}
+		w.addEventListener ('am:themechange', function () {
+			(w.requestAnimationFrame || w.setTimeout) (refreshTimingTheme);
+		});
+		refreshTimingTheme ();
 		/////
 
 
@@ -3217,14 +3234,10 @@ function _topbarConfig ( app, ui ) {
 				return ;
 			}
 
-			var exit = false;
+			if (ttm === pk_timingnum) return ;
+			pk_timingctx.clearRect (0, 0, 150, 40);
 			for (var jk = 0; jk < ttm.length; ++jk)
 			{
-				if (!exit)
-				{
-					if (ttm[jk] === pk_timingnum[jk]) continue;
-					exit = true;
-				}
 				pk_timingctx.drawImage (timing_caches[ttm[jk]], jk * 16, 10);
 			}
 			pk_timingnum = ttm;

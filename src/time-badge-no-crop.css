@@ -3,22 +3,23 @@
    Purpose:
    - keep the main timecode visible;
    - remove the oversized empty spacing between the big timer and side labels;
-   - keep the first toolbar badge flexible instead of hard 292px.
+   - reserve separate, non-shrinking columns for primary and secondary time.
    ============================================================= */
 
 :root{
-	--am-time-main-w:clamp(112px, 8.8vw, 142px);
-	--am-time-side-w:clamp(70px, 5.2vw, 86px);
-	--am-time-badge-w:clamp(212px, 16.5vw, 248px);
+	--am-time-main-w:150px;
+	--am-time-side-w:74px;
+	--am-time-column-gap:8px;
+	--am-time-badge-w:250px;
 }
 
 .pk_timecontainer,
 .pk_mt_on .pk_timecontainer{
 	position:relative!important;
-	flex:0 1 var(--am-time-badge-w)!important;
+	flex:0 0 var(--am-time-badge-w)!important;
 	width:var(--am-time-badge-w)!important;
-	min-width:212px!important;
-	max-width:248px!important;
+	min-width:var(--am-time-badge-w)!important;
+	max-width:var(--am-time-badge-w)!important;
 	height:48px!important;
 	min-height:48px!important;
 	max-height:48px!important;
@@ -29,13 +30,13 @@
 	grid-template-rows:1fr 1fr!important;
 	align-items:center!important;
 	justify-content:start!important;
-	column-gap:6px!important;
+	column-gap:var(--am-time-column-gap)!important;
 	overflow:hidden!important;
 	contain:none!important;
 }
 
-/* Chrome uses a canvas for the big time digits. CSS width scales the full
-   canvas down instead of cropping it, so the badge can stay compact/flexible. */
+/* Chrome renders the large digits into a fixed 150x40 canvas. Match those
+   intrinsic dimensions so browser zoom cannot push pixels into column two. */
 .pk_timecontainer .pk_timingcnv,
 .pk_mt_on .pk_timecontainer .pk_timingcnv{
 	position:static!important;
@@ -50,9 +51,9 @@
 	width:var(--am-time-main-w)!important;
 	min-width:0!important;
 	max-width:var(--am-time-main-w)!important;
-	height:38px!important;
-	min-height:38px!important;
-	max-height:38px!important;
+	height:40px!important;
+	min-height:40px!important;
+	max-height:40px!important;
 	margin:0!important;
 	overflow:visible!important;
 }
@@ -126,19 +127,19 @@
 
 @media (max-width:760px){
 	:root{
-		--am-time-main-w:108px;
-		--am-time-side-w:68px;
-		--am-time-badge-w:196px;
+		--am-time-side-w:70px;
+		--am-time-column-gap:6px;
+		--am-time-badge-w:242px;
 	}
 
 	.pk_timecontainer,
 	.pk_mt_on .pk_timecontainer{
-		flex:0 1 var(--am-time-badge-w)!important;
+		flex:0 0 var(--am-time-badge-w)!important;
 		width:var(--am-time-badge-w)!important;
-		min-width:196px!important;
-		max-width:212px!important;
+		min-width:var(--am-time-badge-w)!important;
+		max-width:var(--am-time-badge-w)!important;
 		padding:4px 7px!important;
-		column-gap:5px!important;
+		column-gap:var(--am-time-column-gap)!important;
 	}
 
 	.pk_timecontainer .pk_total_dur,

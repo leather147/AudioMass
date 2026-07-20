@@ -4,11 +4,13 @@
 	<script>window.update = function(){};</script>
 
     <title>AudioMass - Спектральный анализ</title>
+	<script src="theme-registry.js"></script>
+	<script src="popup-theme.js"></script>
 	<style>
 	html,body{height:100%}
-	body{padding:0;margin:0;background:#111;position:relative;z-index:2;overflow:hidden;}
+	body{padding:0;margin:0;background:var(--background,#111);position:relative;z-index:2;overflow:hidden;}
 	div{position:absolute;top:50%;left:0;right:0;z-index:1;margin-top:-18px;text-align:center;user-select:none;
-		font-size:28px;color:#191919;pointer-events:none;opacity:.75;font-family:Arial}
+		font-size:28px;color:var(--muted-foreground,#191919);pointer-events:none;opacity:.75;font-family:Arial}
 	#e, #d, #f{
 		cursor:pointer;
 		position: absolute;
@@ -17,10 +19,11 @@
 	    display: block;
 	    height: 20px;
 	    z-index: 99999;
-	    background: #eaeaea;
+	    background: var(--secondary,#eaeaea);
 	    left:auto;
+	    border:1px solid var(--border,transparent);
 	    border-radius:4px;
-		color:#111;
+		color:var(--secondary-foreground,#111);
 		font:9px/20px Arial,sans-serif;
 	    width: auto;
 	    padding: 0 6px;
@@ -60,14 +63,14 @@
 	    line-height: 0;
 	    border-radius: 0;
 	    height: 4px;
-	    background: #333;
+	    background: var(--surface-strong,#333);
 	    display:none;
 	    user-select:none;
 	    -moz-user-select:none;
 	}
 
 	.c #f, #f:hover{
-		background:#3C3C3C;
+		background:var(--muted-foreground,#3C3C3C);
 	}
 
 	</style>
@@ -88,6 +91,12 @@
 		var iframe = location.href.indexOf('?iframe') === -1 ? 0 : 1;
 		var canvas = d.getElementById('fr');
 		var ctx = canvas.getContext('2d', {alpha:true, antialias:false});
+		function clearThemedCanvas () {
+			ctx.fillStyle = w.AMPopupTheme ? w.AMPopupTheme.color('background', '#111') : '#111';
+			ctx.fillRect(0, 0, canvas.width || w.innerWidth, canvas.height || w.innerHeight);
+		}
+		w.addEventListener('am:popupthemechange', clearThemedCanvas);
+		clearThemedCanvas();
 
         w.remove = function (){};
         // локализация заголовка и кнопок в зависимости от выбранного языка
@@ -230,7 +239,7 @@
 
 				tempCtx.drawImage (canvas, 0, 0, WIDTH, HEIGHT);
 
-				ctx.fillStyle = 'rgb(0, 0, 0)';
+				ctx.fillStyle = window.AMPopupTheme ? window.AMPopupTheme.color('background', '#111') : '#111';
 				ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
 				// Iterate over the frequencies.

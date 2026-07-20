@@ -1,4 +1,4 @@
-const CACHE_NAME = 'audiomass-production-v63';
+const CACHE_NAME = 'audiomass-production-v68';
 const assets = [
 	'./',
 	'./manifest.json',
@@ -20,6 +20,9 @@ const assets = [
 	'./rnn_denoise.js',
 	'./rnn_denoise.wasm',
 	'./fonts/icomoon.woff',
+	'./menu-check-svg.js',
+	'./theme-registry.js',
+	'./popup-theme.js',
 	'./eq.html',
 	'./sp.html',
 	'./mix.html'//, './test.mp3'

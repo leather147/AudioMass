@@ -3,42 +3,44 @@
 <head>
     <title>AudioMass - Микшер мультидорожек</title>
 	<meta charset="utf-8" />
+	<script src="theme-registry.js"></script>
+	<script src="popup-theme.js"></script>
 	<style>
 	html,body{height:100%}
-	body{margin:0;background:#090d0e;color:#dfe7e8;overflow:hidden;font:12px Arial,sans-serif}
-	#m{box-sizing:border-box;height:100%;padding:26px 10px 10px;white-space:nowrap;overflow:auto;background:#090d0e;scrollbar-color:#1c2026 #0e1013}
+	body{margin:0;background:var(--background,#090d0e);color:var(--foreground,#dfe7e8);overflow:hidden;font:12px Arial,sans-serif}
+	#m{box-sizing:border-box;height:100%;padding:26px 10px 10px;white-space:nowrap;overflow:auto;background:radial-gradient(circle at 18% -10%,var(--accent-soft,transparent),transparent 32%),var(--background,#090d0e);scrollbar-color:var(--surface-strong,#1c2026) var(--background,#0e1013)}
 	#m::-webkit-scrollbar{width:10px;height:10px}
-	#m::-webkit-scrollbar-track{background:#0e1013}
-	#m::-webkit-scrollbar-thumb{background:#1c2026;border:2px solid #0e1013;border-radius:4px}
-	#m::-webkit-scrollbar-thumb:hover,#m::-webkit-scrollbar-thumb:active{background:#6a7380}
-	.s{display:inline-block;position:relative;box-sizing:border-box;width:92px;height:268px;margin-right:8px;padding:8px 7px;vertical-align:top;background:linear-gradient(#182023,#101416);border:1px solid #263338;border-radius:5px;box-shadow:inset 0 1px rgba(255,255,255,.05),0 2px 8px #000}
-	.s.sel{border-color:#56dbe3;box-shadow:0 0 12px rgba(80,220,225,.35),inset 0 1px rgba(255,255,255,.05)}
-	.s.master{border-color:#4b493c;background:linear-gradient(#1f211d,#121310)}
-	strong{display:block;height:26px;overflow:hidden;color:#f3f6f6;font:bold 13px/13px Arial,sans-serif}
-	.meter{height:7px;margin:5px 0 8px;background:#050708;border:1px solid #222c30;box-shadow:inset 0 1px 3px #000;overflow:hidden}
-	.meter i{display:block;height:100%;transform:scaleX(0);transform-origin:0 0;background:linear-gradient(90deg,#56dbe3,#77d26d 62%,#d4bd54 84%,#d45b57)}
+	#m::-webkit-scrollbar-track{background:var(--background,#0e1013)}
+	#m::-webkit-scrollbar-thumb{background:var(--surface-strong,#1c2026);border:2px solid var(--background,#0e1013);border-radius:4px}
+	#m::-webkit-scrollbar-thumb:hover,#m::-webkit-scrollbar-thumb:active{background:var(--muted-foreground,#6a7380)}
+	.s{display:inline-block;position:relative;box-sizing:border-box;width:92px;height:268px;margin-right:8px;padding:8px 7px;vertical-align:top;background:linear-gradient(180deg,var(--bd-s,rgba(255,255,255,.05)),transparent),var(--card,#101416);border:1px solid var(--border,#263338);border-radius:5px;box-shadow:inset 0 1px var(--bd-s,rgba(255,255,255,.05)),0 2px 8px var(--shadow-color,#000)}
+	.s.sel{border-color:var(--ring,#56dbe3);box-shadow:0 0 12px var(--accent-muted,rgba(80,220,225,.35)),inset 0 1px var(--bd-s,rgba(255,255,255,.05))}
+	.s.master{border-color:var(--accent-strong,#4b493c);background:linear-gradient(180deg,var(--accent-soft,transparent),transparent),var(--card,#121310)}
+	strong{display:block;height:26px;overflow:hidden;color:var(--foreground,#f3f6f6);font:bold 13px/13px Arial,sans-serif}
+	.meter{height:7px;margin:5px 0 8px;background:var(--background,#050708);border:1px solid var(--border,#222c30);box-shadow:inset 0 1px 3px var(--shadow-color,#000);overflow:hidden}
+	.meter i{display:block;height:100%;transform:scaleX(0);transform-origin:0 0;background:linear-gradient(90deg,var(--ring,#56dbe3),var(--ok,#77d26d) 62%,var(--warn,#d4bd54) 84%,var(--rec,#d45b57))}
 	p{margin:0 0 8px}
-	button{width:22px;height:22px;margin-right:2px;background:#06090a;color:#dfe7e8;border:1px solid #263338;border-radius:3px;cursor:pointer;font:13px Arial}
-	button.a{color:#111;background:#56dbe3;border-color:#56dbe3}
-	label{display:block;color:#8b9aa0;font:9px/12px monospace;text-transform:uppercase}
+	button{width:22px;height:22px;margin-right:2px;background:var(--background,#06090a);color:var(--foreground,#dfe7e8);border:1px solid var(--border,#263338);border-radius:3px;cursor:pointer;font:13px Arial}
+	button.a{color:var(--accent-contrast,#111);background:var(--ring,#56dbe3);border-color:var(--ring,#56dbe3)}
+	label{display:block;color:var(--muted-foreground,#8b9aa0);font:9px/12px monospace;text-transform:uppercase}
 	input{cursor:pointer}
 	.pn{height:44px;margin:0 -7px;display:flex;align-items:center;justify-content:center;gap:4px}
 	.pn label{width:27px;text-align:right}.pn em{width:25px;text-align:left}
-	.k{position:relative;width:30px;height:30px;margin:0;border-radius:50%;background:linear-gradient(145deg,#080b0c,#151b1e);box-shadow:inset 0 0 0 1px #263338,0 2px 7px #000;cursor:move}
-	.k i{position:absolute;left:14px;top:5px;width:3px;height:11px;background:#66e8ef;border-radius:2px;box-shadow:0 0 8px #66e8ef;transform-origin:50% 10px}
+	.k{position:relative;width:30px;height:30px;margin:0;border-radius:50%;background:linear-gradient(145deg,var(--background,#080b0c),var(--secondary,#151b1e));box-shadow:inset 0 0 0 1px var(--border,#263338),0 2px 7px var(--shadow-color,#000);cursor:move}
+	.k i{position:absolute;left:14px;top:5px;width:3px;height:11px;background:var(--ring,#66e8ef);border-radius:2px;box-shadow:0 0 8px var(--ac-glow,#66e8ef);transform-origin:50% 10px}
 	.vol{position:absolute;left:50%;bottom:78px;width:86px;height:18px;margin-left:-43px;transform:rotate(-90deg);transform-origin:50% 50%;appearance:none;background:transparent}
-	.vol::-webkit-slider-runnable-track{height:6px;background:#050708;border:1px solid #263338;border-radius:9px}
-	.vol::-webkit-slider-thumb{appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:#d7d2c3;border:1px solid #0a0d0e;box-shadow:0 1px 5px #000}
-	.vol::-moz-range-track{height:6px;background:#050708;border:1px solid #263338;border-radius:9px}
-	.vol::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#d7d2c3;border:1px solid #0a0d0e}
-	em,output{display:block;color:#b3b6b1;font:10px/14px monospace;text-align:center}
+	.vol::-webkit-slider-runnable-track{height:6px;background:var(--background,#050708);border:1px solid var(--border,#263338);border-radius:9px}
+	.vol::-webkit-slider-thumb{appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:var(--foreground,#d7d2c3);border:1px solid var(--background,#0a0d0e);box-shadow:0 1px 5px var(--shadow-color,#000)}
+	.vol::-moz-range-track{height:6px;background:var(--background,#050708);border:1px solid var(--border,#263338);border-radius:9px}
+	.vol::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--foreground,#d7d2c3);border:1px solid var(--background,#0a0d0e)}
+	em,output{display:block;color:var(--muted-foreground,#b3b6b1);font:10px/14px monospace;text-align:center}
 	output{position:absolute;left:0;right:0;bottom:20px}
-	.empty{position:absolute;left:0;right:0;top:50%;margin-top:-9px;color:#4d5250;text-align:center;font:18px Arial;letter-spacing:1px}
-	#e,#d,#f{position:absolute;top:7px;right:7px;z-index:9;height:20px;padding:0 6px;background:#eaeaea;color:#111;border-radius:4px;opacity:.9;cursor:pointer;text-align:center;font:9px/20px Arial,sans-serif;user-select:none}
+	.empty{position:absolute;left:0;right:0;top:50%;margin-top:-9px;color:var(--muted-foreground,#4d5250);text-align:center;font:18px Arial;letter-spacing:1px}
+	#e,#d,#f{position:absolute;top:7px;right:7px;z-index:9;height:20px;padding:0 6px;background:var(--secondary,#eaeaea);color:var(--secondary-foreground,#111);border:1px solid var(--border,transparent);border-radius:4px;opacity:.9;cursor:pointer;text-align:center;font:9px/20px Arial,sans-serif;user-select:none}
 	#d{min-width:40px}
 	#e{right:68px;width:10px;display:none}
-	#f{left:0;right:0;top:0;width:100%;height:4px;padding:0;border-radius:0;background:#333;display:none;line-height:0}
-	.b #e,.b #f{display:block}.b #e,.b #d{top:12px}.c #f,#f:hover{background:#444}
+	#f{left:0;right:0;top:0;width:100%;height:4px;padding:0;border-radius:0;background:var(--surface-strong,#333);display:none;line-height:0}
+	.b #e,.b #f{display:block}.b #e,.b #d{top:12px}.c #f,#f:hover{background:var(--muted-foreground,#444)}
 	.b #m{padding-bottom:8px}
 	.b .s{height:236px}
 	.b .vol{bottom:58px;width:72px;margin-left:-36px}
