@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import Literal
 
+import imageio_ffmpeg
 import soundfile as sf
 
 from app.audio.io import inspect_audio
@@ -20,7 +21,18 @@ FORMAT_OPTIONS: dict[str, tuple[str, str | None]] = {
 
 
 def ffmpeg_available() -> bool:
-    return shutil.which("ffmpeg") is not None
+    return _ffmpeg_executable() is not None
+
+
+def _ffmpeg_executable() -> str | None:
+    system_executable = shutil.which("ffmpeg")
+    if system_executable is not None:
+        return system_executable
+    try:
+        bundled_executable = imageio_ffmpeg.get_ffmpeg_exe()
+    except RuntimeError:
+        return None
+    return bundled_executable if Path(bundled_executable).is_file() else None
 
 
 def export_audio(input_path: Path, output_path: Path, output_format: ExportFormat) -> None:
@@ -46,11 +58,11 @@ def export_audio(input_path: Path, output_path: Path, output_format: ExportForma
 
 
 def _export_mp3(input_path: Path, output_path: Path) -> None:
-    executable = shutil.which("ffmpeg")
+    executable = _ffmpeg_executable()
     if executable is None:
         raise AudioProcessingError(
             "ffmpeg_unavailable",
-            "MP3 export requires ffmpeg on the service PATH",
+            "MP3 export requires an available ffmpeg executable",
             status_code=503,
         )
     command = [

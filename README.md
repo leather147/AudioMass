@@ -78,6 +78,7 @@ Python quality commands are documented in [docs/PYTHON_API.md](docs/PYTHON_API.m
 - [NestJS API](docs/API.md)
 - [FastAPI processing API](docs/PYTHON_API.md)
 - [Deployment](docs/DEPLOYMENT.md)
+- [Vercel-only deployment with Neon](docs/VERCEL_ONLY_DEPLOYMENT.md)
 - [Operations runbook](docs/OPERATIONS.md)
 - [Migration record](docs/MIGRATION.md)
 - [Original migration audit](MIGRATION_PLAN.md)
