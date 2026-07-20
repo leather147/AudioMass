@@ -126,12 +126,14 @@
 	<script src="clip-rename-button.js"></script>
 	<script src="touch-clip-select-fix.js"></script>
 	<script src="settings-trigger.js"></script>
+	<script src="next-bridge.js"></script>
 	<script>
 		var editor = PKAudioEditor.init('app');
 		if (window.AMInstallMtScrollRulerFinalFix) window.AMInstallMtScrollRulerFinalFix(editor);
 		if (window.AMInstallMarkerCreateButton) window.AMInstallMarkerCreateButton(editor);
 		if (window.AMInstallClipRenameButton) window.AMInstallClipRenameButton(editor);
 		if (window.AMInstallTouchClipSelectFix) window.AMInstallTouchClipSelectFix(editor);
+		if (window.AMInstallNextBridge) window.AMInstallNextBridge(editor);
 	</script>
 </body>
 </html>

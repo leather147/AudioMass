@@ -3,11 +3,15 @@
 *.aif
 *.aiff
 *.br
-node_modules/*
+node_modules/
+**/node_modules/
 .next/
 .turbo/
 coverage/
 dist/
+!apps/web/public/legacy/dist/
+!apps/web/public/legacy/dist/**
+!apps/web/public/legacy/main.build.css.br
 *.tsbuildinfo
 .env
 .env.local

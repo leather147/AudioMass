@@ -18,13 +18,6 @@
     "clean": "turbo run clean && node tooling/clean.mjs",
     "prepare": "husky"
   },
-  "lint-staged": {
-    "*.{js,mjs,cjs,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yaml,yml,css}": "prettier --write"
-  },
   "devDependencies": {
     "@eslint/js": "9.39.2",
     "@types/node": "^24.0.0",
