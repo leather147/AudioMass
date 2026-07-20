@@ -5,9 +5,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import type { Prisma, ProcessingJob } from '@audiomass/database';
 import type { Page } from '../common/pagination.dto.js';
 import type { PrismaService } from '../database/prisma.service.js';
-import type { Prisma, ProcessingJob } from '../generated/prisma/client.js';
 import type { CreateProcessingJobDto } from './dto/create-processing-job.dto.js';
 import type { ListProcessingJobsDto } from './dto/list-processing-jobs.dto.js';
 import type { TransitionProcessingJobDto } from './dto/transition-processing-job.dto.js';

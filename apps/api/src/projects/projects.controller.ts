@@ -21,8 +21,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import type { Project } from '@audiomass/database';
 import type { Page } from '../common/pagination.dto.js';
-import type { Project } from '../generated/prisma/client.js';
 import type { CreateProjectDto } from './dto/create-project.dto.js';
 import type { ListProjectsDto } from './dto/list-projects.dto.js';
 import type { UpdateProjectDto } from './dto/update-project.dto.js';

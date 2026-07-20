@@ -7,4 +7,4 @@ pnpm-lock.yaml
 apps/web/public/legacy
 apps/web/public/codecs
 apps/web/next-env.d.ts
-apps/api/src/generated
+packages/database/src/generated

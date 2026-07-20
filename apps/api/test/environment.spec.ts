@@ -9,6 +9,11 @@ describe('environment validation', () => {
     const result = validateEnvironment({
       API_KEYS: API_KEY,
       DATABASE_URL: 'postgresql://user:secret@db:5432/audiomass',
+      S3_KEY: 'access-key',
+      S3_REGION: 'eu-central-1',
+      S3_SECRET: 'secret-key',
+      STORAGE_BUCKET: 'audiomass',
+      STORAGE_PROVIDER: 's3',
       PORT: '4100',
     });
 

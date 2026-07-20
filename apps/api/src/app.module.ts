@@ -5,6 +5,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ApiKeyGuard } from './auth/api-key.guard.js';
 import { validateEnvironment } from './config/environment.js';
 import { DatabaseModule } from './database/database.module.js';
+import { FilesModule } from './files/files.module.js';
 import { HealthModule } from './health/health.module.js';
 import { ProcessingJobsModule } from './processing-jobs/processing-jobs.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
@@ -18,6 +19,7 @@ import { ProjectsModule } from './projects/projects.module.js';
     }),
     DatabaseModule,
     HealthModule,
+    FilesModule,
     ProjectsModule,
     ProcessingJobsModule,
   ],

@@ -1,8 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma, Project } from '@audiomass/database';
 
 import type { Page } from '../common/pagination.dto.js';
 import type { PrismaService } from '../database/prisma.service.js';
-import type { Prisma, Project } from '../generated/prisma/client.js';
 import type { CreateProjectDto } from './dto/create-project.dto.js';
 import type { ListProjectsDto } from './dto/list-projects.dto.js';
 import type { UpdateProjectDto } from './dto/update-project.dto.js';
