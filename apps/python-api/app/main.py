@@ -6,10 +6,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import ai, audio, effects, health, jobs, plugins
 from app.core.config import get_settings
 from app.core.errors import install_exception_handlers
 from app.core.logging import configure_logging, install_request_logging
+from app.core.runtime_compat import install_librosa_stub_fallback
 
 
 @asynccontextmanager
@@ -21,6 +21,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
+    install_librosa_stub_fallback()
+    from app.api import ai, audio, effects, health, jobs, plugins
+
     application = FastAPI(
         title="AudioMass Python Processing API",
         summary="Bounded heavy DSP and audio analysis for the AudioMass gateway",
