@@ -30,7 +30,14 @@ Browser
 2. Оставьте `Include files outside the root directory in the Build Step` включённым. Это обязательно для pnpm workspace и общих пакетов.
 3. Выберите Node.js `24.x` для Web и API.
 4. Не задавайте `Output Directory` вручную.
-5. Не переопределяйте Install Command. Vercel найдёт корневой `pnpm-lock.yaml` и `pnpm-workspace.yaml`.
+5. Для Web и API не переопределяйте Install Command: Vercel найдёт корневой `pnpm-lock.yaml` и `pnpm-workspace.yaml`.
+6. Для Python используйте команду из `apps/python-api/vercel.json`:
+
+   ```text
+   uv pip install --python .vercel/python/.venv -r requirements.txt
+   ```
+
+   Она ставит зависимости именно в virtualenv, из которого Vercel запускает FastAPI Function. Не добавляйте `--system` и не выбирайте отдельный системный Python: в Vercel это либо попадёт не в runtime-окружение, либо завершится ошибкой externally managed environment.
 
 Затем откройте `Settings -> Environments -> Production -> Branch Tracking` и выберите ветку, которая реально содержит каталоги `apps/*`. До слияния миграции это `agent/enterprise-migration`.
 

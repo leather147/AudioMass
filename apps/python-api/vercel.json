@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "fastapi",
   "fluid": true,
+  "installCommand": "uv pip install --python .vercel/python/.venv -r requirements.txt",
   "functions": {
     "app/main.py": {
       "maxDuration": 300
