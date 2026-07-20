@@ -9,6 +9,7 @@ node_modules/
 .turbo/
 coverage/
 dist/
+**/src/generated/
 !apps/web/public/legacy/dist/
 !apps/web/public/legacy/dist/**
 !apps/web/public/legacy/main.build.css.br

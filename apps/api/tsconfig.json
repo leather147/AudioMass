@@ -1,0 +1,11 @@
+{
+  "extends": "@audiomass/config/tsconfig/nestjs",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@api/*": ["./src/*"]
+    }
+  },
+  "include": ["prisma.config.ts", "src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+}

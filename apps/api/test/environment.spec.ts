@@ -1,0 +1,40 @@
+import { describe, expect, it } from 'vitest';
+
+import { parseCorsOrigins, validateEnvironment } from '../src/config/environment.js';
+
+const API_KEY = 'a'.repeat(32);
+
+describe('environment validation', () => {
+  it('normalizes a valid production environment', () => {
+    const result = validateEnvironment({
+      API_KEYS: API_KEY,
+      DATABASE_URL: 'postgresql://user:secret@db:5432/audiomass',
+      PORT: '4100',
+    });
+
+    expect(result.PORT).toBe(4100);
+    expect(result.NODE_ENV).toBe('development');
+  });
+
+  it('rejects weak API keys and non-PostgreSQL data sources', () => {
+    expect(() =>
+      validateEnvironment({
+        API_KEYS: 'short',
+        DATABASE_URL: 'postgresql://db/audiomass',
+      }),
+    ).toThrow('at least 32 characters');
+    expect(() =>
+      validateEnvironment({
+        API_KEYS: API_KEY,
+        DATABASE_URL: 'file:./local.db',
+      }),
+    ).toThrow('postgresql://');
+  });
+
+  it('parses an explicit CORS allowlist', () => {
+    expect(parseCorsOrigins('https://app.example.com, https://admin.example.com')).toEqual([
+      'https://app.example.com',
+      'https://admin.example.com',
+    ]);
+  });
+});

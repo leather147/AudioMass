@@ -8,6 +8,7 @@ export default tseslint.config(
       '**/.turbo/**',
       '**/coverage/**',
       '**/dist/**',
+      '**/src/generated/**',
       '**/node_modules/**',
       'apps/web/public/legacy/**',
       'apps/web/public/codecs/**',
