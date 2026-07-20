@@ -216,6 +216,8 @@ html[data-theme] .pk_modal_a_accpt{
 }
 
 /* Time and selection readouts */
+.pk_timecontainer .pk_timing,
+.pk_timecontainer .pk_timingcnv{background:transparent!important}
 .pk_timing{color:var(--foreground)!important;text-shadow:0 0 22px var(--accent-soft)!important}
 .pk_total_dur,
 .pk_hover_dur,

@@ -2946,25 +2946,23 @@ function _topbarConfig ( app, ui ) {
 		pk_timingcnv.width = 150;
 		pk_timingcnv.height = 40;
 		var pk_timingnum = '00:00:000';
-		var pk_timingctx = pk_timingcnv.getContext('2d', {alpha:false});
+		var pk_timingctx = pk_timingcnv.getContext('2d');
 		var timing_caches = {};
 
 		if (is_chrome)
 		{
 			timing.appendChild( pk_timingcnv );
-			pk_timingctx.fillStyle = "#000";
-			pk_timingctx.fillRect(0, 0, 150, 40);
+			pk_timingctx.clearRect(0, 0, 150, 40);
 
 			for (var ii = 0; ii < 11; ++ii)
 			{
 				var curr_cache = d.createElement('canvas');
 				curr_cache.width = 18;
 				curr_cache.height = 26;
-				var curr_ctx = curr_cache.getContext('2d', {alpha:false});
+				var curr_ctx = curr_cache.getContext('2d');
 				curr_ctx.font = "29px Helvetica, Arial, sans-serif";
 				curr_ctx.textAlign = "center";
-				curr_ctx.fillStyle = "#000";
-				curr_ctx.fillRect(0, 0, 18, 26);
+				curr_ctx.clearRect(0, 0, 18, 26);
 				curr_ctx.fillStyle = "#fff";
 				curr_ctx.textBaseline = 'middle';
 
@@ -2991,16 +2989,13 @@ function _topbarConfig ( app, ui ) {
 
 		function refreshTimingTheme () {
 			if (!is_chrome || !w.AMTheme) return ;
-			var bg = w.AMTheme.color ('background', '#000');
 			var fg = w.AMTheme.color ('foreground', '#fff');
-			pk_timingctx.fillStyle = bg;
-			pk_timingctx.fillRect (0, 0, 150, 40);
+			pk_timingctx.clearRect (0, 0, 150, 40);
 			for (var key in timing_caches) {
 				if (!Object.prototype.hasOwnProperty.call (timing_caches, key)) continue ;
 				var cache = timing_caches[key];
-				var cache_ctx = cache.getContext ('2d', {alpha:false});
-				cache_ctx.fillStyle = bg;
-				cache_ctx.fillRect (0, 0, 18, 26);
+				var cache_ctx = cache.getContext ('2d');
+				cache_ctx.clearRect (0, 0, 18, 26);
 				cache_ctx.fillStyle = fg;
 				cache_ctx.font = '29px Helvetica, Arial, sans-serif';
 				cache_ctx.textAlign = 'center';
@@ -3014,6 +3009,7 @@ function _topbarConfig ( app, ui ) {
 		w.addEventListener ('am:themechange', function () {
 			(w.requestAnimationFrame || w.setTimeout) (refreshTimingTheme);
 		});
+		refreshTimingTheme ();
 		/////
 
 
@@ -3238,14 +3234,10 @@ function _topbarConfig ( app, ui ) {
 				return ;
 			}
 
-			var exit = false;
+			if (ttm === pk_timingnum) return ;
+			pk_timingctx.clearRect (0, 0, 150, 40);
 			for (var jk = 0; jk < ttm.length; ++jk)
 			{
-				if (!exit)
-				{
-					if (ttm[jk] === pk_timingnum[jk]) continue;
-					exit = true;
-				}
 				pk_timingctx.drawImage (timing_caches[ttm[jk]], jk * 16, 10);
 			}
 			pk_timingnum = ttm;
