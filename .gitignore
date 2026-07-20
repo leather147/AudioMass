@@ -4,4 +4,15 @@
 *.aiff
 *.br
 node_modules/*
+.next/
+.turbo/
+coverage/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+apps/python-api/.mypy_cache/
+apps/python-api/.pytest_cache/
+apps/python-api/.ruff_cache/
 .venv/*
