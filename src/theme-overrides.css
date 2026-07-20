@@ -125,11 +125,16 @@ a{color:var(--ring)}
 /* Toolbar shell and every toolbar card */
 .pk_app .pk_tbc,
 .pk_app.pk_mt_on .pk_tbc{
+	padding-top:7px!important;
 	background:var(--surface-translucent)!important;
 	border-color:var(--border)!important;
 	box-shadow:var(--inset-hi)!important;
 }
-.pk_tb{background:transparent!important}
+.pk_app .pk_tb{
+	width:100%!important;
+	background:none!important;
+	border:none!important;
+}
 .pk_app .pk_timecontainer,
 .pk_app .pk_transport,
 .pk_app .pk_ctns,
