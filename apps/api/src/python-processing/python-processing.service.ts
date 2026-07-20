@@ -1,11 +1,10 @@
 import type { ProcessingJobKind, StorageObject } from '@audiomass/database';
-import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Inject, Injectable } from '@nestjs/common';
 
-import type { FilesService } from '../files/files.service.js';
-import type { ProcessingJobsService } from '../processing-jobs/processing-jobs.service.js';
+import { FilesService } from '../files/files.service.js';
+import { ProcessingJobsService } from '../processing-jobs/processing-jobs.service.js';
 import type { RunPythonOperationDto } from './dto/run-python-operation.dto.js';
-import type { PythonProcessingClient } from './python-processing.client.js';
-import { PythonApiError } from './python-processing.client.js';
+import { PythonApiError, PythonProcessingClient } from './python-processing.client.js';
 import type {
   PythonExecutionRequest,
   PythonOperation,
@@ -31,8 +30,11 @@ const OPERATION_JOB_KINDS: Record<PythonOperation, ProcessingJobKind> = {
 @Injectable()
 export class PythonProcessingService {
   public constructor(
+    @Inject(FilesService)
     private readonly files: FilesService,
+    @Inject(ProcessingJobsService)
     private readonly jobs: ProcessingJobsService,
+    @Inject(PythonProcessingClient)
     private readonly python: PythonProcessingClient,
   ) {}
 

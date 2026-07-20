@@ -1,13 +1,14 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import type { Prisma, ProcessingJob } from '@audiomass/database';
 import type { Page } from '../common/pagination.dto.js';
-import type { PrismaService } from '../database/prisma.service.js';
+import { PrismaService } from '../database/prisma.service.js';
 import type { CreateProcessingJobDto } from './dto/create-processing-job.dto.js';
 import type { ListProcessingJobsDto } from './dto/list-processing-jobs.dto.js';
 import type { TransitionProcessingJobDto } from './dto/transition-processing-job.dto.js';
@@ -15,7 +16,7 @@ import { assertJobTransition, type ProcessingJobStatusValue } from './processing
 
 @Injectable()
 export class ProcessingJobsService {
-  public constructor(private readonly prisma: PrismaService) {}
+  public constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   public async create(dto: CreateProcessingJobDto): Promise<ProcessingJob> {
     if (dto.projectId) {

@@ -1,15 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../auth/public.decorator.js';
-import type { HealthService } from './health.service.js';
-import { type HealthStatus } from './health.service.js';
+import { HealthService, type HealthStatus } from './health.service.js';
 
 @ApiTags('health')
 @Public()
 @Controller('health')
 export class HealthController {
-  public constructor(private readonly health: HealthService) {}
+  public constructor(@Inject(HealthService) private readonly health: HealthService) {}
 
   @Get('live')
   @ApiOperation({ summary: 'Process liveness probe' })

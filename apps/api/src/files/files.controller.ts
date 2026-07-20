@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,6 +14,7 @@ import {
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiSecurity,
@@ -22,17 +24,17 @@ import {
 import type { StorageObject } from '@audiomass/database';
 import type { Page } from '../common/pagination.dto.js';
 import type { DownloadGrant } from '../storage/storage.types.js';
-import type { CreateUploadDto } from './dto/create-upload.dto.js';
-import type { ListFilesDto } from './dto/list-files.dto.js';
-import type { OwnerQueryDto } from './dto/owner-query.dto.js';
-import type { FilesService } from './files.service.js';
-import { type CreatedUpload } from './files.service.js';
+import { CreateUploadDto } from './dto/create-upload.dto.js';
+import { ListFilesDto } from './dto/list-files.dto.js';
+import { OwnerQueryDto } from './dto/owner-query.dto.js';
+import { type CreatedUpload, FilesService } from './files.service.js';
 
 @ApiTags('files')
 @ApiSecurity('api-key')
+@ApiExtraModels(CreateUploadDto, ListFilesDto, OwnerQueryDto)
 @Controller('files')
 export class FilesController {
-  public constructor(private readonly files: FilesService) {}
+  public constructor(@Inject(FilesService) private readonly files: FilesService) {}
 
   @Post('uploads')
   @ApiCreatedResponse({ description: 'Pending file and a short-lived direct upload grant.' })

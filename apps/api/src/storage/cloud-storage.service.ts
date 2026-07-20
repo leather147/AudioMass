@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { StorageProvider } from '@audiomass/database';
 
 import { S3StorageAdapter } from './providers/s3-storage.adapter.js';
@@ -18,7 +18,7 @@ export class CloudStorageService implements CloudStorageAdapter {
   private readonly adapter: CloudStorageAdapter;
   public readonly maxUploadBytes: number;
 
-  public constructor(config: ConfigService) {
+  public constructor(@Inject(ConfigService) config: ConfigService) {
     const provider = config.getOrThrow<StorageProvider>('STORAGE_PROVIDER');
     const bucket = config.getOrThrow<string>('STORAGE_BUCKET');
     const ttlSeconds = config.getOrThrow<number>('STORAGE_URL_TTL_SECONDS');

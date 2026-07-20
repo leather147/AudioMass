@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import type { PrismaService } from '../database/prisma.service.js';
+import { PrismaService } from '../database/prisma.service.js';
 
 export interface HealthStatus {
   service: 'audiomass-api';
@@ -18,7 +18,7 @@ export function createLivenessStatus(now = new Date()): HealthStatus {
 
 @Injectable()
 export class HealthService {
-  public constructor(private readonly prisma: PrismaService) {}
+  public constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   public live(): HealthStatus {
     return createLivenessStatus();

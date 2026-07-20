@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -14,6 +15,7 @@ import {
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -23,16 +25,17 @@ import {
 
 import type { Project } from '@audiomass/database';
 import type { Page } from '../common/pagination.dto.js';
-import type { CreateProjectDto } from './dto/create-project.dto.js';
-import type { ListProjectsDto } from './dto/list-projects.dto.js';
-import type { UpdateProjectDto } from './dto/update-project.dto.js';
-import type { ProjectsService } from './projects.service.js';
+import { CreateProjectDto } from './dto/create-project.dto.js';
+import { ListProjectsDto } from './dto/list-projects.dto.js';
+import { UpdateProjectDto } from './dto/update-project.dto.js';
+import { ProjectsService } from './projects.service.js';
 
 @ApiTags('projects')
 @ApiSecurity('api-key')
+@ApiExtraModels(CreateProjectDto, ListProjectsDto, UpdateProjectDto)
 @Controller('projects')
 export class ProjectsController {
-  public constructor(private readonly projects: ProjectsService) {}
+  public constructor(@Inject(ProjectsService) private readonly projects: ProjectsService) {}
 
   @Post()
   @ApiCreatedResponse({ description: 'Project created.' })

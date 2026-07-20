@@ -1,9 +1,9 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
-import type { Reflector } from '@nestjs/core';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
 
 import { parseApiKeys } from '../config/environment.js';
 import { IS_PUBLIC_ROUTE } from './public.decorator.js';
@@ -24,7 +24,9 @@ export function isAuthorizedApiKey(candidate: string, configuredKeys: readonly s
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
   public constructor(
+    @Inject(ConfigService)
     private readonly config: ConfigService,
+    @Inject(Reflector)
     private readonly reflector: Reflector,
   ) {}
 

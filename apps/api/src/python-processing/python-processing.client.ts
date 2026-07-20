@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import type {
   PythonExecutionRequest,
@@ -51,7 +51,7 @@ export class PythonProcessingClient {
   private readonly internalKey: string;
   private readonly timeoutMs: number;
 
-  public constructor(config: ConfigService) {
+  public constructor(@Inject(ConfigService) config: ConfigService) {
     this.baseUrl = config.getOrThrow<string>('PYTHON_API_URL').replace(/\/$/, '');
     this.internalKey = config.getOrThrow<string>('PYTHON_API_INTERNAL_KEY');
     this.timeoutMs = config.getOrThrow<number>('PYTHON_API_TIMEOUT_MS');

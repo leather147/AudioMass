@@ -2,6 +2,7 @@ import type { StorageObject } from '@audiomass/database';
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
@@ -9,8 +10,8 @@ import {
 } from '@nestjs/common';
 
 import type { Page } from '../common/pagination.dto.js';
-import type { PrismaService } from '../database/prisma.service.js';
-import type { CloudStorageService } from '../storage/cloud-storage.service.js';
+import { PrismaService } from '../database/prisma.service.js';
+import { CloudStorageService } from '../storage/cloud-storage.service.js';
 import {
   CloudObjectNotFoundError,
   CloudStorageUnavailableError,
@@ -30,7 +31,9 @@ export interface CreatedUpload {
 @Injectable()
 export class FilesService {
   public constructor(
+    @Inject(PrismaService)
     private readonly prisma: PrismaService,
+    @Inject(CloudStorageService)
     private readonly storage: CloudStorageService,
   ) {}
 

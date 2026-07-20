@@ -1,7 +1,18 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiOkResponse,
   ApiSecurity,
   ApiTags,
@@ -9,16 +20,17 @@ import {
 
 import type { ProcessingJob } from '@audiomass/database';
 import type { Page } from '../common/pagination.dto.js';
-import type { CreateProcessingJobDto } from './dto/create-processing-job.dto.js';
-import type { ListProcessingJobsDto } from './dto/list-processing-jobs.dto.js';
-import type { TransitionProcessingJobDto } from './dto/transition-processing-job.dto.js';
-import type { ProcessingJobsService } from './processing-jobs.service.js';
+import { CreateProcessingJobDto } from './dto/create-processing-job.dto.js';
+import { ListProcessingJobsDto } from './dto/list-processing-jobs.dto.js';
+import { TransitionProcessingJobDto } from './dto/transition-processing-job.dto.js';
+import { ProcessingJobsService } from './processing-jobs.service.js';
 
 @ApiTags('processing jobs')
 @ApiSecurity('api-key')
+@ApiExtraModels(CreateProcessingJobDto, ListProcessingJobsDto, TransitionProcessingJobDto)
 @Controller('processing-jobs')
 export class ProcessingJobsController {
-  public constructor(private readonly jobs: ProcessingJobsService) {}
+  public constructor(@Inject(ProcessingJobsService) private readonly jobs: ProcessingJobsService) {}
 
   @Post()
   @ApiCreatedResponse({

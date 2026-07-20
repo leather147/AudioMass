@@ -1,15 +1,18 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Inject, Param, Post } from '@nestjs/common';
+import { ApiExtraModels, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 
-import type { RunPythonOperationDto } from './dto/run-python-operation.dto.js';
-import type { PythonProcessingService } from './python-processing.service.js';
+import { RunPythonOperationDto } from './dto/run-python-operation.dto.js';
+import { PythonProcessingService } from './python-processing.service.js';
 import type { PythonProcessingResult } from './python-processing.types.js';
 
 @ApiTags('python processing')
 @ApiSecurity('api-key')
+@ApiExtraModels(RunPythonOperationDto)
 @Controller('python')
 export class PythonProcessingController {
-  public constructor(private readonly processing: PythonProcessingService) {}
+  public constructor(
+    @Inject(PythonProcessingService) private readonly processing: PythonProcessingService,
+  ) {}
 
   @Post('audio/analyze')
   @ApiOkResponse({ description: 'Audio analysis completed by the private Python service.' })

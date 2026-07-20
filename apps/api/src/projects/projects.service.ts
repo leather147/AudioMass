@@ -1,15 +1,15 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma, Project } from '@audiomass/database';
 
 import type { Page } from '../common/pagination.dto.js';
-import type { PrismaService } from '../database/prisma.service.js';
+import { PrismaService } from '../database/prisma.service.js';
 import type { CreateProjectDto } from './dto/create-project.dto.js';
 import type { ListProjectsDto } from './dto/list-projects.dto.js';
 import type { UpdateProjectDto } from './dto/update-project.dto.js';
 
 @Injectable()
 export class ProjectsService {
-  public constructor(private readonly prisma: PrismaService) {}
+  public constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   public create(dto: CreateProjectDto): Promise<Project> {
     return this.prisma.project.create({
