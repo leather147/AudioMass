@@ -3,10 +3,5 @@
   "buildCommand": "node ../../tooling/vercel-api-build.mjs",
   "framework": "nestjs",
   "fluid": true,
-  "functions": {
-    "src/main.ts": {
-      "maxDuration": 300
-    }
-  },
   "regions": ["iad1"]
 }
