@@ -40,13 +40,13 @@ export class ProjectsService {
     return { items, page: dto.page, pageSize: dto.pageSize, total };
   }
 
-  public async get(id: string): Promise<Project> {
-    const project = await this.prisma.project.findUnique({ where: { id } });
+  public async get(id: string, ownerId: string): Promise<Project> {
+    const project = await this.prisma.project.findFirst({ where: { id, ownerId } });
     if (!project) throw new NotFoundException(`Project ${id} was not found`);
     return project;
   }
 
-  public async update(id: string, dto: UpdateProjectDto): Promise<Project> {
+  public async update(id: string, ownerId: string, dto: UpdateProjectDto): Promise<Project> {
     const data: Prisma.ProjectUpdateManyMutationInput = {
       version: { increment: 1 },
       ...(dto.name === undefined ? {} : { name: dto.name }),
@@ -56,21 +56,21 @@ export class ProjectsService {
     };
     const result = await this.prisma.project.updateMany({
       data,
-      where: { id, version: dto.expectedVersion },
+      where: { id, ownerId, version: dto.expectedVersion },
     });
     if (result.count === 0) {
-      const exists = await this.prisma.project.findUnique({
+      const exists = await this.prisma.project.findFirst({
         select: { id: true },
-        where: { id },
+        where: { id, ownerId },
       });
       if (!exists) throw new NotFoundException(`Project ${id} was not found`);
       throw new ConflictException('Project was updated by another client; reload and retry');
     }
-    return this.get(id);
+    return this.get(id, ownerId);
   }
 
-  public async remove(id: string): Promise<void> {
-    await this.get(id);
+  public async remove(id: string, ownerId: string): Promise<void> {
+    await this.get(id, ownerId);
     await this.prisma.project.delete({ where: { id } });
   }
 }

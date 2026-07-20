@@ -29,12 +29,18 @@ export const DEFAULT_EDITOR_PREFERENCES: EditorPreferences = {
   theme: 'replicate',
 };
 
-function isTheme(value: unknown): value is EditorTheme {
+export function isEditorTheme(value: unknown): value is EditorTheme {
   return EDITOR_THEMES.some((theme) => theme.id === value);
 }
 
-function isLocale(value: unknown): value is EditorLocale {
+export function isEditorLocale(value: unknown): value is EditorLocale {
   return EDITOR_LOCALES.some((locale) => locale.id === value);
+}
+
+export function isEditorPreferences(value: unknown): value is EditorPreferences {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<EditorPreferences>;
+  return isEditorLocale(candidate.locale) && isEditorTheme(candidate.theme);
 }
 
 export function parseEditorPreferences(value: {
@@ -42,7 +48,7 @@ export function parseEditorPreferences(value: {
   theme?: unknown;
 }): EditorPreferences {
   return {
-    locale: isLocale(value.locale) ? value.locale : DEFAULT_EDITOR_PREFERENCES.locale,
-    theme: isTheme(value.theme) ? value.theme : DEFAULT_EDITOR_PREFERENCES.theme,
+    locale: isEditorLocale(value.locale) ? value.locale : DEFAULT_EDITOR_PREFERENCES.locale,
+    theme: isEditorTheme(value.theme) ? value.theme : DEFAULT_EDITOR_PREFERENCES.theme,
   };
 }

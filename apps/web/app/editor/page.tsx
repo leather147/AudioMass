@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-import { LegacyEditor } from '@/components/editor/legacy-editor';
+import { EditorFrame } from '@/components/editor/editor-frame';
 import { DEFAULT_EDITOR_PREFERENCES, parseEditorPreferences } from '@/lib/editor-preferences';
 
 export const metadata = { title: 'Редактор' };
@@ -14,7 +14,7 @@ export default async function EditorPage() {
 
   return (
     <main className="editor-page">
-      <LegacyEditor initialPreferences={preferences} />
+      <EditorFrame initialPreferences={preferences} />
     </main>
   );
 }

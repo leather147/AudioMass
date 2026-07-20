@@ -20,6 +20,9 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
+    "@audiomass/database#typecheck": {
+      "outputs": ["src/generated/**"]
+    },
     "clean": {
       "cache": false
     }

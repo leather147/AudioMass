@@ -2,6 +2,7 @@
   "extends": "@audiomass/config/tsconfig/nestjs",
   "compilerOptions": {
     "baseUrl": ".",
+    "outDir": "dist",
     "rootDir": ".",
     "paths": {
       "@api/*": ["./src/*"]

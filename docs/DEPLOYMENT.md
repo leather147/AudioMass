@@ -48,11 +48,11 @@ Use a private bucket. Allow CORS for the deployed web origin and the exact uploa
 
 Add the hostnames that appear in generated input and output URLs to `PYTHON_API_ALLOWED_STORAGE_HOSTS`. S3 virtual-hosted URLs commonly include the bucket in the hostname. Supabase and Vercel may use different control-plane and object-delivery hosts; inspect real grants in staging and list every exact host. Never use a wildcard to make a failed allowlist disappear.
 
-## Vercel web deployment
+## Vercel deployment
 
-`vercel.json` builds only `@audiomass/web`. Configure the repository root as the project root, keep pnpm lockfile installation enabled, and set `NEXT_PUBLIC_API_URL` to the public NestJS `/api/v1` URL. The same-origin legacy assets live in `apps/web/public/legacy` and are included automatically.
+Create three independent Vercel projects from the same repository, with Root Directory values `apps/web`, `apps/api`, and `apps/python-api`. Keep `Include files outside the root directory in the Build Step` enabled so Vercel can use the root pnpm workspace and shared packages. Each application directory contains its own `vercel.json`.
 
-Vercel hosts only the Next.js application in this topology. Deploy NestJS and FastAPI as containers or managed services with private networking between them.
+The same-origin legacy assets live in `apps/web/public/legacy` and are included in the Next.js deployment automatically. Do not put `API_KEYS` in Web or any `NEXT_PUBLIC_*` variable. For the complete Neon, Private Vercel Blob, FastAPI, environment-variable, deployment-order, and troubleshooting procedure, use [VERCEL_ONLY_DEPLOYMENT.md](VERCEL_ONLY_DEPLOYMENT.md).
 
 ## Security checklist
 

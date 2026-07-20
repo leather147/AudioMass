@@ -1,6 +1,6 @@
 import type { EditorPreferences } from '@/lib/editor-preferences';
 
-export const LEGACY_EDITOR_PATH = '/legacy/index.html';
+export const EDITOR_RUNTIME_PATH = '/legacy/index.html';
 export const EDITOR_BRIDGE_CHANNEL = 'audiomass.editor.v1';
 
 export type EditorCommandMap = {
@@ -15,11 +15,17 @@ export type EditorCommand<Name extends keyof EditorCommandMap = keyof EditorComm
   payload: EditorCommandMap[Name];
 };
 
-export type EditorBridgeEvent = {
-  channel: typeof EDITOR_BRIDGE_CHANNEL;
-  event: 'editor.file-loaded' | 'editor.pause' | 'editor.play' | 'editor.ready';
-  payload?: unknown;
-};
+export type EditorBridgeEvent =
+  | {
+      channel: typeof EDITOR_BRIDGE_CHANNEL;
+      event: 'preferences.changed';
+      payload: EditorPreferences;
+    }
+  | {
+      channel: typeof EDITOR_BRIDGE_CHANNEL;
+      event: 'editor.file-loaded' | 'editor.pause' | 'editor.play' | 'editor.ready';
+      payload?: unknown;
+    };
 
 export function createEditorCommand<Name extends keyof EditorCommandMap>(
   command: Name,
@@ -34,6 +40,12 @@ export function isEditorBridgeEvent(value: unknown): value is EditorBridgeEvent 
   return (
     candidate.channel === EDITOR_BRIDGE_CHANNEL &&
     typeof candidate.event === 'string' &&
-    ['editor.file-loaded', 'editor.pause', 'editor.play', 'editor.ready'].includes(candidate.event)
+    [
+      'editor.file-loaded',
+      'editor.pause',
+      'editor.play',
+      'editor.ready',
+      'preferences.changed',
+    ].includes(candidate.event)
   );
 }

@@ -2,27 +2,32 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { EditorPreferences } from '@/lib/editor-preferences';
-import {
-  createEditorCommand,
-  isEditorBridgeEvent,
-  LEGACY_EDITOR_PATH,
-} from '@/lib/legacy-editor-bridge';
+import { createEditorCommand, EDITOR_RUNTIME_PATH, isEditorBridgeEvent } from '@/lib/editor-bridge';
+import { isEditorPreferences, type EditorPreferences } from '@/lib/editor-preferences';
 
-interface LegacyEditorProps {
+interface EditorFrameProps {
   initialPreferences: EditorPreferences;
 }
 
-export function LegacyEditor({ initialPreferences }: LegacyEditorProps) {
+export function EditorFrame({ initialPreferences }: EditorFrameProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const preferencesRef = useRef(initialPreferences);
   const [ready, setReady] = useState(false);
+
+  const persistPreferences = useCallback((preferences: EditorPreferences) => {
+    void fetch('/api/editor-preferences', {
+      body: JSON.stringify(preferences),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
+    }).catch(() => undefined);
+  }, []);
 
   const sendPreferences = useCallback(() => {
     iframeRef.current?.contentWindow?.postMessage(
-      createEditorCommand('preferences.apply', initialPreferences),
+      createEditorCommand('preferences.apply', preferencesRef.current),
       window.location.origin,
     );
-  }, [initialPreferences]);
+  }, []);
 
   useEffect(() => {
     const receiveMessage = (event: MessageEvent<unknown>) => {
@@ -33,6 +38,15 @@ export function LegacyEditor({ initialPreferences }: LegacyEditorProps) {
         return;
       }
       if (!isEditorBridgeEvent(event.data)) return;
+      if (event.data.event === 'preferences.changed' && isEditorPreferences(event.data.payload)) {
+        const next = event.data.payload;
+        const current = preferencesRef.current;
+        if (next.locale !== current.locale || next.theme !== current.theme) {
+          preferencesRef.current = next;
+          persistPreferences(next);
+        }
+        return;
+      }
       if (event.data.event === 'editor.ready') {
         setReady(true);
         sendPreferences();
@@ -41,7 +55,7 @@ export function LegacyEditor({ initialPreferences }: LegacyEditorProps) {
 
     window.addEventListener('message', receiveMessage);
     return () => window.removeEventListener('message', receiveMessage);
-  }, [sendPreferences]);
+  }, [persistPreferences, sendPreferences]);
 
   return (
     <>
@@ -51,9 +65,8 @@ export function LegacyEditor({ initialPreferences }: LegacyEditorProps) {
       <iframe
         allow="autoplay; clipboard-read; clipboard-write; microphone"
         className="editor-frame"
-        onLoad={sendPreferences}
         ref={iframeRef}
-        src={LEGACY_EDITOR_PATH}
+        src={EDITOR_RUNTIME_PATH}
         title="AudioMass editor"
       />
     </>

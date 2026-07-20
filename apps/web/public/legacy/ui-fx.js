@@ -2946,6 +2946,13 @@
 		});
 
 		app.listenFor ('RequestShowFreqAn', function ( url, args_arr ) {
+			var tool_routes = {
+				eq:'/tools/frequency-analyser',
+				sp:'/tools/spectral-analyser',
+				mix:'/tools/multitrack-mixer'
+			};
+			var tool_route = tool_routes[url];
+			if (!tool_route) return ;
 
 			if (app.isMobile) {
 				alert ('В данный момент AudioMass недоступен на мобильных устройствах!');
@@ -3031,7 +3038,7 @@
 					}
 
 					var size = is_mix ? [760, 320] : [600, 188];
-					var wnd = window.open ('/' + url + '.html', title, "directories=no,titlebar=no,toolbar=no,"+
+					var wnd = window.open (tool_route, title, "directories=no,titlebar=no,toolbar=no,"+
 							"location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=" + size[0] + ",height=" + size[1] + extra);
 
 					if (!wnd) {
@@ -3118,7 +3125,7 @@
 						setEvents ( curr_win, url );
 					}
 				};
-				iframe.src = '/' + url + '.html?iframe=1';
+				iframe.src = tool_route + '?embedded=1';
 			}
 			// ---
 

@@ -1518,66 +1518,30 @@ function _topbarConfig ( app, ui ) {
 					{
 						name   : 'Store Offline Version',
 						action : function () {
-							if (window.location.href.indexOf('-cache') > 0) {
-
-								function onUpdateReady ( e ) {
-									if (confirm ('Would you like to refresh the page to load the newer version?'))
-										window.location.reload();
-								}
-								function downLoading ( e ) {
-									OneUp ('Downloading newer version', 1500);
-								}
-
-								window.applicationCache.onupdateready = onUpdateReady;
-								window.applicationCache.ondownloading = downLoading;
-
-								if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-									onUpdateReady ();
-								}
-
-								window.applicationCache.update ();
-
+							if (!('serviceWorker' in navigator)) {
+								OneUp ('Offline mode is not supported by this browser', 2600, 'pk_r');
 								return ;
 							}
-
-							var message = 'This will open a new window that will try to store a local version in your browser'; // nicer text
-
-							new PKSimpleModal ({
-								title : 'Open Offline Version?',
-
-								ondestroy : function( q ) {
-									app.ui.InteractionHandler.on = false;
-									app.ui.KeyHandler.removeCallback ('modalTempErr');
-								},
-
-								buttons:[
-									{
-										title:'OPEN',
-										callback: function( q ) {
-											window.open ('/index-cache.html');
-											q.Destroy ();
-										}
-									}
-								],
-								body:'<p>' + message + '</p>',
-								setup:function( q ) {
-									app.fireEvent ('RequestPause');
-									app.fireEvent( 'RequestRegionClear');
-
-									app.ui.InteractionHandler.checkAndSet ('modal');
-									app.ui.KeyHandler.addCallback ('modalTempErr', function ( e ) {
-										q.Destroy ();
-									}, [27]);
-								}
-							}).Show ();
-							// -
+							OneUp ('Saving AudioMass for offline use…', 1800);
+							navigator.serviceWorker.register ('/sw.js', {scope:'/'}).then (function (registration) {
+								return navigator.serviceWorker.ready.then (function () {
+									var worker = registration.active || registration.waiting || registration.installing;
+									var urls = ['/editor', window.location.href];
+									var resources = window.performance && window.performance.getEntriesByType ?
+										window.performance.getEntriesByType ('resource') : [];
+									for (var i = 0; i < resources.length; ++i) urls.push (resources[i].name);
+									try {
+										var shellResources = window.parent.performance.getEntriesByType ('resource');
+										for (var j = 0; j < shellResources.length; ++j) urls.push (shellResources[j].name);
+									} catch (error) {}
+									worker && worker.postMessage ({type:'CACHE_URLS', urls:urls});
+									OneUp ('AudioMass is ready for offline use', 2600, 'pk_gr');
+								});
+							}).catch (function () {
+								OneUp ('Could not enable offline mode', 2600, 'pk_r');
+							});
 						},
-						setup: function ( obj ) {
-							if (window.location.href.indexOf('-cache') > 0)
-							{
-								obj.innerHTML = 'Update Offline Version';
-							}
-						}
+						setup: function () {}
 					},
 
 					{
@@ -1587,7 +1551,7 @@ function _topbarConfig ( app, ui ) {
 					{
 						name   : 'About',
 						action : function () {
-							window.open ('/about.html');
+							window.open ('/about');
 						}
 					},
 
@@ -1597,13 +1561,6 @@ function _topbarConfig ( app, ui ) {
 							PKAudioEditor._deps.Wlc ();
 						}
 					},
-					// {
-					// 	name   : 'About AudioMass',
-					// 	action : function () {
-					// 		window.open ('/about.html');
-					// 	}
-					// },
-
 					// {
 					// 	name:'---'
 					// },

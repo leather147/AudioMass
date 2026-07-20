@@ -19,15 +19,15 @@ API keys are comma-separated in `API_KEYS`. Each key must contain at least 32 ch
 
 ## Projects
 
-| Method   | Route           | Purpose                              |
-| -------- | --------------- | ------------------------------------ |
-| `POST`   | `/projects`     | Create a project                     |
-| `GET`    | `/projects`     | Cursor-paginated owner listing       |
-| `GET`    | `/projects/:id` | Read one owner-scoped project        |
-| `PATCH`  | `/projects/:id` | Update with an expected version      |
-| `DELETE` | `/projects/:id` | Delete a project and related records |
+| Method   | Route           | Purpose                        |
+| -------- | --------------- | ------------------------------ |
+| `POST`   | `/projects`     | Create a project               |
+| `GET`    | `/projects`     | Page-based owner listing       |
+| `GET`    | `/projects/:id` | Read one owner-scoped project  |
+| `PATCH`  | `/projects/:id` | Update an owner-scoped project |
+| `DELETE` | `/projects/:id` | Delete an owner-scoped project |
 
-The project timeline is JSON and begins as an empty array. Updates increment `version`; a stale expected version returns a conflict rather than overwriting another writer.
+`GET`, `PATCH`, and `DELETE /projects/:id` require an `ownerId` query parameter. The project timeline is JSON and begins as an empty array. Updates increment `version`; the body must include `expectedVersion`, and a stale value returns a conflict rather than overwriting another writer.
 
 ## Processing jobs
 
@@ -40,6 +40,8 @@ The project timeline is JSON and begins as an empty array. Updates increment `ve
 | `POST`  | `/processing-jobs/:id/cancel` | Cancel a non-terminal job                        |
 
 The state machine is `QUEUED -> RUNNING -> SUCCEEDED | FAILED | CANCELLED`, with cancellation also allowed while queued. Progress is an integer from 0 through 100.
+
+Processing-job routes are service-level orchestration endpoints. They do not accept an end-user identity and must be called only by a trusted server that has already authorized the referenced project. Namespace idempotency keys by tenant/workspace to avoid collisions. Do not call these routes directly from browser code.
 
 ## Cloud files
 
@@ -84,4 +86,4 @@ NestJS obtains signed storage URLs, invokes the private FastAPI job endpoint, ve
 
 NestJS uses standard HTTP status codes. Validation failures are `400`; missing owner-scoped resources are `404`; stale versions and duplicate unique operations are `409`; missing/invalid keys are `401`; rate limiting is `429`; an unavailable dependency is `503`.
 
-List routes use bounded page sizes and cursor pagination. Treat cursors as opaque and send the returned cursor unchanged.
+List routes use bounded page-based pagination. Send `page` starting at `1` and `pageSize` from `1` through `100`; responses contain `items`, `page`, `pageSize`, and `total`.

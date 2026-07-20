@@ -29,6 +29,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level moderate
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
@@ -54,3 +55,4 @@ jobs:
       - run: ruff check app tests
       - run: mypy app
       - run: pytest
+      - run: pip-audit -r requirements.txt

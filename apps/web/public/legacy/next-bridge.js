@@ -18,8 +18,17 @@
 			typeof value.locale === 'string' && typeof value.theme === 'string';
 	}
 
+	function preferences () {
+		return {
+			locale: w.AMI18n && w.AMI18n.getLocale ? w.AMI18n.getLocale() : 'ru',
+			theme: w.AMTheme && w.AMTheme.get ? w.AMTheme.get().id : 'replicate'
+		};
+	}
+
 	w.AMInstallNextBridge = function (editor) {
 		if (!editor || typeof editor.fireEvent !== 'function') return;
+		if (w.__amNextBridgeInstalled) return;
+		w.__amNextBridgeInstalled = true;
 
 		Object.keys(EVENT_NAMES).forEach(function (editorEvent) {
 			editor.listenFor(editorEvent, function (payload) {
@@ -42,6 +51,12 @@
 				}
 			}
 		}, false);
+
+		if (w.AMPreferences && typeof w.AMPreferences.onChange === 'function') {
+			w.AMPreferences.onChange(function () {
+				send('preferences.changed', preferences());
+			});
+		}
 
 		setTimeout(function () { send('editor.ready'); }, 0);
 	};

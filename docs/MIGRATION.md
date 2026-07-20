@@ -29,6 +29,7 @@ Each feature phase is independently reviewable and has package-level tests. The 
 - Project updates use optimistic concurrency, and processing creation supports idempotency.
 - Browser plugins are capability-scoped packages; Python plugins are trusted server installations.
 - Existing editor assets remain under `apps/web/public/legacy` until their behavior is migrated feature by feature.
+- Frequency analysis, spectral analysis, the multitrack mixer, About, preference persistence, and offline installation now use App Router or root web-platform entrypoints; their superseded standalone HTML and AppCache files have been removed.
 
 ## Success criteria
 

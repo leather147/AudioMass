@@ -18,11 +18,11 @@ Browser
 
 Создайте три проекта из одного GitHub-репозитория `leather147/AudioMass`.
 
-| Vercel Project          | Framework | Root Directory    | Production Branch                           |
-| ----------------------- | --------- | ----------------- | ------------------------------------------- |
-| `audio-mass`            | Next.js   | `apps/web`        | `production` или выбранная стабильная ветка |
-| `audio-mass-api`        | NestJS    | `apps/api`        | `agent/enterprise-migration` до слияния     |
-| `audio-mass-python-api` | FastAPI   | `apps/python-api` | `agent/enterprise-migration` до слияния     |
+| Vercel Project          | Framework | Root Directory    | Production Branch |
+| ----------------------- | --------- | ----------------- | ----------------- |
+| `audio-mass`            | Next.js   | `apps/web`        | `production`      |
+| `audio-mass-api`        | NestJS    | `apps/api`        | `production`      |
+| `audio-mass-python-api` | FastAPI   | `apps/python-api` | `production`      |
 
 Для каждого проекта откройте `Settings -> Build and Deployment`:
 
@@ -39,7 +39,7 @@ Browser
 
    Она ставит зависимости именно в virtualenv, из которого Vercel запускает FastAPI Function. Не добавляйте `--system` и не выбирайте отдельный системный Python: в Vercel это либо попадёт не в runtime-окружение, либо завершится ошибкой externally managed environment.
 
-Затем откройте `Settings -> Environments -> Production -> Branch Tracking` и выберите ветку, которая реально содержит каталоги `apps/*`. До слияния миграции это `agent/enterprise-migration`.
+Затем откройте `Settings -> Environments -> Production -> Branch Tracking` и выберите `production`. Для незавершённой feature-ветки используйте Preview Deployment, не переключая production traffic.
 
 Файлы `vercel.json` уже находятся в корнях приложений. Они фиксируют framework preset, регион `iad1`, Fluid Compute и максимальную длительность API Functions 300 секунд.
 
@@ -161,7 +161,7 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 ### Шаг 1 — FastAPI
 
 1. Добавьте все переменные `audio-mass-python-api`.
-2. Откройте `Deployments` и запустите Redeploy последнего deployment ветки `agent/enterprise-migration`.
+2. Откройте `Deployments` и запустите Redeploy последнего deployment ветки `production`.
 3. Проверьте:
 
 ```text
@@ -190,7 +190,7 @@ https://audio-mass-api.vercel.app/docs
 ### Шаг 3 — Next.js Web
 
 1. Оставьте production-сайт на стабильной ветке, пока API и Python health checks не зелёные.
-2. Redeploy Preview ветки `agent/enterprise-migration` в `audio-mass`.
+2. Создайте Preview Deployment текущей feature-ветки в `audio-mass`.
 3. Откройте Preview URL и проверьте загрузку редактора, импорт аудио, Web Audio, waveform, темы и локализацию.
 4. После проверки слейте ветку в `production` или поменяйте Branch Tracking осознанно.
 

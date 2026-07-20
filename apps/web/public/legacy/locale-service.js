@@ -96,6 +96,10 @@
 
 	function start () {
 		if (started) return;
+		if (!d.documentElement) {
+			w.setTimeout(start, 0);
+			return;
+		}
 		started = true;
 		apply();
 		new MutationObserver(schedule).observe(d.documentElement, {
@@ -112,7 +116,13 @@
 		if (value === locale()) return true;
 		if (w.AMPreferences) w.AMPreferences.set('locale', value);
 		try { if (w.localStorage) w.localStorage.setItem('lang', value); } catch (error) {}
-		w.location.reload();
+		if (d.createEvent) {
+			var event = d.createEvent('CustomEvent');
+			event.initCustomEvent('am:localechange', false, false, {locale:value});
+			w.dispatchEvent(event);
+		}
+		// Let the Next.js bridge persist the preference before this frame reloads.
+		w.setTimeout(function () { w.location.reload(); }, 80);
 		return true;
 	}
 

@@ -102,6 +102,9 @@ export function validateEnvironment(
 
   const apiKeys = requiredString(input, 'API_KEYS');
   parseApiKeys(apiKeys);
+  const corsOrigins = parseCorsOrigins(
+    typeof input.CORS_ORIGINS === 'string' ? input.CORS_ORIGINS : undefined,
+  );
 
   const pythonApiUrl = requiredString(input, 'PYTHON_API_URL').replace(/\/$/, '');
   let parsedPythonApiUrl: URL;
@@ -136,8 +139,7 @@ export function validateEnvironment(
   return {
     ...input,
     API_KEYS: apiKeys,
-    CORS_ORIGINS:
-      typeof input.CORS_ORIGINS === 'string' ? input.CORS_ORIGINS : 'http://localhost:3000',
+    CORS_ORIGINS: corsOrigins.join(','),
     DATABASE_URL: databaseUrl,
     NODE_ENV: typeof input.NODE_ENV === 'string' ? input.NODE_ENV : 'development',
     PORT: port,
@@ -153,8 +155,43 @@ export function validateEnvironment(
 }
 
 export function parseCorsOrigins(value: string | undefined): string[] {
-  return (value ?? 'http://localhost:3000')
+  const origins = (value ?? 'http://localhost:3000')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+
+  if (origins.length === 0) {
+    throw new Error('CORS_ORIGINS must contain at least one HTTP(S) origin');
+  }
+
+  return [
+    ...new Set(
+      origins.map((origin) => {
+        if (origin.includes('*')) {
+          throw new Error('CORS_ORIGINS cannot contain a wildcard when credentials are enabled');
+        }
+        let parsed: URL;
+        try {
+          parsed = new URL(origin);
+        } catch {
+          throw new Error(`CORS_ORIGINS contains an invalid origin: ${origin}`);
+        }
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          throw new Error(`CORS_ORIGINS must contain only HTTP(S) origins: ${origin}`);
+        }
+        if (
+          parsed.username ||
+          parsed.password ||
+          parsed.pathname !== '/' ||
+          parsed.search ||
+          parsed.hash
+        ) {
+          throw new Error(
+            `CORS_ORIGINS must not contain credentials, paths, queries, or hashes: ${origin}`,
+          );
+        }
+        return parsed.origin;
+      }),
+    ),
+  ];
 }
