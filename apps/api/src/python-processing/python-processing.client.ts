@@ -30,12 +30,17 @@ function parseResponse(
     throw new PythonApiError('Python service returned an invalid response');
   }
   const outputSize = value.output_size;
-  if (outputSize !== null && typeof outputSize !== 'number') {
+  let parsedOutputSize: number | null;
+  if (outputSize === null) {
+    parsedOutputSize = null;
+  } else if (typeof outputSize === 'number') {
+    parsedOutputSize = outputSize;
+  } else {
     throw new PythonApiError('Python service returned an invalid output size');
   }
   return {
     operation: expectedOperation,
-    output_size: outputSize,
+    output_size: parsedOutputSize,
     result: value.result,
   };
 }
