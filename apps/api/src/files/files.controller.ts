@@ -25,7 +25,8 @@ import type { DownloadGrant } from '../storage/storage.types.js';
 import type { CreateUploadDto } from './dto/create-upload.dto.js';
 import type { ListFilesDto } from './dto/list-files.dto.js';
 import type { OwnerQueryDto } from './dto/owner-query.dto.js';
-import type { CreatedUpload, FilesService } from './files.service.js';
+import type { FilesService } from './files.service.js';
+import { type CreatedUpload } from './files.service.js';
 
 @ApiTags('files')
 @ApiSecurity('api-key')

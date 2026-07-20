@@ -4,7 +4,8 @@ import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/co
 import type { FilesService } from '../files/files.service.js';
 import type { ProcessingJobsService } from '../processing-jobs/processing-jobs.service.js';
 import type { RunPythonOperationDto } from './dto/run-python-operation.dto.js';
-import { PythonApiError, type PythonProcessingClient } from './python-processing.client.js';
+import type { PythonProcessingClient } from './python-processing.client.js';
+import { PythonApiError } from './python-processing.client.js';
 import type {
   PythonExecutionRequest,
   PythonOperation,
