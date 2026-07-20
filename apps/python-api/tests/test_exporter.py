@@ -25,9 +25,7 @@ def test_ffmpeg_executable_uses_bundled_binary(
     bundled = tmp_path / "ffmpeg"
     bundled.touch()
     monkeypatch.setattr(exporter.shutil, "which", lambda _name: None)
-    monkeypatch.setattr(
-        exporter.imageio_ffmpeg, "get_ffmpeg_exe", lambda: str(bundled)
-    )
+    monkeypatch.setattr(exporter.imageio_ffmpeg, "get_ffmpeg_exe", lambda: str(bundled))
 
     assert exporter._ffmpeg_executable() == str(bundled)
 

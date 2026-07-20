@@ -59,7 +59,14 @@ plugins = ["pydantic.mypy"]
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["faster_whisper.*", "librosa.*", "pyloudnorm.*", "scipy.*", "soundfile.*"]
+module = [
+  "faster_whisper.*",
+  "imageio_ffmpeg.*",
+  "librosa.*",
+  "pyloudnorm.*",
+  "scipy.*",
+  "soundfile.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
