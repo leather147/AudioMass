@@ -470,13 +470,56 @@ html[data-theme] .pk_modal_bottom{background:var(--secondary)!important;border-c
 	backdrop-filter:blur(18px) saturate(115%);
 	-webkit-backdrop-filter:blur(18px) saturate(115%);
 }
-/* Menu checkmarks are injected after stylesheets, so use stronger semantic selectors. */
+/* Semantic menu separators and check state indicators. */
+.pk_app .pk_hdr .pk_menu .pk_menu_separator{
+	position:relative;
+	height:13px;
+	margin:1px 6px;
+	pointer-events:none;
+}
+.pk_app .pk_hdr .pk_menu .pk_menu_separator::before{
+	content:"";
+	position:absolute;
+	left:4px;
+	right:4px;
+	top:6px;
+	height:1px;
+	background:linear-gradient(90deg,transparent,var(--border) 15%,var(--border) 85%,transparent);
+	box-shadow:0 1px 0 var(--bd-s);
+}
+.pk_app .pk_hdr .pk_menu .pk_opt.pk_menu_checkable{
+	display:grid!important;
+	grid-template-columns:minmax(0,1fr) 17px;
+	align-items:center;
+	gap:12px;
+}
+.pk_app .pk_hdr .pk_menu .pk_menu_label{
+	min-width:0;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+}
 .pk_app .pk_hdr .pk_menu .pk_menu_check_svg{
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	width:17px;
+	height:17px;
+	box-sizing:border-box;
+	border:1px solid var(--accent-strong)!important;
+	border-radius:999px;
 	background:var(--accent-soft)!important;
-	border-color:var(--accent-strong)!important;
+	opacity:0;
+	transform:scale(.72);
+	transition:opacity 120ms var(--ease),transform 120ms var(--ease),box-shadow 120ms var(--ease);
+}
+.pk_app .pk_hdr .pk_menu .pk_menu_checked .pk_menu_check_svg{
+	opacity:1;
+	transform:scale(1);
 	box-shadow:0 0 12px var(--accent-muted)!important;
 }
-.pk_app .pk_hdr .pk_menu .pk_menu_check_svg path{stroke:var(--ring)!important}
+.pk_app .pk_hdr .pk_menu .pk_menu_check_svg svg{display:block;width:11px;height:11px}
+.pk_app .pk_hdr .pk_menu .pk_menu_check_svg path{fill:none;stroke:var(--ring)!important;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
 .pk_app .pk_lcla2{background:var(--secondary)!important;border-color:var(--border)!important;color:var(--secondary-foreground)!important}
 .pk_app .pk_lcla2.pk_act,
 .pk_app .pk_lcla2:hover{background:var(--ring)!important;border-color:var(--ring)!important;color:var(--accent-contrast)!important}
