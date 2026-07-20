@@ -13,10 +13,10 @@
 	--shadow-popover:0 26px 80px var(--shadow-color),0 0 0 1px var(--border);
 	--theme-panel:linear-gradient(180deg,var(--bd-s),transparent),var(--card);
 	--theme-panel-raised:linear-gradient(180deg,var(--accent-soft),transparent 72%),var(--secondary);
-	--theme-grid-major:color-mix(in srgb,var(--ring) 22%,transparent);
-	--theme-grid-mid:color-mix(in srgb,var(--ring) 11%,transparent);
-	--theme-grid-minor:var(--grid-color);
-	--theme-grid-micro:color-mix(in srgb,var(--foreground) 2.5%,transparent);
+	--theme-grid-major:color-mix(in srgb,var(--ring) 19%,transparent);
+	--theme-grid-mid:color-mix(in srgb,var(--ring) 9.5%,transparent);
+	--theme-grid-minor:color-mix(in srgb,var(--grid-color) 86%,transparent);
+	--theme-grid-micro:color-mix(in srgb,var(--foreground) 2%,transparent);
 	--mt-playhead:var(--ring);
 	--mt-marker:var(--warn);
 }
@@ -78,6 +78,29 @@ a{color:var(--ring)}
 .pk_anim_popover button:hover{background:var(--accent)!important;color:var(--accent-foreground)!important}
 .pk_hdr .pk_shrtct,
 .pk_contextMenu em{color:var(--muted-foreground)!important}
+
+/* Every top-menu option owns its complete row and starts at the same edge. */
+.pk_app .pk_hdr .pk_menu{
+	text-align:left!important;
+}
+.pk_app .pk_hdr .pk_menu .pk_menu_el{
+	display:block;
+	width:100%;
+	box-sizing:border-box;
+	text-align:left;
+}
+.pk_app .pk_hdr .pk_menu .pk_menu_el>.pk_opt{
+	display:flex!important;
+	align-items:center;
+	justify-content:flex-start!important;
+	width:100%;
+	min-width:0;
+	box-sizing:border-box;
+	text-align:left!important;
+}
+.pk_app .pk_hdr .pk_menu .pk_menu_el>.pk_opt .pk_shrtct{
+	margin-left:auto!important;
+}
 
 /* The actual settings/multitrack pills belong to the active theme too. */
 .pk_app .pk_hdr .pk_mt_topbtn,
