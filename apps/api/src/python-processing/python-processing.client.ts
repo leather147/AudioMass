@@ -29,12 +29,13 @@ function parseResponse(
   if (!isRecord(value) || value.operation !== expectedOperation || !isRecord(value.result)) {
     throw new PythonApiError('Python service returned an invalid response');
   }
-  if (value.output_size !== null && typeof value.output_size !== 'number') {
+  const outputSize = value.output_size;
+  if (outputSize !== null && typeof outputSize !== 'number') {
     throw new PythonApiError('Python service returned an invalid output size');
   }
   return {
     operation: expectedOperation,
-    output_size: value.output_size,
+    output_size: outputSize,
     result: value.result,
   };
 }
