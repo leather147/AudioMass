@@ -6,4 +6,4 @@ node_modules
 pnpm-lock.yaml
 apps/web/public/legacy
 apps/web/public/codecs
-src
+apps/web/next-env.d.ts

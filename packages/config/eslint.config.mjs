@@ -11,7 +11,6 @@ export default tseslint.config(
       '**/node_modules/**',
       'apps/web/public/legacy/**',
       'apps/web/public/codecs/**',
-      'src/**',
     ],
   },
   eslint.configs.recommended,
