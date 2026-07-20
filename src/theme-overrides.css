@@ -135,7 +135,7 @@ a{color:var(--ring)}
 .pk_app .pk_ftr .pk_btn,
 .pk_app .pk_zoombtn .pk_btn,
 .pk_app .pk_transport .pk_btn,
-.pk_app .pk_modal_a_bottom,
+html[data-theme] .pk_modal_a_bottom,
 .pk_app .pk_prc button,
 .pk_app .pk_anim_actions button,
 .pk_app .pk_mt_add_bottom{
@@ -149,7 +149,7 @@ a{color:var(--ring)}
 .pk_app .pk_ftr .pk_btn:hover,
 .pk_app .pk_zoombtn .pk_btn:hover,
 .pk_app .pk_transport .pk_btn:hover,
-.pk_app .pk_modal_a_bottom:hover,
+html[data-theme] .pk_modal_a_bottom:hover,
 .pk_app .pk_prc button:hover,
 .pk_app .pk_anim_actions button:hover,
 .pk_app .pk_mt_add_bottom:hover{
@@ -163,7 +163,7 @@ a{color:var(--ring)}
 .pk_app .pk_transport .pk_btn.pk_act,
 .pk_app .pk_loop.pk_act,
 .pk_app .pk_play.pk_act,
-.pk_app .pk_modal_a_accpt{
+html[data-theme] .pk_modal_a_accpt{
 	background:var(--ring)!important;
 	border-color:var(--ring)!important;
 	color:var(--accent-contrast)!important;
@@ -260,20 +260,29 @@ a{color:var(--ring)}
 .pk_sloop{background:var(--accent-muted)!important;box-shadow:inset 0 0 0 1px var(--accent-strong)!important;mix-blend-mode:normal!important}
 .pk_wavepoint{background:var(--ring)!important;border-color:var(--accent-contrast)!important}
 
-/* Multitrack shell, channels and ruler */
-.pk_app.pk_mt_on .pk_mt,
-.pk_app.pk_mt_on .pk_mt_main,
-.pk_app.pk_mt_on .pk_mt_lanes{background-color:var(--wave-bg)!important;color:var(--foreground)!important;border-color:var(--border)!important}
-.pk_app.pk_mt_on .pk_mt_side{background:var(--card)!important;border-color:var(--border)!important}
-.pk_app.pk_mt_on .pk_mt_head,
-.pk_app.pk_mt_on .pk_mt_ruler{
+/* Editor workspace, channels and ruler.
+   The same surface is reused by single-wave focus mode, so its background
+   must not depend on .pk_mt_on being present. */
+html[data-theme] .pk_app .pk_mt,
+html[data-theme] .pk_app .pk_mt_main,
+html[data-theme] .pk_app .pk_mt_lanes{
+	background-color:var(--wave-bg)!important;
+	color:var(--foreground)!important;
+	border-color:var(--border)!important;
+}
+html[data-theme] .pk_app .pk_mt_side{
+	background:var(--card)!important;
+	border-color:var(--border)!important;
+}
+html[data-theme] .pk_app .pk_mt_head,
+html[data-theme] .pk_app .pk_mt_ruler{
 	background:var(--timeline-bg)!important;
 	border-color:var(--border)!important;
 	color:var(--timeline-fg)!important;
 }
-.pk_app.pk_mt_on .pk_mt_lanes,
-.pk_app.pk_mt_on .pk_mt_lanes.pk_mt_beats,
-.pk_app.pk_mt_on .pk_mt_main{
+html[data-theme] .pk_app .pk_mt_lanes,
+html[data-theme] .pk_app .pk_mt_lanes.pk_mt_beats,
+html[data-theme] .pk_app .pk_mt_main{
 	background-color:var(--wave-bg)!important;
 	background-image:
 		linear-gradient(var(--theme-grid-major) 1px,transparent 1px),
@@ -303,41 +312,45 @@ a{color:var(--ring)}
 		var(--mt-grid-x,0) var(--mt-grid-y,24px),
 		var(--mt-grid-x,0) var(--mt-grid-y,24px)!important;
 }
-.pk_app.pk_mt_on .pk_mt_track,
-.pk_app.pk_mt_on .pk_mt_lane{background:transparent!important;border-color:var(--grid-strong)!important;color:var(--foreground)!important}
-.pk_app.pk_mt_on .pk_mt_track.pk_mt_sel,
-.pk_app.pk_mt_on .pk_mt_lane.pk_mt_sel{background:var(--accent-soft)!important}
-.pk_app.pk_mt_on .pk_mt_lane.pk_mt_sel::before{background:var(--accent-muted)!important;border-color:var(--accent-strong)!important}
-.pk_app.pk_mt_on .pk_mt_track input,
-.pk_app.pk_mt_on .pk_mt_track .pk_mt_name,
-.pk_app.pk_mt_on .pk_mt_head input{
+html[data-theme] .pk_app .pk_mt_track{
+	background:color-mix(in srgb,var(--card) 86%,var(--wave-bg))!important;
+	border-color:var(--grid-strong)!important;
+	color:var(--foreground)!important;
+}
+html[data-theme] .pk_app .pk_mt_lane{background:transparent!important;border-color:var(--grid-strong)!important;color:var(--foreground)!important}
+html[data-theme] .pk_app .pk_mt_track.pk_mt_sel,
+html[data-theme] .pk_app .pk_mt_lane.pk_mt_sel{background:var(--accent-soft)!important}
+html[data-theme] .pk_app .pk_mt_lane.pk_mt_sel::before{background:var(--accent-muted)!important;border-color:var(--accent-strong)!important}
+html[data-theme] .pk_app .pk_mt_track input,
+html[data-theme] .pk_app .pk_mt_track .pk_mt_name,
+html[data-theme] .pk_app .pk_mt_head input{
 	background:var(--background)!important;
 	border-color:var(--border)!important;
 	color:var(--foreground)!important;
 }
-.pk_app.pk_mt_on .pk_mt_track input:focus{border-color:var(--ring)!important;box-shadow:0 0 0 3px var(--accent-soft)!important}
-.pk_app.pk_mt_on .pk_mt_head button,
-.pk_app.pk_mt_on .pk_mt_track button,
-.pk_app.pk_mt_on .pk_mt_channel button,
-.pk_app.pk_mt_on .pk_mt_knob{
+html[data-theme] .pk_app .pk_mt_track input:focus{border-color:var(--ring)!important;box-shadow:0 0 0 3px var(--accent-soft)!important}
+html[data-theme] .pk_app .pk_mt_head button,
+html[data-theme] .pk_app .pk_mt_track button,
+html[data-theme] .pk_app .pk_mt_channel button,
+html[data-theme] .pk_app .pk_mt_knob{
 	background:var(--secondary)!important;
 	border-color:var(--border)!important;
 	color:var(--secondary-foreground)!important;
 	box-shadow:var(--inset-hi)!important;
 }
-.pk_app.pk_mt_on .pk_mt_head button:not(.pk_inact):hover,
-.pk_app.pk_mt_on .pk_mt_track button:not(.pk_inact):hover,
-.pk_app.pk_mt_on .pk_mt_channel button:not(.pk_inact):hover{background:var(--surface-hover)!important;border-color:var(--bd-h)!important;color:var(--foreground)!important}
-.pk_app.pk_mt_on button.pk_mt_mute.pk_act{background:var(--warn)!important;border-color:var(--warn)!important;color:var(--background)!important}
-.pk_app.pk_mt_on button.pk_mt_solo.pk_act{background:var(--solo)!important;border-color:var(--solo)!important;color:var(--background)!important}
-.pk_app.pk_mt_on button.pk_mt_rec.pk_act{background:var(--rec)!important;border-color:var(--rec)!important;color:var(--danger-contrast)!important}
-.pk_app.pk_mt_on button.pk_mt_del{background:var(--secondary)!important;border-color:var(--border)!important;color:var(--muted-foreground)!important}
-.pk_app.pk_mt_on button.pk_mt_del:hover,
-.pk_app.pk_mt_on button.pk_mt_del:active{background:var(--danger-soft)!important;border-color:var(--destructive)!important;color:var(--destructive)!important;box-shadow:0 0 14px var(--danger-soft)!important}
-.pk_app.pk_mt_on .pk_mt_vol::before{background:var(--surface-strong)!important}
-.pk_app.pk_mt_on .pk_mt_vol i{background:var(--ring)!important;box-shadow:0 0 12px var(--ac-glow)!important}
-.pk_app.pk_mt_on .pk_mt_tick{color:var(--timeline-fg)!important}
-.pk_app.pk_mt_on .pk_mt_tick::after{border-color:var(--grid-strong)!important}
+html[data-theme] .pk_app .pk_mt_head button:not(.pk_inact):hover,
+html[data-theme] .pk_app .pk_mt_track button:not(.pk_inact):hover,
+html[data-theme] .pk_app .pk_mt_channel button:not(.pk_inact):hover{background:var(--surface-hover)!important;border-color:var(--bd-h)!important;color:var(--foreground)!important}
+html[data-theme] .pk_app button.pk_mt_mute.pk_act{background:var(--warn)!important;border-color:var(--warn)!important;color:var(--background)!important}
+html[data-theme] .pk_app button.pk_mt_solo.pk_act{background:var(--solo)!important;border-color:var(--solo)!important;color:var(--background)!important}
+html[data-theme] .pk_app button.pk_mt_rec.pk_act{background:var(--rec)!important;border-color:var(--rec)!important;color:var(--danger-contrast)!important}
+html[data-theme] .pk_app button.pk_mt_del{background:var(--secondary)!important;border-color:var(--border)!important;color:var(--muted-foreground)!important}
+html[data-theme] .pk_app button.pk_mt_del:hover,
+html[data-theme] .pk_app button.pk_mt_del:active{background:var(--danger-soft)!important;border-color:var(--destructive)!important;color:var(--destructive)!important;box-shadow:0 0 14px var(--danger-soft)!important}
+html[data-theme] .pk_app .pk_mt_vol::before{background:var(--surface-strong)!important}
+html[data-theme] .pk_app .pk_mt_vol i{background:var(--ring)!important;box-shadow:0 0 12px var(--ac-glow)!important}
+html[data-theme] .pk_app .pk_mt_tick{color:var(--timeline-fg)!important}
+html[data-theme] .pk_app .pk_mt_tick::after{border-color:var(--grid-strong)!important}
 
 /* Clips retain track identity, while their surfaces follow the theme. */
 .pk_app.pk_mt_on .pk_mt_clip{
@@ -379,14 +392,15 @@ a{color:var(--ring)}
 .pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,var(--ring),var(--accent-strong))!important}
 
 /* Dialogs, forms and specialised controls */
-.pk_app .pk_modal{
+html[data-theme] .pk_modal{
 	background:var(--popover)!important;
 	border-color:var(--border)!important;
 	color:var(--popover-foreground)!important;
 	box-shadow:0 28px 100px var(--shadow-color),var(--inset-hi)!important;
 }
-.pk_modal_title,
-.pk_modal_bottom{background:var(--popover)!important;border-color:var(--border)!important;color:var(--foreground)!important}
+html[data-theme] .pk_modal_main{background:var(--popover)!important;color:var(--popover-foreground)!important}
+html[data-theme] .pk_modal_title,
+html[data-theme] .pk_modal_bottom{background:var(--secondary)!important;border-color:var(--border)!important;color:var(--foreground)!important}
 .pk_modal input,
 .pk_modal select,
 .pk_modal textarea,
@@ -435,7 +449,15 @@ a{color:var(--ring)}
 
 /* Inline legacy colours inside effect dialogs are neutralised by specificity. */
 .pk_modal [style*="background:#000"],
-.pk_modal [style*="background: #000"]{background:var(--wave-bg)!important}
+.pk_modal [style*="background: #000"],
+.pk_modal [style*="background-color:#000"],
+.pk_modal [style*="background-color: #000"],
+.pk_modal [style*="background:#111"],
+.pk_modal [style*="background: #111"],
+.pk_modal [style*="background:#18181b"],
+.pk_modal [style*="background: #18181b"],
+.pk_modal [style*="background:#202027"],
+.pk_modal [style*="background: #202027"]{background:var(--wave-bg)!important}
 .pk_modal [style*="color:#aaa"],
 .pk_modal [style*="color: #aaa"],
 .pk_modal [style*="color:#ccc"],
@@ -536,5 +558,5 @@ html[data-theme] .pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb:hover{bac
 .pk_app .pk_tbsa:hover{background:var(--surface-hover)!important;color:var(--foreground)!important;box-shadow:var(--inset-hi)!important}
 .pk_app #pk_tmp_tap2 .pk_obj,
 .pk_app #pk_tmp_tap .pk_obj{background:linear-gradient(90deg,var(--danger-soft),transparent 25%,transparent)!important;border-color:var(--rec)!important}
-.pk_app .pk_modal_cancel{background:var(--secondary)!important;border-color:var(--border)!important;color:var(--muted-foreground)!important}
-.pk_app .pk_modal_cancel:hover{background:var(--danger-soft)!important;border-color:var(--destructive)!important;color:var(--destructive)!important}
+html[data-theme] .pk_modal_cancel{background:var(--secondary)!important;border-color:var(--border)!important;color:var(--muted-foreground)!important}
+html[data-theme] .pk_modal_cancel:hover{background:var(--danger-soft)!important;border-color:var(--destructive)!important;color:var(--destructive)!important}

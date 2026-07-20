@@ -2,6 +2,7 @@ CACHE MANIFEST
 # v1 - July 26, 2018
 # v2 - May 25, 2020
 # v6 - multitrack sample cancel refresh
+# v7 - themed popup surfaces
 
 /index-cache.html
 /manifest.json
@@ -23,6 +24,8 @@ CACHE MANIFEST
 /rnn_denoise.wasm
 /fonts/icomoon.ttf
 /fonts/icomoon.woff
+/theme-registry.js
+/popup-theme.js
 /eq.html
 /sp.html
 /mix.html
