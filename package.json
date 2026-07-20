@@ -13,8 +13,8 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "node tooling/prettier.mjs --write",
+    "format:check": "node tooling/prettier.mjs --check",
     "clean": "turbo run clean && node tooling/clean.mjs",
     "prepare": "husky"
   },

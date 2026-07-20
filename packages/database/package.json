@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "prisma generate && tsc -p tsconfig.build.json",
-    "clean": "node ../../tooling/clean.mjs packages/database/dist packages/database/coverage packages/database/src/generated",
+    "clean": "node ../../tooling/clean.mjs dist coverage src/generated",
     "dev": "tsc -p tsconfig.build.json --watch",
     "lint": "eslint . --max-warnings=0",
     "prisma:generate": "prisma generate",
