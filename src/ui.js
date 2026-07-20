@@ -2993,6 +2993,32 @@ function _topbarConfig ( app, ui ) {
 				}
 			})(pk_timingctx, timing_caches);
 		}
+
+		function refreshTimingTheme () {
+			if (!is_chrome || !w.AMTheme) return ;
+			var bg = w.AMTheme.color ('background', '#000');
+			var fg = w.AMTheme.color ('foreground', '#fff');
+			pk_timingctx.fillStyle = bg;
+			pk_timingctx.fillRect (0, 0, 150, 40);
+			for (var key in timing_caches) {
+				if (!Object.prototype.hasOwnProperty.call (timing_caches, key)) continue ;
+				var cache = timing_caches[key];
+				var cache_ctx = cache.getContext ('2d', {alpha:false});
+				cache_ctx.fillStyle = bg;
+				cache_ctx.fillRect (0, 0, 18, 26);
+				cache_ctx.fillStyle = fg;
+				cache_ctx.font = '29px Helvetica, Arial, sans-serif';
+				cache_ctx.textAlign = 'center';
+				cache_ctx.textBaseline = 'middle';
+				cache_ctx.fillText (key, key === ':' ? 8 : 9, 14);
+			}
+			for (var ti = 0; ti < pk_timingnum.length; ++ti) {
+				pk_timingctx.drawImage (timing_caches[pk_timingnum[ti]], ti * 16, 10);
+			}
+		}
+		w.addEventListener ('am:themechange', function () {
+			(w.requestAnimationFrame || w.setTimeout) (refreshTimingTheme);
+		});
 		/////
 
 
