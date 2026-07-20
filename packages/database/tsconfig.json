@@ -1,0 +1,7 @@
+{
+  "extends": "@audiomass/config/tsconfig/base",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+}

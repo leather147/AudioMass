@@ -1,0 +1,131 @@
+name: audiomass
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-audiomass}
+      POSTGRES_USER: ${POSTGRES_USER:-audiomass}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data --console-address :9001
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${S3_KEY:-audiomass}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET:?Set S3_SECRET in .env}
+    ports:
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://127.0.0.1:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    entrypoint: >
+      /bin/sh -c "
+      until /usr/bin/mc alias set local http://minio:9000 '${S3_KEY:-audiomass}' '${S3_SECRET}'; do sleep 1; done;
+      /usr/bin/mc mb --ignore-existing 'local/${STORAGE_BUCKET:-audiomass}';
+      "
+    depends_on:
+      minio:
+        condition: service_healthy
+
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: build
+    command: pnpm --filter @audiomass/database prisma:migrate
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-audiomass}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-audiomass}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  python-api:
+    build:
+      context: ./apps/python-api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PYTHON_API_INTERNAL_KEY: ${PYTHON_API_INTERNAL_KEY:?Set PYTHON_API_INTERNAL_KEY in .env}
+      PYTHON_API_ALLOWED_STORAGE_HOSTS: ${PYTHON_API_ALLOWED_STORAGE_HOSTS:-minio}
+      PYTHON_API_ALLOW_INSECURE_STORAGE: ${PYTHON_API_ALLOW_INSECURE_STORAGE:-true}
+      PYTHON_API_MAX_CONCURRENT_JOBS: ${PYTHON_API_MAX_CONCURRENT_JOBS:-2}
+      PYTHON_API_MAX_UPLOAD_BYTES: ${PYTHON_API_MAX_UPLOAD_BYTES:-536870912}
+      PYTHON_API_REMOTE_TIMEOUT_SECONDS: ${PYTHON_API_REMOTE_TIMEOUT_SECONDS:-900}
+      PYTHON_API_WHISPER_MODEL: ${PYTHON_API_WHISPER_MODEL:-small}
+      PYTHON_API_WHISPER_DEVICE: ${PYTHON_API_WHISPER_DEVICE:-cpu}
+      PYTHON_API_WHISPER_COMPUTE_TYPE: ${PYTHON_API_WHISPER_COMPUTE_TYPE:-int8}
+    expose:
+      - '8000'
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-audiomass}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-audiomass}
+      API_KEYS: ${API_KEYS:?Set API_KEYS in .env}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      PYTHON_API_URL: http://python-api:8000
+      PYTHON_API_INTERNAL_KEY: ${PYTHON_API_INTERNAL_KEY:?Set PYTHON_API_INTERNAL_KEY in .env}
+      PYTHON_API_TIMEOUT_MS: ${PYTHON_API_TIMEOUT_MS:-900000}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-minio}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-audiomass}
+      STORAGE_MAX_UPLOAD_BYTES: ${STORAGE_MAX_UPLOAD_BYTES:-536870912}
+      STORAGE_URL_TTL_SECONDS: ${STORAGE_URL_TTL_SECONDS:-900}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_KEY: ${S3_KEY:-audiomass}
+      S3_SECRET: ${S3_SECRET:?Set S3_SECRET in .env}
+      SUPABASE_URL: ${SUPABASE_URL:-}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-}
+      BLOB_READ_WRITE_TOKEN: ${BLOB_READ_WRITE_TOKEN:-}
+      VERCEL_BLOB_ACCESS: ${VERCEL_BLOB_ACCESS:-private}
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      python-api:
+        condition: service_started
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/v1}
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  minio-data:
+  postgres-data:

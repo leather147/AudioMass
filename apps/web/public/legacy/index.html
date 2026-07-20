@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>AM - Audio Editor</title>
+	<link href="ico.png" rel="shortcut icon">
+	<meta charset="utf-8">
+	<link rel="manifest" href="manifest.json">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="AM is a free full-featured web-based audio &amp; waveform editing tool">
+	<meta property="og:image" content="https://audiomass.co/icon.jpg">
+	<meta property="og:title" content="AM">
+	<meta property="og:url" content="https://audiomass.co/">
+	<meta property="og:description" content="AM is a free full-featured web-based audio &amp; waveform editing tool">
+	<meta name="keywords" content="AM, WebAudio, WaveForm, audio editing, free audio editing, audio tool, waveform editor, sound editor, open source">
+	<link rel="apple-touch-icon" href="https://audiomass.co/icon-app.png">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="AM">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@pkalogiros">
+	<meta name="twitter:creator" content="@pkalogiros">
+	<meta name="twitter:title" content="AM - Audio Editor">
+	<meta name="twitter:description" content="AM is a free full-featured web-based audio &amp; waveform editing tool">
+	<meta name="twitter:image" content="https://audiomass.co/icon.jpg">
+
+	<script src="preferences.js"></script>
+	<script src="theme-registry.js"></script>
+	<script src="theme-service.js"></script>
+	<script src="theme-canvas.js"></script>
+	<script src="locale-service.js"></script>
+	<script src="locale-ru.js"></script>
+	<script src="appearance.js"></script>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="replicate-theme.css">
+	<link rel="stylesheet" href="mt-track-color-frames.css">
+	<link rel="stylesheet" href="mt-infinite-grid.css">
+	<link rel="stylesheet" href="ui-bugfixes.css">
+	<link rel="stylesheet" href="mt-grid-soft.css">
+	<link rel="stylesheet" href="mt-background-grid.css">
+	<link rel="stylesheet" href="selection-badge.css">
+	<link rel="stylesheet" href="interaction-cursors.css">
+	<link rel="stylesheet" href="animation-system.css">
+	<link rel="stylesheet" href="toolbar-badges-icons.css">
+	<link rel="stylesheet" href="tooltip-layer.css">
+	<link rel="stylesheet" href="mt-add-channel-bottom.css">
+	<link rel="stylesheet" href="floating-safe-placement.css">
+	<link rel="stylesheet" href="menu-dialog-chain.css">
+	<link rel="stylesheet" href="timeline-extra-scroll.css">
+	<link rel="stylesheet" href="toolbar-fluid-fix.css">
+	<link rel="stylesheet" href="selection-panel-final-fix.css">
+	<link rel="stylesheet" href="marker-head-centering.css">
+	<link rel="stylesheet" href="toolbar-icons-restore.css">
+	<link rel="stylesheet" href="composition-waveform-badge.css">
+	<link rel="stylesheet" href="toolbar-time-transport-final-fix.css">
+	<link rel="stylesheet" href="time-badge-no-crop.css">
+	<link rel="stylesheet" href="mt-scroll-ruler-final-fix.css">
+	<link rel="stylesheet" href="selection-panel-responsive-fix.css">
+	<link rel="stylesheet" href="marker-create-button.css">
+	<link rel="stylesheet" href="clip-rename-button.css">
+	<link rel="stylesheet" href="appearance.css">
+	<link rel="stylesheet" href="theme-overrides.css">
+	<style>
+		:root{
+			--ff:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+			--ff-mono:"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+			--ff-heading:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+		}
+		h1,h2,h3,h4,h5,h6,.pk_modal_title,.pk_modal_title>span{font-family:var(--ff-heading)}
+		small,.pk_sloop_meta,.pk_timing,.pk_total_dur,.pk_hover_dur,.pk_shrtct{
+			font-family:var(--ff-mono)!important;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1,"zero" 0;
+		}
+	</style>
+	<script>
+		(function () {
+			var geistMono = '"Geist Mono",ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace';
+			if (!window.CanvasRenderingContext2D || !CanvasRenderingContext2D.prototype) return;
+			var descriptor = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'font');
+			if (!descriptor || !descriptor.get || !descriptor.set) return;
+			Object.defineProperty(CanvasRenderingContext2D.prototype, 'font', {
+				get:descriptor.get,
+				set:function (value) {
+					if (typeof value === 'string') value = value.replace(/Arial\s*,\s*sans-serif|Arial|sans-serif|monospace/gi, geistMono);
+					descriptor.set.call(this, value);
+				}
+			});
+		})();
+	</script>
+</head>
+<body>
+	<div id="app"></div>
+
+	<script src="dist/wavesurfer.js"></script>
+	<script src="dist/plugin/wavesurfer.regions.js"></script>
+	<script src="oneup.js"></script>
+	<script src="app.js"></script>
+	<script src="keys.js"></script>
+	<script src="markers.js"></script>
+	<script src="contextmenu.js"></script>
+	<script src="lufs.js"></script>
+	<script src="menu-check-svg.js"></script>
+	<script src="ui-fx.js"></script>
+	<script src="ui.js"></script>
+	<script src="modal.js"></script>
+	<script src="state.js"></script>
+	<script src="engine.js"></script>
+	<script src="actions.js"></script>
+	<script src="drag.js"></script>
+	<script src="recorder.js"></script>
+	<script src="welcome.js"></script>
+	<script src="fx-pg-eq.js"></script>
+	<script src="fx-auto.js"></script>
+	<script src="local.js"></script>
+	<script src="id3.js"></script>
+	<script src="lzma.js"></script>
+	<script src="amss-format.js"></script>
+	<script src="multitrack.js"></script>
+	<script src="composition-waveform-badge.js"></script>
+	<script src="mt-scroll-ruler-final-fix.js"></script>
+	<script src="marker-create-button.js"></script>
+	<script src="clip-rename-button.js"></script>
+	<script src="touch-clip-select-fix.js"></script>
+	<script src="settings-trigger.js"></script>
+	<script src="next-bridge.js"></script>
+	<script>
+		var editor = PKAudioEditor.init('app');
+		if (window.AMInstallMtScrollRulerFinalFix) window.AMInstallMtScrollRulerFinalFix(editor);
+		if (window.AMInstallMarkerCreateButton) window.AMInstallMarkerCreateButton(editor);
+		if (window.AMInstallClipRenameButton) window.AMInstallClipRenameButton(editor);
+		if (window.AMInstallTouchClipSelectFix) window.AMInstallTouchClipSelectFix(editor);
+		if (window.AMInstallNextBridge) window.AMInstallNextBridge(editor);
+	</script>
+</body>
+</html>

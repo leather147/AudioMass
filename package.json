@@ -1,0 +1,33 @@
+{
+  "name": "audiomass-enterprise",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.12.3",
+  "engines": {
+    "node": "24.x",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "format": "node tooling/prettier.mjs --write",
+    "format:check": "node tooling/prettier.mjs --check",
+    "clean": "turbo run clean && node tooling/clean.mjs",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.2",
+    "@types/node": "^24.0.0",
+    "eslint": "9.39.2",
+    "husky": "9.1.7",
+    "lint-staged": "17.1.0",
+    "prettier": "3.9.5",
+    "turbo": "2.10.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.64.0",
+    "vitest": "4.1.10"
+  }
+}
