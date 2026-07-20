@@ -9,6 +9,7 @@ import { FilesModule } from './files/files.module.js';
 import { HealthModule } from './health/health.module.js';
 import { ProcessingJobsModule } from './processing-jobs/processing-jobs.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
+import { PythonProcessingModule } from './python-processing/python-processing.module.js';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProjectsModule } from './projects/projects.module.js';
     FilesModule,
     ProjectsModule,
     ProcessingJobsModule,
+    PythonProcessingModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ApiKeyGuard }],
 })

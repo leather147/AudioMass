@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api import ai, audio, effects, health, plugins
+from app.api import ai, audio, effects, health, jobs, plugins
 from app.core.config import get_settings
 from app.core.errors import install_exception_handlers
 from app.core.logging import configure_logging, install_request_logging
@@ -32,6 +32,7 @@ def create_app() -> FastAPI:
             {"name": "effects", "description": "Server-side streaming DSP"},
             {"name": "plugins", "description": "Trusted Python audio plugin registry"},
             {"name": "ai", "description": "Machine-assisted audio analysis"},
+            {"name": "jobs", "description": "Private presigned-URL processing pipeline"},
         ],
     )
     install_request_logging(application)
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     application.include_router(effects.router, prefix="/v1")
     application.include_router(plugins.router, prefix="/v1")
     application.include_router(ai.router, prefix="/v1")
+    application.include_router(jobs.router, prefix="/v1")
     return application
 
 

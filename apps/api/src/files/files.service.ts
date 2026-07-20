@@ -34,6 +34,10 @@ export class FilesService {
     private readonly storage: CloudStorageService,
   ) {}
 
+  public get maximumUploadBytes(): number {
+    return this.storage.maxUploadBytes;
+  }
+
   public async createUpload(dto: CreateUploadDto): Promise<CreatedUpload> {
     if (dto.expectedSize > this.storage.maxUploadBytes) {
       throw new BadRequestException(`Upload exceeds ${this.storage.maxUploadBytes} bytes`);
@@ -108,6 +112,42 @@ export class FilesService {
     });
     if (update.count === 0) throw new ConflictException('File changed concurrently');
     return this.getOwned(id, ownerId);
+  }
+
+  public async getReady(id: string, ownerId: string): Promise<StorageObject> {
+    const file = await this.getOwned(id, ownerId);
+    if (file.status !== 'READY') throw new ConflictException('File is not ready for processing');
+    return file;
+  }
+
+  public async completeGenerated(
+    id: string,
+    ownerId: string,
+    actualSize: number,
+  ): Promise<StorageObject> {
+    if (!Number.isInteger(actualSize) || actualSize < 1 || actualSize > this.maximumUploadBytes) {
+      throw new BadRequestException('Generated file size is outside the configured limit');
+    }
+    const updated = await this.prisma.storageObject.updateMany({
+      data: { expectedSize: actualSize },
+      where: { id, ownerId, status: 'PENDING' },
+    });
+    if (updated.count === 0) throw new ConflictException('Generated file is no longer pending');
+    return this.complete(id, ownerId);
+  }
+
+  public async rejectPending(id: string, ownerId: string): Promise<void> {
+    const file = await this.getOwned(id, ownerId);
+    if (file.status !== 'PENDING') return;
+    await this.prisma.storageObject.update({
+      data: { status: 'REJECTED' },
+      where: { id: file.id },
+    });
+    try {
+      await this.storage.delete(file.objectKey);
+    } catch {
+      // The tombstone prevents access; lifecycle rules can remove a failed remote object later.
+    }
   }
 
   public async list(dto: ListFilesDto): Promise<Page<StorageObject>> {

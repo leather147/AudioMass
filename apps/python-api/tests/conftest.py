@@ -10,6 +10,7 @@ import soundfile as sf
 from numpy.typing import NDArray
 
 os.environ["PYTHON_API_INTERNAL_KEY"] = "test-internal-key-with-at-least-32-characters"
+os.environ["PYTHON_API_ALLOWED_STORAGE_HOSTS"] = "storage.example.com"
 os.environ["PYTHON_API_MAX_UPLOAD_BYTES"] = str(8 * 1024 * 1024)
 os.environ["PYTHON_API_MAX_CONCURRENT_JOBS"] = "2"
 

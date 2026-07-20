@@ -29,7 +29,9 @@ def test_health_and_openapi_are_public() -> None:
     assert health.status_code == 200
     assert health.json()["service"] == "audiomass-python-api"
     assert schema.status_code == 200
+    assert "/v1/jobs/execute" in schema.json()["paths"]
     assert "/v1/audio/analyze" in schema.json()["paths"]
+    assert "/v1/ai/transcribe" in schema.json()["paths"]
     assert "APIKeyHeader" in schema.json()["components"]["securitySchemes"]
 
 
@@ -38,6 +40,22 @@ def test_processing_routes_require_internal_key() -> None:
         response = client.post(
             "/v1/audio/analyze",
             files={"file": ("tone.wav", _wave_file(), "audio/wav")},
+        )
+
+    assert response.status_code == 401
+
+
+def test_remote_job_route_requires_internal_key_before_fetching_storage() -> None:
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/jobs/execute",
+            json={
+                "operation": "analyze",
+                "input": {
+                    "filename": "tone.wav",
+                    "url": "https://storage.example.com/input.wav",
+                },
+            },
         )
 
     assert response.status_code == 401

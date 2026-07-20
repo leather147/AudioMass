@@ -16,6 +16,9 @@ export interface ApiEnvironment {
   DATABASE_URL: string;
   NODE_ENV: string;
   PORT: number;
+  PYTHON_API_INTERNAL_KEY: string;
+  PYTHON_API_TIMEOUT_MS: number;
+  PYTHON_API_URL: string;
   STORAGE_BUCKET: string;
   STORAGE_MAX_UPLOAD_BYTES: number;
   STORAGE_PROVIDER: StorageProvider;
@@ -100,6 +103,20 @@ export function validateEnvironment(
   const apiKeys = requiredString(input, 'API_KEYS');
   parseApiKeys(apiKeys);
 
+  const pythonApiUrl = requiredString(input, 'PYTHON_API_URL').replace(/\/$/, '');
+  let parsedPythonApiUrl: URL;
+  try {
+    parsedPythonApiUrl = new URL(pythonApiUrl);
+  } catch {
+    throw new Error('PYTHON_API_URL must be an absolute HTTP(S) URL');
+  }
+  if (!['http:', 'https:'].includes(parsedPythonApiUrl.protocol)) {
+    throw new Error('PYTHON_API_URL must be an absolute HTTP(S) URL');
+  }
+  const pythonInternalKey = requiredString(input, 'PYTHON_API_INTERNAL_KEY');
+  parseApiKeys(pythonInternalKey);
+  const pythonTimeoutMs = positiveInteger(input, 'PYTHON_API_TIMEOUT_MS', 900_000, 3_600_000);
+
   const provider = storageProvider(input);
   const storageBucket = requiredString(input, 'STORAGE_BUCKET');
   const storageUrlTtlSeconds = positiveInteger(input, 'STORAGE_URL_TTL_SECONDS', 900, 86_400);
@@ -125,6 +142,9 @@ export function validateEnvironment(
     NODE_ENV: typeof input.NODE_ENV === 'string' ? input.NODE_ENV : 'development',
     PORT: port,
     STORAGE_BUCKET: storageBucket,
+    PYTHON_API_INTERNAL_KEY: pythonInternalKey,
+    PYTHON_API_TIMEOUT_MS: pythonTimeoutMs,
+    PYTHON_API_URL: pythonApiUrl,
     STORAGE_MAX_UPLOAD_BYTES: storageMaxUploadBytes,
     STORAGE_PROVIDER: provider,
     STORAGE_URL_TTL_SECONDS: storageUrlTtlSeconds,

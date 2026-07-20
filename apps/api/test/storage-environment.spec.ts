@@ -5,6 +5,8 @@ import { validateEnvironment } from '../src/config/environment.js';
 const BASE = {
   API_KEYS: 'a'.repeat(32),
   DATABASE_URL: 'postgresql://user:secret@db:5432/audiomass',
+  PYTHON_API_INTERNAL_KEY: 'p'.repeat(32),
+  PYTHON_API_URL: 'http://python-api:8000',
   STORAGE_BUCKET: 'audiomass',
 };
 

@@ -2,7 +2,8 @@ FROM python:3.13-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/home/audiomass/.cache/huggingface
 
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes ffmpeg libsndfile1 \
