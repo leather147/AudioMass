@@ -6,3 +6,7 @@ onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
   - 'prisma'
+
+overrides:
+  '@hono/node-server@<1.19.13': 1.19.13
+  'postcss@<8.5.10': 8.5.20

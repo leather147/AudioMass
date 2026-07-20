@@ -28,8 +28,13 @@ Each feature phase is independently reviewable and has package-level tests. The 
 - Storage adapters share one lifecycle and verification contract.
 - Project updates use optimistic concurrency, and processing creation supports idempotency.
 - Browser plugins are capability-scoped packages; Python plugins are trusted server installations.
-- Existing editor assets remain under `apps/web/public/legacy` until their behavior is migrated feature by feature.
+- Editor sources now have a single `apps/web/editor-runtime` boundary. Static compatibility modules and binary resources are versioned under `editor-runtime/static`; `public/editor-assets` is generated and ignored.
 - Frequency analysis, spectral analysis, the multitrack mixer, About, preference persistence, and offline installation now use App Router or root web-platform entrypoints; their superseded standalone HTML and AppCache files have been removed.
+- The final static editor HTML entrypoint was replaced by the `/editor-runtime` Route Handler and a tested asset-order manifest. Relative worker, worklet, codec, and sample paths remain compatible through the runtime document base URL.
+- Preference storage, locale application, theme application, and the editor bridge were moved from handwritten public scripts to typed `apps/web/editor-runtime` sources. Generated browser assets are rebuilt before web development, tests, and production builds.
+- Preference synchronization is transactional inside the iframe and serialized in the Next.js shell, eliminating stale locale writes caused by concurrent cookie requests.
+- Copy, trim, insert, silence, overwrite, and chunked-float operations were extracted from `actions.js` into the typed and unit-tested editor runtime. The existing AudioUtils method names remain as a compatibility facade.
+- Shared gain routing, fade curves, peak/RMS normalization, and playback-rate profile calculations were extracted into a second typed and unit-tested runtime module. The effect bank still consumes its established local helper names and parameter shapes.
 
 ## Success criteria
 

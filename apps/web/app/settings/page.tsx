@@ -1,31 +1,27 @@
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 
 import { saveEditorPreferences } from '@/app/settings/actions';
-import {
-  DEFAULT_EDITOR_PREFERENCES,
-  EDITOR_LOCALES,
-  EDITOR_THEMES,
-  parseEditorPreferences,
-} from '@/lib/editor-preferences';
+import { editorCopy } from '@/lib/editor-copy';
+import { readEditorPreferences } from '@/lib/editor-preference-cookies';
+import { EDITOR_LOCALES, EDITOR_THEMES } from '@/lib/editor-preferences';
 
-export const metadata = { title: 'Настройки' };
+export async function generateMetadata() {
+  const { locale } = await readEditorPreferences();
+  return { title: editorCopy(locale, 'settingsTitle') };
+}
 
 export default async function SettingsPage() {
-  const cookieStore = await cookies();
-  const preferences = parseEditorPreferences({
-    locale: cookieStore.get('am-locale')?.value ?? DEFAULT_EDITOR_PREFERENCES.locale,
-    theme: cookieStore.get('am-theme')?.value ?? DEFAULT_EDITOR_PREFERENCES.theme,
-  });
+  const preferences = await readEditorPreferences();
+  const copy = (key: Parameters<typeof editorCopy>[1]) => editorCopy(preferences.locale, key);
 
   return (
     <main className="settings-page">
       <section className="settings-card">
-        <h1>Настройки редактора</h1>
-        <p>Параметры применяются к production-редактору при открытии рабочей области.</p>
+        <h1>{copy('settingsTitle')}</h1>
+        <p>{copy('preferencesDescription')}</p>
         <form action={saveEditorPreferences} className="settings-form">
           <label>
-            Язык
+            {copy('language')}
             <select defaultValue={preferences.locale} name="locale">
               {EDITOR_LOCALES.map((locale) => (
                 <option key={locale.id} value={locale.id}>
@@ -35,7 +31,7 @@ export default async function SettingsPage() {
             </select>
           </label>
           <label>
-            Цветовая тема
+            {copy('colorTheme')}
             <select defaultValue={preferences.theme} name="theme">
               {EDITOR_THEMES.map((theme) => (
                 <option key={theme.id} value={theme.id}>
@@ -45,8 +41,8 @@ export default async function SettingsPage() {
             </select>
           </label>
           <div className="settings-actions">
-            <Link href="/editor">Отмена</Link>
-            <button type="submit">Сохранить</button>
+            <Link href="/editor">{copy('cancel')}</Link>
+            <button type="submit">{copy('save')}</button>
           </div>
         </form>
       </section>

@@ -131,28 +131,28 @@ apps/
   api/          NestJS 11 BFF/API Gateway
   python-api/   FastAPI compute service
 packages/
-  audio-engine/ TypeScript Web Audio engine and legacy bridge
+  audio-engine/ TypeScript Web Audio engine and compatibility bridge
   plugin-sdk/   Plugin contracts, registry and lazy loader
   shared/       DTO, result/error and domain contracts
   ui/           Shared React UI primitives
   config/       Shared TypeScript, ESLint and environment config
   database/     Prisma schema and generated client
 tooling/        Repository scripts and OpenAPI generation
-legacy/         Migration notes only; runtime assets live under apps/web/public
+docs/           Architecture, deployment and completed migration notes
 ```
 
 ## 4. Архитектурная стратегия
 
 ### 4.1 Сохранение функциональности
 
-Миграция использует production strangler pattern:
+Миграция выполнена через production strangler pattern:
 
-1. Текущий `src` перемещается с сохранением Git history в `apps/web/public/legacy`.
-2. Next.js route `/editor` предоставляет рабочий same-origin client boundary для существующего runtime.
-3. Legacy editor продолжает выполнять все текущие browser audio функции без сетевого round-trip.
-4. Между Next.js shell и editor вводится типизированный `postMessage` bridge с проверкой origin и schema validation.
-5. По мере извлечения модулей bridge переводится с legacy implementations на `packages/audio-engine` и `packages/plugin-sdk`.
-6. Legacy runtime удаляется только после parity tests для соответствующей функции.
+1. Исходный browser runtime был перенесён с сохранением Git history и поведения.
+2. Next.js routes `/editor` и `/editor-runtime` предоставляют рабочую same-origin границу без статического HTML entrypoint.
+3. Интерактивные browser audio функции продолжают выполняться локально без сетевого round-trip.
+4. Между Next.js shell и editor работает типизированный `postMessage` bridge с проверкой origin и payload.
+5. Preference, locale, theme, bridge и общие DSP-операции извлечены в TypeScript; совместимые UI/DSP assets находятся в едином source-каталоге `apps/web/editor-runtime`.
+6. Публичная legacy-граница удалена. `public/editor-assets` является воспроизводимым и игнорируемым результатом сборки с parity/asset-integrity tests.
 
 Это не mock и не демонстрационный iframe: редактор остаётся полноценным production runtime, а Next.js управляет routing, settings, projects, API access, error boundaries и deployment.
 
@@ -199,7 +199,7 @@ interface AudioEngine {
 - AudioWorklet transport;
 - worker protocol;
 - WAV encoder без server dependency;
-- legacy adapter для текущего `PKAudioEditor`;
+- compatibility adapter для внутреннего API `PKAudioEditor`;
 - capability detection для SharedArrayBuffer/WASM.
 
 ### 4.4 Plugin SDK
@@ -275,19 +275,19 @@ IndexedDB остаётся только как offline cache/device draft и н�
 
 ## 5. Карта переноса
 
-| Текущий файл/область      | Цель                                       | Действие                                              |
-| ------------------------- | ------------------------------------------ | ----------------------------------------------------- |
-| `src/index.html` и assets | `apps/web/public/legacy`                   | Переместить без изменения поведения                   |
-| `app.js` event bus        | `audio-engine/legacy` + shared events      | Обернуть typed adapter, затем извлекать               |
-| `engine.js`               | `packages/audio-engine`                    | Постепенно разделить transport, edit, effects, export |
-| `multitrack.js`           | `packages/audio-engine/multitrack`         | Сохранить runtime, добавить typed facade              |
-| `ui.js`, `ui-fx.js`       | Next client boundary + legacy runtime      | Не переписывать одномоментно                          |
-| `recorder-worklet.js`     | `apps/web/public/worklets` и audio package | Сохранить и типизировать protocol                     |
-| `tempo-worker.js`         | `apps/web/workers`                         | Перенести с typed messages                            |
-| WASM/vendor codecs        | `apps/web/public/codecs`                   | Сохранить license notices и loading paths             |
-| `local.js`                | projects/storage APIs                      | Оставить offline cache, добавить cloud sync           |
-| static servers            | удалить после parity                       | Заменить Next/Nest/FastAPI scripts                    |
-| root Python placeholder   | `apps/python-api`                          | Заменить полноценным сервисом                         |
+| Текущий файл/область      | Цель                                        | Действие                                              |
+| ------------------------- | ------------------------------------------- | ----------------------------------------------------- |
+| `src/index.html` и assets | `/editor-runtime` + `editor-runtime/static` | HTML генерируется Route Handler, assets собираются    |
+| `app.js` event bus        | typed bridge + internal runtime events      | Совместимый adapter и проверяемый message protocol    |
+| `engine.js`               | `packages/audio-engine`                     | Постепенно разделить transport, edit, effects, export |
+| `multitrack.js`           | `packages/audio-engine/multitrack`          | Сохранить runtime, добавить typed facade              |
+| `ui.js`, `ui-fx.js`       | Next client boundary + runtime assets       | Сохранить поведение за изолированной границей         |
+| `recorder-worklet.js`     | `apps/web/public/worklets` и audio package  | Сохранить и типизировать protocol                     |
+| `tempo-worker.js`         | `apps/web/workers`                          | Перенести с typed messages                            |
+| WASM/vendor codecs        | `apps/web/public/codecs`                    | Сохранить license notices и loading paths             |
+| `local.js`                | projects/storage APIs                       | Оставить offline cache, добавить cloud sync           |
+| static servers            | удалить после parity                        | Заменить Next/Nest/FastAPI scripts                    |
+| root Python placeholder   | `apps/python-api`                           | Заменить полноценным сервисом                         |
 
 ## 6. Этапы и коммиты
 
@@ -296,7 +296,9 @@ IndexedDB остаётся только как offline cache/device draft и н�
 2. `feat(web): migrate AudioMass UI to Next.js 16`
    - Next shell, editor boundary, routes, перенесённые legacy assets.
 3. `feat(audio): extract browser audio engine`
-   - typed engine, worklet/worker protocol, legacy adapter.
+
+- typed engine, worklet/worker protocol, compatibility adapter.
+
 4. `feat(plugin): create plugin sdk`
    - contracts, registry, versioning, lazy loading.
 5. `feat(api): migrate backend modules to NestJS`
@@ -312,7 +314,7 @@ IndexedDB остаётся только как offline cache/device draft и н�
 
 ## 7. Проверки на каждом этапе
 
-- Legacy editor opens and sample project loads.
+- Editor runtime opens and the sample project loads.
 - Playback, pause, seek and waveform remain functional.
 - Multitrack clips, channels and bounce remain functional.
 - Recording worklet loads.

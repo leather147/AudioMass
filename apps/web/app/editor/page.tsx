@@ -1,16 +1,14 @@
-import { cookies } from 'next/headers';
-
 import { EditorFrame } from '@/components/editor/editor-frame';
-import { DEFAULT_EDITOR_PREFERENCES, parseEditorPreferences } from '@/lib/editor-preferences';
+import { editorCopy } from '@/lib/editor-copy';
+import { readEditorPreferences } from '@/lib/editor-preference-cookies';
 
-export const metadata = { title: 'Редактор' };
+export async function generateMetadata() {
+  const { locale } = await readEditorPreferences();
+  return { title: editorCopy(locale, 'editorTitle') };
+}
 
 export default async function EditorPage() {
-  const cookieStore = await cookies();
-  const preferences = parseEditorPreferences({
-    locale: cookieStore.get('am-locale')?.value ?? DEFAULT_EDITOR_PREFERENCES.locale,
-    theme: cookieStore.get('am-theme')?.value ?? DEFAULT_EDITOR_PREFERENCES.theme,
-  });
+  const preferences = await readEditorPreferences();
 
   return (
     <main className="editor-page">

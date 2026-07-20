@@ -1,5 +1,5 @@
-const CACHE_NAME = 'audiomass-runtime-v1';
-const CORE_ROUTES = ['/editor', '/legacy/index.html'];
+const CACHE_NAME = 'audiomass-runtime-v4';
+const CORE_ROUTES = ['/editor', '/editor-runtime'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ROUTES)));

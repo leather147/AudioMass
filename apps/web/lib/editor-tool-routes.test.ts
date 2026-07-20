@@ -13,7 +13,7 @@ describe('editor tool routes', () => {
   });
 
   it('keeps the runtime menu in sync with the typed route map', () => {
-    const runtime = readFileSync(join(process.cwd(), 'public/legacy/ui-fx.js'), 'utf8');
+    const runtime = readFileSync(join(process.cwd(), 'editor-runtime/static/ui-fx.js'), 'utf8');
     for (const route of Object.values(EDITOR_TOOL_ROUTES)) expect(runtime).toContain(route);
     expect(runtime).not.toContain("'/' + url + '.html'");
   });

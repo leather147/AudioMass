@@ -10,6 +10,8 @@ import {
 } from 'react';
 
 import type { EditorToolId } from '@/lib/editor-tool-routes';
+import { editorCopy } from '@/lib/editor-copy';
+import type { EditorLocale } from '@/lib/editor-preferences';
 
 import styles from './editor-tools.module.css';
 
@@ -71,15 +73,26 @@ function embeddedSnapshot() {
   return new URLSearchParams(window.location.search).get('embedded') === '1';
 }
 
-function localeSnapshot(): 'en' | 'ru' {
-  const value =
-    getHost(embeddedSnapshot())?.AMI18n?.getLocale() ?? window.localStorage.getItem('lang');
+function localeSnapshot(embedded: boolean, fallback: EditorLocale): EditorLocale {
+  const value = getHost(embedded)?.AMI18n?.getLocale() ?? fallback;
   return value === 'en' ? 'en' : 'ru';
 }
 
-function useEditorTool(tool: EditorToolId) {
+function useEditorTool(tool: EditorToolId, initialLocale: EditorLocale) {
   const embedded = useSyncExternalStore(subscribeStatic, embeddedSnapshot, () => false);
-  const locale = useSyncExternalStore(subscribeStatic, localeSnapshot, () => 'ru');
+  const subscribeLocale = useCallback(
+    (notify: () => void) => {
+      const host = getHost(embedded);
+      host?.addEventListener('am:localechange', notify);
+      return () => host?.removeEventListener('am:localechange', notify);
+    },
+    [embedded],
+  );
+  const getLocaleSnapshot = useCallback(
+    () => localeSnapshot(embedded, initialLocale),
+    [embedded, initialLocale],
+  );
+  const locale = useSyncExternalStore(subscribeLocale, getLocaleSnapshot, () => initialLocale);
 
   useEffect(() => {
     const host = getHost(embedded);
@@ -175,7 +188,7 @@ function ToolControls({ controller }: { controller: EditorToolController }) {
     <>
       {embedded ? (
         <button
-          aria-label={locale === 'en' ? 'Close' : 'Закрыть'}
+          aria-label={editorCopy(locale, 'close')}
           className={styles.close}
           onClick={closeEmbedded}
           type="button"
@@ -184,11 +197,11 @@ function ToolControls({ controller }: { controller: EditorToolController }) {
         </button>
       ) : null}
       <button className={styles.dock} onClick={dock} type="button">
-        {embedded ? (locale === 'en' ? 'RETURN' : 'ВЕРНУТЬ') : locale === 'en' ? 'DOCK' : 'ОКНО'}
+        {editorCopy(locale, embedded ? 'return' : 'dock')}
       </button>
       {embedded ? (
         <button
-          aria-label={locale === 'en' ? 'Drag panel' : 'Перетащить панель'}
+          aria-label={editorCopy(locale, 'dragPanel')}
           className={styles.drag}
           onPointerDown={drag}
           type="button"
@@ -226,13 +239,19 @@ function spectralColor(value: number) {
   return `rgb(${start.map((channel, index) => Math.round(channel + (end[index]! - channel) * progress)).join(',')})`;
 }
 
-export function AnalyserTool({ kind }: { kind: 'frequency' | 'spectral' }) {
+export function AnalyserTool({
+  initialLocale,
+  kind,
+}: {
+  initialLocale: EditorLocale;
+  kind: 'frequency' | 'spectral';
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<number | null>(null);
   const latestRef = useRef<FrequencyData>(null);
   const [hasData, setHasData] = useState(false);
   const tool = kind === 'frequency' ? 'eq' : 'sp';
-  const controller = useEditorTool(tool);
+  const controller = useEditorTool(tool, initialLocale);
   const { locale } = controller;
 
   const draw = useCallback(() => {
@@ -300,14 +319,7 @@ export function AnalyserTool({ kind }: { kind: 'frequency' | 'spectral' }) {
     };
   }, [draw]);
 
-  const title =
-    kind === 'frequency'
-      ? locale === 'en'
-        ? 'FREQUENCY ANALYSER'
-        : 'ЧАСТОТНЫЙ АНАЛИЗАТОР'
-      : locale === 'en'
-        ? 'SPECTRAL ANALYSER'
-        : 'СПЕКТРАЛЬНЫЙ АНАЛИЗАТОР';
+  const title = editorCopy(locale, kind === 'frequency' ? 'frequencyAnalyser' : 'spectralAnalyser');
 
   return (
     <main className={styles.toolPage}>
@@ -418,9 +430,9 @@ function MixerStrip({ master = false, onSet, track }: MixerStripProps) {
   );
 }
 
-export function MixerTool() {
+export function MixerTool({ initialLocale }: { initialLocale: EditorLocale }) {
   const [data, setData] = useState<MixerData | null>(null);
-  const controller = useEditorTool('mix');
+  const controller = useEditorTool('mix', initialLocale);
   const { locale } = controller;
 
   useEffect(() => {
@@ -465,9 +477,7 @@ export function MixerTool() {
         {data ? (
           data.tracks.map((track) => <MixerStrip key={track.id} onSet={setValue} track={track} />)
         ) : (
-          <div className={styles.empty}>
-            {locale === 'en' ? 'OPEN MULTITRACK' : 'ОТКРОЙТЕ МУЛЬТИТРЕК'}
-          </div>
+          <div className={styles.empty}>{editorCopy(locale, 'openMultitrack')}</div>
         )}
         {master ? <MixerStrip master onSet={setValue} track={master} /> : null}
       </div>

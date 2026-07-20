@@ -1,7 +1,13 @@
 import { AnalyserTool } from '@/components/tools/editor-tools';
+import { editorCopy } from '@/lib/editor-copy';
+import { readEditorPreferences } from '@/lib/editor-preference-cookies';
 
-export const metadata = { title: 'Frequency analyser' };
+export async function generateMetadata() {
+  const { locale } = await readEditorPreferences();
+  return { title: editorCopy(locale, 'frequencyAnalyser') };
+}
 
-export default function FrequencyAnalyserPage() {
-  return <AnalyserTool kind="frequency" />;
+export default async function FrequencyAnalyserPage() {
+  const { locale } = await readEditorPreferences();
+  return <AnalyserTool initialLocale={locale} kind="frequency" />;
 }

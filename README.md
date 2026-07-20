@@ -4,11 +4,11 @@ AudioMass — браузерный многодорожечный аудиоре
 движком, Next.js-оболочкой, NestJS API, PostgreSQL, облачным хранилищем и
 изолированным FastAPI-сервисом для тяжёлого DSP и транскрипции.
 
-Исходный редактор не переписан заново: он сохранён в
-`apps/web/public/legacy` и загружается с того же origin внутри современной
-Next.js-оболочки. Это сохраняет существующие инструменты, темы, локализацию,
-горячие клавиши, waveform и аудиомеханику, пока новые части постепенно
-переносятся в типизированные модули.
+Исходники runtime редактора собраны в `apps/web/editor-runtime`: типизированные
+сервисы лежат в корне каталога, а совместимые DSP/UI-модули, стили, кодеки и
+демо-медиа — в `editor-runtime/static`. Перед разработкой, тестами и production
+build они воспроизводимо собираются в игнорируемый `public/editor-assets` и
+загружаются с того же origin внутри Next.js-оболочки.
 
 ## Текущий production
 
@@ -26,7 +26,7 @@ Vercel Project.
 
 ```text
 apps/
-  web/            Next.js 16, React 19 и same-origin legacy-редактор
+  web/            Next.js 16, React 19 и same-origin runtime редактора
   api/            NestJS 11/Fastify, OpenAPI и orchestration
   python-api/     FastAPI, DSP, export, анализ и Faster-Whisper
 packages/
@@ -46,7 +46,7 @@ runtime и независимые точки деплоя, но один lockfil
 ```text
 Browser
   -> Next.js web shell
-       -> same-origin legacy editor
+       -> same-origin editor runtime
        -> Web Audio / workers / AudioWorklet
 
 Trusted server-side caller
@@ -61,7 +61,7 @@ Trusted server-side caller
 - Тяжёлые операции выполняет FastAPI, не получая постоянных storage credentials.
 - Браузер не должен напрямую вызывать FastAPI.
 - `API_KEYS` — серверный service credential. Его нельзя помещать в
-  `NEXT_PUBLIC_*`, legacy JavaScript или любой клиентский bundle.
+  `NEXT_PUBLIC_*` или любой клиентский bundle.
 - `ownerId` ограничивает выборку ресурса, но сам по себе не подтверждает
   личность. Будущая облачная интеграция браузера должна передавать запросы через
   аутентифицированный BFF и получать `ownerId` из серверной сессии.
@@ -577,26 +577,41 @@ wildcard в production.
 Vercel Project. Для этой монорепы правильный Web root — `apps/web`; старый
 статический root-деплой не соответствует текущей структуре.
 
-## Правила безопасной разработки legacy-редактора
+## Правила безопасной разработки runtime редактора
 
-`apps/web/public/legacy` — рабочая совместимая граница, а не мусорная папка.
+`apps/web/editor-runtime` — единственный source-каталог браузерного редактора.
+Ручное редактирование `apps/web/public/editor-assets` запрещено: это полностью
+генерируемый build output, который очищается и пересобирается командой
+`pnpm --filter @audiomass/web runtime:build`.
 
-Уже перенесённые поверхности не дублируются внутри этой границы: анализаторы и
+Поверхности не дублируются внутри runtime: анализаторы и
 микшер находятся в `apps/web/app/tools`, About — в `apps/web/app/about`, а
-синхронизация темы/языка проходит через версионированный bridge и
-`/api/editor-preferences`.
+синхронизация темы/языка проходит через типизированный версионированный bridge и
+`/api/editor-preferences`. Preference, locale, theme и bridge runtime-сервисы
+компилируются перед `dev`, `test` и `build`, а статические зависимости копируются
+в тот же каталог с сохранением относительных URL воркеров, кодеков и медиа.
 
-- Не меняйте порядок `<script>` в legacy `index.html` без проверки зависимостей.
-- Не удаляйте глобальные `PKAudioEditor`, `PKAudioFX`, bridge hooks и CSS tokens,
-  пока их потребители не перенесены.
+Операции копирования, обрезки, вставки, тишины и замены `AudioBuffer` находятся
+в `editor-runtime/audio-buffer-operations.ts`; `actions.js` сохраняет прежние
+имена методов только как совместимый фасад для движка и эффектов.
+
+Общие Web Audio/DSP-примитивы усиления, peak/RMS-нормализации, fade-кривых и
+профилей скорости находятся в `editor-runtime/audio-effect-utilities.ts`.
+`actions.js` использует их через прежние локальные имена, поэтому существующий
+банк эффектов и формат его параметров остаются совместимыми.
+
+- Не меняйте порядок ресурсов в `editor-runtime-manifest.ts` без проверки
+  зависимостей и production-сборки `/editor-runtime`.
+- Совместимые глобальные `PKAudioEditor`, `PKAudioFX`, bridge hooks и CSS tokens
+  являются внутренним API runtime; изменение требует контрактного теста.
 - Общие цвета меняйте через theme tokens; не добавляйте новые hardcoded popup
   backgrounds.
-- Локализацию добавляйте через существующий locale service, без параллельных
-  словарей в отдельных модулях.
+- Локализацию добавляйте через `editor-runtime/locale-service.ts`, без
+  параллельных словарей и прямого `localStorage + reload` в UI-модулях.
 - После UI-изменений вручную проверьте пустой проект, загруженный multitrack,
   широкий и узкий viewport, zoom браузера, темы, popup-окна и обе локали.
-- Генерируемые `.next`, `dist`, coverage, Prisma client и Python caches не
-  коммитятся.
+- Генерируемые `public/editor-assets`, `.next`, `dist`, coverage, Prisma client
+  и Python caches не коммитятся.
 
 ## API, данные и безопасность
 

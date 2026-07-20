@@ -1,6 +1,6 @@
 import type { EditorPreferences } from '@/lib/editor-preferences';
 
-export const EDITOR_RUNTIME_PATH = '/legacy/index.html';
+export const EDITOR_RUNTIME_PATH = '/editor-runtime';
 export const EDITOR_BRIDGE_CHANNEL = 'audiomass.editor.v1';
 
 export type EditorCommandMap = {

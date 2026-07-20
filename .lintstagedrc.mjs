@@ -1,4 +1,4 @@
-const LEGACY_EDITOR_PATH = '/apps/web/public/legacy/';
+const CLASSIC_RUNTIME_PATH = '/apps/web/editor-runtime/static/';
 
 function quote(filename) {
   return `"${filename.replaceAll('"', '\\"')}"`;
@@ -6,7 +6,7 @@ function quote(filename) {
 
 function commandsFor(files, commands) {
   const targets = files
-    .filter((filename) => !filename.replaceAll('\\', '/').includes(LEGACY_EDITOR_PATH))
+    .filter((filename) => !filename.replaceAll('\\', '/').includes(CLASSIC_RUNTIME_PATH))
     .map(quote)
     .join(' ');
 

@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prebuild": "pnpm runtime:build",
     "build": "next build",
-    "clean": "node ../../tooling/clean.mjs .next coverage",
+    "clean": "node ../../tooling/clean.mjs .next coverage public/editor-assets",
+    "predev": "pnpm runtime:build",
     "dev": "next dev --turbopack",
     "lint": "eslint . --max-warnings=0",
     "start": "next start",
+    "pretest": "pnpm runtime:build",
+    "runtime:build": "node ../../tooling/clean.mjs public/editor-assets && node ../../tooling/copy-directory.mjs apps/web/editor-runtime/static apps/web/public/editor-assets && tsc -p editor-runtime/tsconfig.json",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

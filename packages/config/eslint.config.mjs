@@ -10,7 +10,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/src/generated/**',
       '**/node_modules/**',
-      'apps/web/public/legacy/**',
+      'apps/web/editor-runtime/static/**',
       'apps/web/public/codecs/**',
     ],
   },

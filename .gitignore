@@ -5,14 +5,14 @@
 *.br
 node_modules/
 **/node_modules/
+apps/web/public/editor-assets/
 .next/
 .turbo/
 coverage/
 dist/
 **/src/generated/
-!apps/web/public/legacy/dist/
-!apps/web/public/legacy/dist/**
-!apps/web/public/legacy/main.build.css.br
+!apps/web/editor-runtime/static/dist/
+!apps/web/editor-runtime/static/dist/**
 *.tsbuildinfo
 .env
 .env.local
