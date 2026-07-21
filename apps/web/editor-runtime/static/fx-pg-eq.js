@@ -2267,7 +2267,7 @@
 						ok ();
 						return ;
 					}
-					q.app.loadScript ('tempo-estimator.js?v=mt2', ok, fail);
+					q.app.loadScript ('tempo-estimator.js?v=mt3', ok, fail);
 				}
 
 				function setBusy ( q, on ) {
@@ -2333,7 +2333,7 @@
 
 						try {
 							if (q.worker) q.worker.terminate ();
-							q.worker = new Worker ('tempo-worker.js?v=mt1');
+							q.worker = new Worker ('tempo-worker.js?v=mt2');
 						}
 						catch (e2) {
 							runMainEstimator (

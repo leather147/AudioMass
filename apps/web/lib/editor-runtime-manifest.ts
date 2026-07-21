@@ -50,7 +50,7 @@ export const EDITOR_RUNTIME_SCRIPTS = [
   'keys.js',
   'markers.js',
   'contextmenu.js',
-  'lufs.js',
+  '/editor-assets/loudness-analysis.js',
   'menu-check-svg.js',
   'ui-fx.js',
   'ui.js',

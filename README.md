@@ -634,6 +634,7 @@ Vercel Project. Для этой монорепы правильный Web root �
 - [Vercel + Neon + Private Blob](docs/VERCEL_ONLY_DEPLOYMENT.md)
 - [Operations runbook](docs/OPERATIONS.md)
 - [Migration record](docs/MIGRATION.md)
+- [План полной переписи editor runtime](docs/EDITOR_RUNTIME_REWRITE.md)
 - [Исходный migration audit](MIGRATION_PLAN.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 

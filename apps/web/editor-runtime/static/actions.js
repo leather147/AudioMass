@@ -635,7 +635,7 @@
 				worker = new Worker('flac.js');
 			}
 			else {
-				worker = new Worker('wav.js');
+				worker = new Worker('wav.js?v=ts1');
 			}
 
 			var sample_rate = originalBuffer.sampleRate;
