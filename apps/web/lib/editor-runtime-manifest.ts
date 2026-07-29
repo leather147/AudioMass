@@ -2,12 +2,12 @@ export const EDITOR_ASSET_BASE = '/editor-assets/';
 
 export const EDITOR_BOOTSTRAP_SCRIPTS = [
   '/editor-assets/preferences.js',
-  'theme-registry.js',
+  '/editor-assets/theme-registry.js',
   '/editor-assets/theme-service.js',
-  'theme-canvas.js',
+  '/editor-assets/theme-canvas.js',
   '/editor-assets/locale-service.js',
   'locale-ru.js',
-  'appearance.js',
+  '/editor-assets/appearance-service.js',
 ] as const;
 
 export const EDITOR_STYLESHEETS = [

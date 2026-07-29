@@ -21,10 +21,10 @@ manifest loads only the replacement.
 
 After the first leaf-module batch and the AMSS codec migration:
 
-- 27 first-party classic JavaScript files remain;
-- approximately 25,494 first-party JavaScript lines remain;
-- 15 strict TypeScript runtime modules are generated into /editor-assets;
-- LUFS, tempo analysis, WAV export, AMSS project files, local session storage, and ID3/MP4 metadata have behavioral tests.
+- 24 first-party classic JavaScript files remain;
+- approximately 25,087 first-party JavaScript lines remain;
+- 18 strict TypeScript runtime modules are generated into /editor-assets;
+- LUFS, tempo analysis, WAV export, AMSS project files, local session storage, ID3/MP4 metadata, theme tokens, canvas colors, and appearance UI have behavioral tests.
 
 ## Scope boundary
 
@@ -70,7 +70,7 @@ manifest and notices. Any local patch to them must be documented.
 ### Wave 2 — small runtime and presentation services
 
 - [x] `oneup.js` and `menu-check-svg.js`.
-- [ ] theme registry/canvas and appearance modules.
+- [x] theme registry/canvas and appearance modules.
 - [ ] welcome and settings trigger modules.
 - [ ] marker/clip/composition toolbar extensions.
 - [ ] multitrack scroll and touch selection extensions.
