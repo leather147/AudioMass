@@ -44,11 +44,7 @@
     BS1770Block: typeof CONSTANTS;
     analyze(buffer: AudioBufferLike): LoudnessReport;
     db(value: number): number;
-    gainForTarget(
-      report: LoudnessReport,
-      target: unknown,
-      ceiling: unknown,
-    ): LoudnessNormalization;
+    gainForTarget(report: LoudnessReport, target: unknown, ceiling: unknown): LoudnessNormalization;
     integratedLUFS(buffer: AudioBufferLike): number;
     kWeightCoeffs(rate: number): [BiquadCoefficients, BiquadCoefficients];
   };
@@ -100,11 +96,9 @@
     const amplitudeRoot = Math.sqrt(amplitude);
 
     return normalizeCoefficients(
-      amplitude *
-        (amplitude + 1 + (amplitude - 1) * cosine + 2 * amplitudeRoot * alpha),
+      amplitude * (amplitude + 1 + (amplitude - 1) * cosine + 2 * amplitudeRoot * alpha),
       -2 * amplitude * (amplitude - 1 + (amplitude + 1) * cosine),
-      amplitude *
-        (amplitude + 1 + (amplitude - 1) * cosine - 2 * amplitudeRoot * alpha),
+      amplitude * (amplitude + 1 + (amplitude - 1) * cosine - 2 * amplitudeRoot * alpha),
       amplitude + 1 - (amplitude - 1) * cosine + 2 * amplitudeRoot * alpha,
       2 * (amplitude - 1 - (amplitude + 1) * cosine),
       amplitude + 1 - (amplitude - 1) * cosine - 2 * amplitudeRoot * alpha,

@@ -63,8 +63,7 @@
     const frames = Math.max(1, Math.trunc(buffer.length / hop));
     const envelope = new Float32Array(frames);
     const firstChannel = buffer.getChannelData(0);
-    const secondChannel =
-      buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : undefined;
+    const secondChannel = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : undefined;
 
     for (let frame = 0; frame < frames; frame += 1) {
       const start = frame * hop;

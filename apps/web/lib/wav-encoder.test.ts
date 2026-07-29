@@ -34,9 +34,9 @@ function loadWavEncoder() {
 }
 
 function ascii(view: DataView, offset: number, length: number) {
-  return Array.from({ length }, (_, index) => String.fromCharCode(view.getUint8(offset + index))).join(
-    '',
-  );
+  return Array.from({ length }, (_, index) =>
+    String.fromCharCode(view.getUint8(offset + index)),
+  ).join('');
 }
 
 describe('generated WAV encoder', () => {
