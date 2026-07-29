@@ -4,7 +4,14 @@
 
 The repository moved from a static browser application with local-only persistence to a Turborepo workspace with an incremental Next.js shell, reusable browser audio packages, a versioned NestJS gateway, PostgreSQL persistence, provider-neutral object storage, and a private FastAPI processing service.
 
-The editor was not rewritten in one step. Its stable UI and mature audio behavior remain available under a same-origin isolation boundary, while new application infrastructure and extractable engine/plugin modules live alongside it. This preserves user-visible behavior and provides a controlled path for future React-native editor surfaces.
+The editor is not being rewritten in one unsafe step. Its stable UI and mature
+audio behavior remain available under a same-origin isolation boundary while a
+framework-native implementation grows alongside it. The new path uses React
+feature modules in Next.js, framework-independent domain/application modules in
+`@audiomass/audio-engine`, transport DTOs and orchestration in NestJS, and
+discriminated Pydantic contracts in FastAPI. See
+[FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md) for the live
+inventory and removal gate.
 
 ## Commit sequence
 
@@ -35,6 +42,12 @@ Each feature phase is independently reviewable and has package-level tests. The 
 - Preference synchronization is transactional inside the iframe and serialized in the Next.js shell, eliminating stale locale writes caused by concurrent cookie requests.
 - Copy, trim, insert, silence, overwrite, and chunked-float operations were extracted from `actions.js` into the typed and unit-tested editor runtime. The existing AudioUtils method names remain as a compatibility facade.
 - Shared gain routing, fade curves, peak/RMS normalization, and playback-rate profile calculations were extracted into a second typed and unit-tested runtime module. The effect bank still consumes its established local helper names and parameter shapes.
+- A later structural wave introduced `EditorSession`, bounded typed history,
+  marker/project domains, PCM/DSP/WAV modules, recording worklets, multitrack
+  scheduling, React controller/store/components, and an IndexedDB project
+  repository without adding new globals.
+- NestJS and FastAPI now validate each remote operation with matching
+  operation-specific contracts instead of passing generic parameter maps.
 
 ## Success criteria
 

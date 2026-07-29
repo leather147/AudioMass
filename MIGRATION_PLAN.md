@@ -5,6 +5,18 @@
 
 ## Статус документа
 
+Первая миграция инфраструктуры и перенос first-party `.js` в TypeScript
+завершены. Текущая фаза не считает эти файлы современными только из-за
+расширения `.ts`: IIFE, ordered scripts, globals и прямое построение DOM должны
+быть заменены framework-native модулями. Исполняемый план этой фазы находится в
+[`docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md`](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
+
+На текущем checkpoint созданы доменные/application-модули audio-engine,
+React-controller/store и feature-компоненты Next.js, versioned project codec,
+IndexedDB repository, typed recording/worklet/WAV/DSP/multitrack primitives,
+operation-specific NestJS DTO и discriminated FastAPI job schemas. Production
+остаётся на compatibility runtime до parity gate.
+
 - Ветка миграции: `agent/enterprise-migration`.
 - Базовая версия: полнофункциональный статический AudioMass с multitrack, темами, записью, эффектами и экспортом.
 - Стратегия: поэтапная миграция существующего приложения без функционального переписывания с нуля.
@@ -372,6 +384,8 @@ mypy app
 Миграция завершена только когда:
 
 - текущий AudioMass editor полностью работает из Next.js `/editor`;
+- каталог `apps/web/editor-runtime`, iframe bridge, `module: none` и first-party
+  runtime globals удалены после прохождения parity gate;
 - все три сервиса запускаются независимо;
 - browser сохраняет простые audio операции;
 - frontend общается с Python только через NestJS;

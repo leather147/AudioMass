@@ -1,5 +1,15 @@
 # Third-party notices
 
+## Editor migration note
+
+The framework-native rewrite does not relicense or silently rewrite codec and
+waveform vendors. The temporary compatibility runtime still contains the eight
+allowlisted generated/vendor assets documented in
+[`docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md`](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
+They must remain isolated behind typed adapters, keep their upstream notices,
+and may be deleted only when an equivalent licensed ESM dependency or tested
+adapter preserves the existing import/export behavior.
+
 The bundled third-party files keep their own licenses. File paths in the table
 below are relative to `apps/web/editor-runtime/static`.
 

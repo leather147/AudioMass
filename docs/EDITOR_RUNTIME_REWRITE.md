@@ -1,4 +1,8 @@
-# Editor runtime rewrite plan
+# Editor runtime source-language migration record
+
+> This record describes the completed JavaScript-to-TypeScript compatibility
+> migration. It is not the plan for removing the legacy architecture. Continue
+> with [FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 ## Baseline
 
@@ -130,3 +134,8 @@ rules accidentally.
   parity checks.
 - Full JavaScript/TypeScript, Python, production build, and dependency audit
   pipelines remain green.
+
+These criteria prove source-language migration only. The modules still preserve
+classic initialization order and global facades; structural completion requires
+deleting this runtime after React/audio-engine parity, as defined by the
+framework-native plan.

@@ -4,11 +4,12 @@ AudioMass — браузерный многодорожечный аудиоре
 движком, Next.js-оболочкой, NestJS API, PostgreSQL, облачным хранилищем и
 изолированным FastAPI-сервисом для тяжёлого DSP и транскрипции.
 
-Исходники runtime редактора собраны в `apps/web/editor-runtime`: типизированные
-сервисы лежат в корне каталога, а совместимые DSP/UI-модули, стили, кодеки и
-демо-медиа — в `editor-runtime/static`. Перед разработкой, тестами и production
-build они воспроизводимо собираются в игнорируемый `public/editor-assets` и
-загружаются с того же origin внутри Next.js-оболочки.
+Редактор проходит вторую, структурную миграцию. Production-маршрут `/editor`
+пока использует совместимый same-origin runtime, а `/editor/native` содержит
+новую реализацию на React-компонентах, controller/store/hooks и импортируемом
+`@audiomass/audio-engine`. Старый runtime нельзя удалять до функционального
+паритета. Точный план, карта каждого модуля и критерии удаления находятся в
+[FRAMEWORK_NATIVE_EDITOR_PLAN.md](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 ## Текущий production
 
@@ -26,7 +27,7 @@ Vercel Project.
 
 ```text
 apps/
-  web/            Next.js 16, React 19 и same-origin runtime редактора
+  web/            Next.js 16, React 19, native editor и временный compatibility runtime
   api/            NestJS 11/Fastify, OpenAPI и orchestration
   python-api/     FastAPI, DSP, export, анализ и Faster-Whisper
 packages/
@@ -46,8 +47,9 @@ runtime и независимые точки деплоя, но один lockfil
 ```text
 Browser
   -> Next.js web shell
-       -> same-origin editor runtime
-       -> Web Audio / workers / AudioWorklet
+       -> React editor features
+       -> @audiomass/audio-engine / workers / AudioWorklet
+       -> temporary same-origin compatibility runtime
 
 Trusted server-side caller
   -> NestJS API
@@ -66,6 +68,10 @@ Trusted server-side caller
   личность. Будущая облачная интеграция браузера должна передавать запросы через
   аутентифицированный BFF и получать `ownerId` из серверной сессии.
 - Текущий редактор может работать полностью локально без облачного API.
+- `packages/audio-engine` не зависит от React или backend-фреймворков: он владеет
+  PCM, playback, recording, markers, history, project codec и multitrack domain.
+- NestJS проверяет параметры каждой remote operation отдельным DTO, FastAPI —
+  соответствующей discriminated Pydantic-моделью.
 
 Подробнее: [архитектура](docs/ARCHITECTURE.md) и [NestJS API](docs/API.md).
 

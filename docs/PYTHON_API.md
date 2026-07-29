@@ -33,6 +33,17 @@ MP3 export uses FFmpeg. WAV/FLAC/OGG processing uses SoundFile. Transcription do
 
 ## Presigned job execution
 
+`POST /v1/jobs/execute` accepts a Pydantic discriminated union keyed by
+`operation`. Each variant owns its parameter model and whether an output upload
+grant is required. Unknown parameter fields are forbidden. Code outside FastAPI
+request injection can use `parse_remote_job_request`; services receive an
+already narrowed model and do not parse generic dictionaries again.
+
+The current variants are analyze, normalize, export, reverb, noise reduction,
+plugin, voice activity, and transcription. Only audio-producing variants accept
+`output`; metadata variants reject it. The response result is likewise limited
+to typed analysis, VAD, transcription, or audio-output metadata models.
+
 `POST /v1/jobs/execute` is the production integration endpoint. It accepts an operation, a signed input URL, an optional signed output URL, content metadata, and operation parameters. Supported operations are constrained by the execution registry; request data cannot import modules or execute source code.
 
 The service:

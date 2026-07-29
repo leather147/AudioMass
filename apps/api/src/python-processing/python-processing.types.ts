@@ -28,7 +28,7 @@ export interface PythonExecutionRequest {
   input: PythonRemoteObject;
   operation: PythonOperation;
   output?: PythonRemoteOutput;
-  parameters: Record<string, unknown>;
+  parameters: object;
 }
 
 export interface PythonExecutionResponse {

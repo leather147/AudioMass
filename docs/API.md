@@ -57,6 +57,23 @@ The upload request contains `ownerId`, optional `projectId`, `fileName`, `conten
 
 ## Python processing gateway
 
+Every gateway route now has an operation-specific DTO. `parameters` is no
+longer an untyped dictionary for analyze, normalize, export, reverb, noise
+reduction, voice activity, or transcription. Nest validates ranges and enums
+before reserving output storage or calling FastAPI; plugin parameters remain an
+explicit extensibility boundary nested below a validated plugin identifier.
+
+| Operation       | Validated parameters                                         |
+| --------------- | ------------------------------------------------------------ |
+| analyze         | empty object                                                 |
+| normalize       | `target_peak_dbfs` from `-20` through `0`                    |
+| export          | `output_format`: `wav`, `flac`, `mp3`, or `ogg`              |
+| reverb          | `room_size`, `damping`, and `wet` from `0` through `1`       |
+| noise-reduction | `strength` from `0` through `1`                              |
+| voice-activity  | `sensitivity` from `0` through `1`                           |
+| transcribe      | optional language plus `transcribe` or `translate` task      |
+| plugin          | plugin-owned object, wrapped by the allowlisted plugin route |
+
 Every route below accepts the same JSON envelope:
 
 ```json
