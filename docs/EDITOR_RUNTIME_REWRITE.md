@@ -9,13 +9,22 @@ localization, and introduced a reproducible `/editor-assets` build.
 The remaining rewrite starts from this measured baseline:
 
 - 36 first-party classic JavaScript files;
-- approximately 23,626 first-party JavaScript lines;
+- approximately 27,407 first-party JavaScript lines;
 - 8 third-party or generated JavaScript assets kept outside the rewrite scope;
 - 6 typed runtime modules already generated before development, tests, and builds.
 
 The line count is only a progress indicator. A module is complete when its old
 file is deleted, its replacement has strict types and tests, and the runtime
 manifest loads only the replacement.
+
+## Current checkpoint
+
+After the first leaf-module batch and the AMSS codec migration:
+
+- 31 first-party classic JavaScript files remain;
+- approximately 26,465 first-party JavaScript lines remain;
+- 11 strict TypeScript runtime modules are generated into /editor-assets;
+- LUFS, tempo analysis, WAV export, and AMSS project files have behavioral tests.
 
 ## Scope boundary
 
@@ -54,7 +63,7 @@ manifest and notices. Any local patch to them must be documented.
 - [x] `lufs.js` -> typed loudness analysis service.
 - [x] `tempo-estimator.js` and `tempo-worker.js` -> typed tempo analysis pair.
 - [x] `wav.js` -> typed WAV encoder.
-- [ ] `amss-format.js` -> typed project format codec.
+- [x] `amss-format.js` -> typed project format codec.
 - [ ] `id3.js` -> typed metadata parser/writer.
 - [ ] `local.js` -> typed local project repository.
 

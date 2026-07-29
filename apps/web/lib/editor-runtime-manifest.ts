@@ -68,7 +68,7 @@ export const EDITOR_RUNTIME_SCRIPTS = [
   'local.js',
   'id3.js',
   'lzma.js',
-  'amss-format.js',
+  '/editor-assets/amss-format.js',
   'multitrack.js',
   'composition-waveform-badge.js',
   'mt-scroll-ruler-final-fix.js',
