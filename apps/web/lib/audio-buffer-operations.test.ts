@@ -84,10 +84,7 @@ function values(buffer: FakeAudioBuffer, channel = 0) {
 
 describe('generated audio buffer operations', () => {
   it('replaces the duplicated buffer implementations in the compatibility host', () => {
-    const actions = readFileSync(
-      join(process.cwd(), 'editor-runtime', 'static', 'actions.js'),
-      'utf8',
-    );
+    const actions = readFileSync(join(process.cwd(), 'editor-runtime', 'actions.ts'), 'utf8');
     expect(actions).toContain('bufferOperations.trim');
     expect(actions).toContain('bufferOperations.insertSegment');
     expect(actions).not.toMatch(/function\s+(TrimBuffer|InsertSegmentToBuffer|CopyBufferSegment)/);

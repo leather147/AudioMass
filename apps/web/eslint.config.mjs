@@ -2,6 +2,7 @@ import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTypescript from 'eslint-config-next/typescript';
 
 import baseConfig from '@audiomass/config/eslint';
+import { createClassicRuntimeCompatibility } from '../../tooling/eslint-classic-runtime.mjs';
 
 const eslintConfig = [
   ...baseConfig,
@@ -16,6 +17,7 @@ const eslintConfig = [
       'editor-runtime/static/**',
     ],
   },
+  createClassicRuntimeCompatibility(),
 ];
 
 export default eslintConfig;

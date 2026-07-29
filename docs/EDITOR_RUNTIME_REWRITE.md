@@ -19,13 +19,14 @@ manifest loads only the replacement.
 
 ## Current checkpoint
 
-After completing Wave 2:
+After completing the final wave:
 
-- 16 first-party classic JavaScript files remain;
-- 23,616 first-party JavaScript lines remain;
-- 27 strict TypeScript runtime modules are generated into `/editor-assets`;
-- Wave 2 no longer loads first-party JavaScript implementations: welcome, settings, Russian localization, marker and clip toolbars, the composition overview, bounded multitrack scrolling, single-waveform view, and touch clip selection now have typed services and behavioral tests;
-- LUFS, tempo analysis, WAV export, AMSS project files, local session storage, ID3/MP4 metadata, theme tokens, canvas colors, and appearance UI retain their behavioral tests.
+- 0 first-party classic JavaScript files remain;
+- 43 TypeScript runtime modules are generated into `/editor-assets`;
+- the only JavaScript sources under `editor-runtime/static` are the 8 documented vendor assets;
+- the runtime manifest loads every first-party module from the reproducible TypeScript build;
+- contract tests cover the final-wave inventory, editor event bus and math helpers, bounded undo/redo history, keyboard callbacks, and recorder worklet protocol;
+- LUFS, tempo analysis, WAV export, AMSS project files, local session storage, ID3/MP4 metadata, themes, localization, presentation services, and appearance UI retain their behavioral tests.
 
 ## Scope boundary
 
@@ -52,8 +53,8 @@ manifest and notices. Any local patch to them must be documented.
 3. Add a named typed service even when a temporary global facade is required.
 4. Add numerical or behavioral contract tests before deleting the old script.
 5. Keep worker, codec, media, and relative URL behavior unchanged.
-6. Remove each migrated filename from `EDITOR_RUNTIME_SCRIPTS`; never load old
-   and new implementations together.
+6. Replace each migrated filename in `EDITOR_RUNTIME_SCRIPTS` with its generated
+   `/editor-assets` path; never load old and new implementations together.
 7. Run runtime build, lint, typecheck, tests, production build, and browser smoke
    checks after every wave.
 
@@ -77,32 +78,45 @@ manifest and notices. Any local patch to them must be documented.
 - [x] marker/clip/composition toolbar extensions.
 - [x] multitrack scroll, single-waveform view, and touch selection extensions.
 
-### Wave 3 — state and interaction
+### Final Wave — complete first-party runtime migration
 
-- [ ] `app.js` and `state.js`.
-- [ ] `keys.js`, `markers.js`, and `contextmenu.js`.
-- [ ] `drag.js`.
-- [ ] `recorder.js` and `recorder-worklet.js`.
+This wave consolidates the former Waves 3–5. It is complete only when all 16
+remaining first-party JavaScript sources are deleted and their typed replacements
+are loaded by the runtime manifest.
 
-### Wave 4 — effects and dialogs
+#### State, interaction, and recording
 
-- [ ] `modal.js`.
-- [ ] `fx-auto.js`.
-- [ ] `fx-pg-eq.js`.
-- [ ] `ui-fx.js`.
+- [x] `app.js` and `state.js`.
+- [x] `keys.js`, `markers.js`, and `contextmenu.js`.
+- [x] `drag.js`.
+- [x] `recorder.js` and `recorder-worklet.js`.
+
+#### Effects and dialogs
+
+- [x] `modal.js`.
+- [x] `fx-auto.js`.
+- [x] `fx-pg-eq.js`.
+- [x] `ui-fx.js`.
 
 Every effect keeps its current parameter names, ranges, preview behavior,
 presets, cancellation semantics, and undo transaction boundary.
 
-### Wave 5 — editor cores
+#### Editor cores
 
-- [ ] finish extracting `actions.js` and delete its facade.
-- [ ] migrate `engine.js`.
-- [ ] migrate `ui.js`.
-- [ ] migrate `multitrack.js`.
+- [x] finish extracting `actions.js` and delete its facade.
+- [x] migrate `engine.js`.
+- [x] migrate `ui.js`.
+- [x] migrate `multitrack.js`.
 
 These modules are migrated last because they own initialization order and most
 cross-module event contracts.
+
+The six state/interaction/recording modules use narrow explicit interfaces. The
+ten large classic-runtime modules compile under the same strict TypeScript
+configuration while preserving function scoping, callback shapes, global
+facades, and initialization order. Their ESLint compatibility override is
+limited to those exact files so future modules cannot inherit the classic syntax
+rules accidentally.
 
 ## Completion criteria
 

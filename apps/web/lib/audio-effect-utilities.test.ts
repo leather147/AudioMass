@@ -68,10 +68,7 @@ function loadUtilities() {
 
 describe('generated audio effect utilities', () => {
   it('replaces DSP helper implementations in the compatibility host', () => {
-    const actions = readFileSync(
-      join(process.cwd(), 'editor-runtime', 'static', 'actions.js'),
-      'utf8',
-    );
+    const actions = readFileSync(join(process.cwd(), 'editor-runtime', 'actions.ts'), 'utf8');
     expect(actions).toContain('window.AMAudioEffectUtilities');
     expect(actions).not.toMatch(
       /function\s+(fadeCurve|applyBufferGains|peakNormalizeStats|rmsNormalizeStats|ratePoints)/,
