@@ -16,7 +16,7 @@ function listFiles(root: string, directory = root): string[] {
 describe('editor runtime assets', () => {
   it('copies every source asset into the generated public runtime', () => {
     const sourceFiles = listFiles(runtimeSource);
-    expect(sourceFiles.length).toBeGreaterThan(100);
+    expect(sourceFiles).toEqual(expect.arrayContaining(['main.css', 'manifest.json']));
     for (const file of sourceFiles) {
       expect(existsSync(join(runtimeOutput, file)), file).toBe(true);
     }

@@ -21,10 +21,10 @@ manifest loads only the replacement.
 
 After the first leaf-module batch and the AMSS codec migration:
 
-- 31 first-party classic JavaScript files remain;
-- approximately 26,465 first-party JavaScript lines remain;
-- 11 strict TypeScript runtime modules are generated into /editor-assets;
-- LUFS, tempo analysis, WAV export, and AMSS project files have behavioral tests.
+- 30 first-party classic JavaScript files remain;
+- approximately 26,201 first-party JavaScript lines remain;
+- 12 strict TypeScript runtime modules are generated into /editor-assets;
+- LUFS, tempo analysis, WAV export, AMSS project files, and local session storage have behavioral tests.
 
 ## Scope boundary
 
@@ -65,7 +65,7 @@ manifest and notices. Any local patch to them must be documented.
 - [x] `wav.js` -> typed WAV encoder.
 - [x] `amss-format.js` -> typed project format codec.
 - [ ] `id3.js` -> typed metadata parser/writer.
-- [ ] `local.js` -> typed local project repository.
+- [x] `local.js` -> typed local project repository.
 
 ### Wave 2 — small runtime and presentation services
 

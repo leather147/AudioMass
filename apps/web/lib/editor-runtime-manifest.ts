@@ -65,7 +65,7 @@ export const EDITOR_RUNTIME_SCRIPTS = [
   'welcome.js',
   'fx-pg-eq.js',
   'fx-auto.js',
-  'local.js',
+  '/editor-assets/local-session-store.js',
   'id3.js',
   'lzma.js',
   '/editor-assets/amss-format.js',
