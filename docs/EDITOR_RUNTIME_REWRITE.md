@@ -19,12 +19,13 @@ manifest loads only the replacement.
 
 ## Current checkpoint
 
-After the first leaf-module batch and the AMSS codec migration:
+After completing Wave 2:
 
-- 24 first-party classic JavaScript files remain;
-- approximately 25,087 first-party JavaScript lines remain;
-- 18 strict TypeScript runtime modules are generated into /editor-assets;
-- LUFS, tempo analysis, WAV export, AMSS project files, local session storage, ID3/MP4 metadata, theme tokens, canvas colors, and appearance UI have behavioral tests.
+- 16 first-party classic JavaScript files remain;
+- 23,616 first-party JavaScript lines remain;
+- 27 strict TypeScript runtime modules are generated into `/editor-assets`;
+- Wave 2 no longer loads first-party JavaScript implementations: welcome, settings, Russian localization, marker and clip toolbars, the composition overview, bounded multitrack scrolling, single-waveform view, and touch clip selection now have typed services and behavioral tests;
+- LUFS, tempo analysis, WAV export, AMSS project files, local session storage, ID3/MP4 metadata, theme tokens, canvas colors, and appearance UI retain their behavioral tests.
 
 ## Scope boundary
 
@@ -71,9 +72,10 @@ manifest and notices. Any local patch to them must be documented.
 
 - [x] `oneup.js` and `menu-check-svg.js`.
 - [x] theme registry/canvas and appearance modules.
-- [ ] welcome and settings trigger modules.
-- [ ] marker/clip/composition toolbar extensions.
-- [ ] multitrack scroll and touch selection extensions.
+- [x] welcome and settings trigger modules.
+- [x] Russian locale dictionary.
+- [x] marker/clip/composition toolbar extensions.
+- [x] multitrack scroll, single-waveform view, and touch selection extensions.
 
 ### Wave 3 — state and interaction
 

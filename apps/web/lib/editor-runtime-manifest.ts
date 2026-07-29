@@ -6,7 +6,7 @@ export const EDITOR_BOOTSTRAP_SCRIPTS = [
   '/editor-assets/theme-service.js',
   '/editor-assets/theme-canvas.js',
   '/editor-assets/locale-service.js',
-  'locale-ru.js',
+  '/editor-assets/locale-ru.js',
   '/editor-assets/appearance-service.js',
 ] as const;
 
@@ -62,7 +62,7 @@ export const EDITOR_RUNTIME_SCRIPTS = [
   'actions.js',
   'drag.js',
   'recorder.js',
-  'welcome.js',
+  '/editor-assets/welcome-service.js',
   'fx-pg-eq.js',
   'fx-auto.js',
   '/editor-assets/local-session-store.js',
@@ -70,12 +70,13 @@ export const EDITOR_RUNTIME_SCRIPTS = [
   'lzma.js',
   '/editor-assets/amss-format.js',
   'multitrack.js',
-  'composition-waveform-badge.js',
-  'mt-scroll-ruler-final-fix.js',
-  'marker-create-button.js',
-  'clip-rename-button.js',
-  'touch-clip-select-fix.js',
-  'settings-trigger.js',
+  '/editor-assets/composition-waveform-service.js',
+  '/editor-assets/multitrack-scroll-service.js',
+  '/editor-assets/marker-toolbar-service.js',
+  '/editor-assets/clip-rename-toolbar-service.js',
+  '/editor-assets/single-waveform-view-service.js',
+  '/editor-assets/touch-clip-selection-service.js',
+  '/editor-assets/settings-trigger-service.js',
   '/editor-assets/next-bridge.js',
 ] as const;
 
