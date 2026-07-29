@@ -46,6 +46,9 @@ Each feature phase is independently reviewable and has package-level tests. The 
   marker/project domains, PCM/DSP/WAV modules, recording worklets, multitrack
   scheduling, React controller/store/components, and an IndexedDB project
   repository without adding new globals.
+- The leaf-infrastructure wave completed native ID3/MP4 metadata, discriminated
+  WAV and tempo worker protocols/clients, and a fail-closed Next.js gateway for
+  all eight retained vendor assets.
 - NestJS and FastAPI now validate each remote operation with matching
   operation-specific contracts instead of passing generic parameter maps.
 

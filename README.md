@@ -31,7 +31,7 @@ apps/
   api/            NestJS 11/Fastify, OpenAPI и orchestration
   python-api/     FastAPI, DSP, export, анализ и Faster-Whisper
 packages/
-  audio-engine/   Web Audio, AudioWorklet, workers, PCM и peaks
+  audio-engine/   Web Audio, AudioWorklet, typed workers, PCM, codecs и metadata
   plugin-sdk/     типизированный lifecycle, RPC и storage плагинов
   database/       Prisma 7, PostgreSQL client, schema и migrations
   config/         общие TypeScript и ESLint-конфигурации
@@ -69,7 +69,11 @@ Trusted server-side caller
   аутентифицированный BFF и получать `ownerId` из серверной сессии.
 - Текущий редактор может работать полностью локально без облачного API.
 - `packages/audio-engine` не зависит от React или backend-фреймворков: он владеет
-  PCM, playback, recording, markers, history, project codec и multitrack domain.
+  PCM, playback, recording, markers, history, project codec, ID3/MP4 metadata,
+  typed WAV/tempo workers и multitrack domain.
+- Восемь неизменяемых vendor-ассетов совместимого редактора доступны новому
+  React-контуру только через проверяемый `LegacyEditorVendorGateway`; их
+  глобалы и URL не являются application API.
 - NestJS проверяет параметры каждой remote operation отдельным DTO, FastAPI —
   соответствующей discriminated Pydantic-моделью.
 

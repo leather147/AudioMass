@@ -1,15 +1,5 @@
-import { encodePcmAsWav, type WavBitDepth } from '../codecs/wav.js';
-
-export interface WavEncodeRequest {
-  bitDepth: WavBitDepth;
-  channels: ArrayBuffer[];
-  id: string;
-  sampleRate: number;
-  type: 'encode';
-}
-
-export type WavEncodeResponse =
-  { id: string; type: 'encoded'; wav: ArrayBuffer } | { error: string; id: string; type: 'error' };
+import { encodePcmAsWav } from '../codecs/wav.js';
+import type { WavEncodeRequest, WavEncodeResponse } from './wav-encoder-protocol.js';
 
 const worker = globalThis as typeof globalThis & {
   onmessage: ((event: MessageEvent<WavEncodeRequest>) => void) | null;

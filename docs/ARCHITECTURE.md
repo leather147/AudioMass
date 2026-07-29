@@ -43,10 +43,17 @@ immutable snapshots, hooks own keyboard/drop lifecycles, and feature components
 own transport, timeline, markers, dialogs, notifications, effects, and tracks.
 
 `packages/audio-engine` is the framework-independent boundary. It contains the
-Web Audio graph, PCM edits, WAV encoding, recording/worklet protocols, bounded
-history, markers, versioned project parsing, multitrack entities, and scheduling.
-Browser persistence implements an `AudioProjectRepository` through IndexedDB.
-No package module reads React context, cookies, or Next.js APIs.
+Web Audio graph, PCM edits, WAV encoding, typed WAV/tempo worker clients,
+recording/worklet protocols, loudness and tempo analysis, ID3/MP4 metadata,
+bounded history, markers, versioned project parsing, multitrack entities, and
+scheduling. Browser persistence implements an `AudioProjectRepository` through
+IndexedDB. No package module reads React context, cookies, or Next.js APIs.
+
+The eight retained codec, compression, noise-suppression, and WaveSurfer assets
+are not imported as application globals. The Next.js editor infrastructure owns
+their absolute asset allowlist, script lifecycle, worker factories, and runtime
+shape validation through `LegacyEditorVendorGateway`. Replacing one vendor no
+longer changes controller or component contracts.
 
 `/editor/native` is the migration preview. `/editor` and `/editor-runtime` still
 serve the behavior-complete compatibility editor while React parity is built.

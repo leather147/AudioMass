@@ -12,6 +12,12 @@ export { encodePcmAsWav, encodeWav, interleaveWavChannels } from './codecs/wav.j
 export { EditorSession } from './application/editor-session.js';
 export { EditHistory } from './domain/edit-history.js';
 export {
+  readAudioMetadata,
+  readId3Metadata,
+  readMp4Metadata,
+  writeId3Metadata,
+} from './metadata/audio-metadata.js';
+export {
   AUDIO_PROJECT_FORMAT,
   AUDIO_PROJECT_VERSION,
   deserializeAudioProject,
@@ -42,6 +48,8 @@ export { clipsAt } from './multitrack/scheduler.js';
 export { AudioRecorder, mergeRecordedChunks } from './recording/audio-recorder.js';
 export { RECORDER_PROCESSOR_NAME } from './recording/recorder-protocol.js';
 export { SharedAudioRingBuffer } from './shared-ring-buffer.js';
+export { TempoWorkerClient } from './workers/tempo-worker-client.js';
+export { WavEncoderWorkerClient } from './workers/wav-encoder-client.js';
 export type { SharedRingBufferDescriptor } from './shared-ring-buffer.js';
 export type { LoudnessNormalization, LoudnessReport } from './analysis/loudness.js';
 export type { AudioBufferView, TempoOptions, TempoResult } from './analysis/tempo.js';
@@ -63,6 +71,12 @@ export type {
 } from './application/editor-session.js';
 export type { EditHistorySnapshot } from './domain/edit-history.js';
 export type { AudioMarker, CreateAudioMarker } from './domain/markers.js';
+export type {
+  AudioComment,
+  AudioLyrics,
+  AudioMetadata,
+  AudioPicture,
+} from './metadata/audio-metadata.js';
 export type { SerializedAudioProject } from './domain/project-codec.js';
 export type { WavBitDepth, WavEncodingOptions, WavSamples } from './codecs/wav.js';
 export type {
@@ -84,3 +98,5 @@ export type {
   CreateAudioTrack,
 } from './multitrack/project.js';
 export type { ScheduledClip } from './multitrack/scheduler.js';
+export type { TempoAnalyzeRequest, TempoAnalyzeResponse } from './workers/tempo-worker-protocol.js';
+export type { WavEncodeRequest, WavEncodeResponse } from './workers/wav-encoder-protocol.js';

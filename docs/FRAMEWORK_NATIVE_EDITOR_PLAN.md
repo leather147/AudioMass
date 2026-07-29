@@ -238,9 +238,10 @@ FastAPI remains a private compute service:
 - [x] Framework ownership and completion criteria defined.
 - [x] Wave A platform: `EditorSession`, React controller/provider, native preview,
       strict command/event boundary, and no-global contract test.
-- [ ] Wave B (in progress): themes, locale, notifications, drop adapter,
-      versioned project codec, IndexedDB repository, WAV worker, tempo, loudness,
-      and typed leaf DSP are native; metadata and final vendor adapters remain.
+- [x] Wave B: themes, locale, notifications, drop adapter, versioned project
+      codec, IndexedDB repository, ID3/MP4 metadata, WAV and tempo worker
+      clients/protocols, loudness, typed leaf DSP, and the eight-asset vendor
+      gateway are native and tested.
 - [ ] Wave C (in progress): playback/session/history, PCM editing, recording and
       recorder worklet are native; full edit-command and export UI parity remains.
 - [ ] Wave D (in progress): project/track/clip domain and scheduler are native;
@@ -250,3 +251,65 @@ FastAPI remains a private compute service:
       are implemented; compatibility deletion waits for Waves B-E.
 - [ ] Wave G (documentation synchronized at this checkpoint; final release
       proof remains).
+
+## Stage reports
+
+Every structural stage ends with this report, its verification evidence, one
+reviewable commit, and an explicit push to `agent/repository-hardening`.
+
+### Stage 1 — framework-native foundation
+
+- **Status:** complete and pushed on 2026-07-30.
+- **Commit:** `4b2ea19` (`Build framework-native editor foundation`).
+- **Delivered:** React `/editor/native` route; controller/provider/store/hooks;
+  transport, timeline, marker, dialog, and notification components; typed
+  themes; `EditorSession`; history, marker, project, PCM/DSP/WAV, recorder,
+  loudness, tempo, multitrack, NestJS operation DTO, and FastAPI job foundations.
+- **Compatibility result:** `/editor` stayed on the behavior-complete runtime;
+  the new path introduced no `PKAudioEditor`, `PKAudioFX`, iframe, or new global
+  dependency.
+- **Verification:** repository format, lint, TypeScript typecheck, JavaScript /
+  TypeScript tests, production builds, and Python Black/Ruff/mypy/pytest passed.
+- **Remaining after stage:** metadata, worker client boundaries, vendor
+  isolation, then the state/playback/effects/presentation parity waves.
+
+### Stage 2 — Wave B leaf services and browser infrastructure
+
+- **Status:** complete on 2026-07-30; the commit containing this report is the
+  Wave B checkpoint (`Complete framework-native editor Wave B`).
+- **Delivered:** native ID3v2.2/v2.3/v2.4 and MP4/M4A metadata reader plus ID3
+  writer; public metadata contracts; ESM tempo worker; discriminated WAV/tempo
+  protocols; request-correlated clients that transfer owned PCM copies and
+  reject pending work on shutdown; one typed Next.js gateway and absolute
+  allowlist for the eight retained WaveSurfer, LAME, libFLAC, LZ4, and RNNoise
+  assets.
+- **Compatibility result:** ID3 writes preserve the original audio payload;
+  MP4 fields and artwork are decoded without mutating input; established tempo
+  folding remains 89.8/80 BPM where required; vendor bytecode is unchanged and
+  codec worker URLs remain same-origin.
+- **Automated proof:** audio-engine has 9 passing test files / 33 tests; web has
+  21 passing test files / 79 tests. Metadata round trips, truncated input,
+  worker copy ownership, discriminated errors, vendor ordering, runtime shape
+  validation, and the exact eight-asset inventory are covered.
+- **Architectural result:** Wave B is complete. Vendor globals are now an
+  infrastructure implementation detail rather than an API available to React,
+  controllers, or the audio domain.
+- **Remaining after stage:** Wave C single-track command/playback parity, Wave D
+  mixer/effects parity, Wave E React presentation, then Wave F compatibility
+  deletion and the final Wave G browser/release proof.
+
+## Overall stage summary
+
+| Wave | State       | Current result                                                                    |
+| ---- | ----------- | --------------------------------------------------------------------------------- |
+| A    | Complete    | Typed application/domain platform and React lifecycle                             |
+| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation      |
+| C    | In progress | Session/history/PCM/recording exist; complete edit/playback/export parity remains |
+| D    | In progress | Project/track/clip scheduling exists; mixer, effects, bounce, crossfade remain    |
+| E    | Not started | Full React editor presentation replacement                                        |
+| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity           |
+| G    | In progress | Documentation is current; final browser and release proof remains                 |
+
+Two structural stages are complete. This is not the final legacy deletion:
+`apps/web/editor-runtime` intentionally remains the production fallback until
+Waves C-E pass parity and Wave F removes the entire boundary atomically.

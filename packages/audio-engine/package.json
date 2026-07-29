@@ -16,6 +16,7 @@
       "import": "./dist/dsp/index.js"
     },
     "./workers/wav-encoder": "./dist/workers/wav-encoder.worker.js",
+    "./workers/tempo": "./dist/workers/tempo.worker.js",
     "./worklets/meter": "./dist/worklets/meter-processor.js",
     "./worklets/recorder": "./dist/worklets/recorder-processor.js"
   },

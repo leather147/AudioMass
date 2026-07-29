@@ -49,6 +49,12 @@ vendor dependencies and are isolated rather than rewritten:
 Vendor files may only be referenced through an explicit allowlist in the runtime
 manifest and notices. Any local patch to them must be documented.
 
+The framework-native editor additionally isolates the same eight assets behind
+`features/editor/infrastructure/LegacyEditorVendorGateway`. The gateway owns
+their absolute URLs, script ordering, classic worker construction, and runtime
+shape validation. New React, controller, and audio-domain modules must never
+read the vendor globals directly.
+
 ## Migration rules
 
 1. Move leaf modules before stateful orchestrators.

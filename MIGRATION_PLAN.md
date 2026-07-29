@@ -14,10 +14,11 @@
 На текущем checkpoint созданы доменные/application-модули audio-engine,
 React-controller/store и feature-компоненты Next.js, versioned project codec,
 IndexedDB repository, typed recording/worklet/WAV/DSP/multitrack primitives,
+ID3/MP4 metadata, typed WAV/tempo worker clients, isolated vendor gateway,
 operation-specific NestJS DTO и discriminated FastAPI job schemas. Production
 остаётся на compatibility runtime до parity gate.
 
-- Ветка миграции: `agent/enterprise-migration`.
+- Активная ветка структурной миграции: `agent/repository-hardening`.
 - Базовая версия: полнофункциональный статический AudioMass с multitrack, темами, записью, эффектами и экспортом.
 - Стратегия: поэтапная миграция существующего приложения без функционального переписывания с нуля.
 - Цель: production-ready Turborepo с Next.js 16, NestJS 11, FastAPI, Prisma и типизированными пакетами.
