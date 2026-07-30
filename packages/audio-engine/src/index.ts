@@ -13,8 +13,26 @@ export { EditorSession } from './application/editor-session.js';
 export { AudioExportService } from './application/export-audio.js';
 export { executeSingleTrackEdit } from './application/single-track-edit.js';
 export { executeEffectEdit } from './application/effect-edit.js';
+export { executeSpecializedEffectEdit } from './application/specialized-effect.js';
 export { EFFECT_SCHEMAS, getEffectSchema } from './effects/catalog.js';
 export { EffectProcessorRegistry, NATIVE_EFFECT_PROCESSOR_IDS } from './effects/processing.js';
+export {
+  DEFAULT_AUDIO_REPAIR_WORKFLOW,
+  DEFAULT_PARAGRAPHIC_EQ_WORKFLOW,
+  DEFAULT_SEAMLESS_LOOP_WORKFLOW,
+  defaultAutomationWorkflow,
+  parseSpecializedEffectWorkflow,
+  SPECIALIZED_EFFECT_IDS,
+} from './effects/specialized/models.js';
+export { automationValueAt, processAutomation } from './effects/specialized/automation.js';
+export {
+  detectMainsFrequency,
+  processAudioRepair,
+  removeClicks,
+  repairSplices,
+} from './effects/specialized/audio-repair.js';
+export { processParagraphicEqualizer } from './effects/specialized/paragraphic-equalizer.js';
+export { processSeamlessLoop } from './effects/specialized/seamless-loop.js';
 export {
   defaultEffectValues,
   effectSchemaById,
@@ -133,6 +151,14 @@ export type {
   EffectEditorState,
   PreviewEffectCommand,
 } from './application/effect-edit.js';
+export type {
+  ApplySpecializedEffectCommand,
+  PreviewSpecializedEffectCommand,
+  SpecializedEffectCommand,
+  SpecializedEffectEditorState,
+  SpecializedEffectEditResult,
+  SpecializedEffectMetadata,
+} from './application/specialized-effect.js';
 export type { EditHistorySnapshot } from './domain/edit-history.js';
 export type {
   BooleanEffectParameter,
@@ -148,6 +174,22 @@ export type {
 } from './effects/schema.js';
 export type { CreateEffectPreset, EffectPreset, EffectPresetDocument } from './effects/presets.js';
 export type { NativeEffectProcessor, NativeEffectProcessorId } from './effects/processing.js';
+export type {
+  AudioRepairWorkflow,
+  AutomationPoint,
+  AutomationWorkflow,
+  MainsFrequency,
+  ParagraphicEqBand,
+  ParagraphicEqBandType,
+  ParagraphicEqualizerWorkflow,
+  RepairMode,
+  RepairSensitivity,
+  SeamlessLoopWorkflow,
+  SpecializedEffectId,
+  SpecializedEffectWorkflow,
+} from './effects/specialized/models.js';
+export type { AudioRepairResult } from './effects/specialized/audio-repair.js';
+export type { SeamlessLoopResult } from './effects/specialized/seamless-loop.js';
 export type { AudioMarker, CreateAudioMarker } from './domain/markers.js';
 export type {
   AudioComment,

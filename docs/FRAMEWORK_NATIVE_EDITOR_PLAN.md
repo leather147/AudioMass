@@ -290,11 +290,11 @@ advertises an effect that still resolves through the compatibility runtime:
 - [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
       silence insertion, selection/marker transforms, recording/worklet,
       keyboard controls, and typed WAV export UI are native and tested.
-- [ ] Wave D (D.1-D.3b1 complete): project/track/clip, scheduler,
+- [ ] Wave D (D.1-D.3b2 complete): project/track/clip, scheduler,
       mixer/routing, crossfade, bounce, primary effect schemas, versioned
       presets, the native React effect transaction, and all fixed-duration
       primary processors are complete; specialized/duration-changing workflows
-      and multitrack runtime consumers continue in D.3b2-D.3c.
+      multitrack runtime consumers and compatibility deletion continue in D.3c.
 - [ ] Wave E.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
@@ -511,31 +511,47 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 
 ### Stage 8 — Wave D.3b2 specialized effect workflows
 
-- **Status:** in progress on 2026-07-30. This scope is committed before the
-  implementation so duration-changing and non-generic workflows remain a
-  separate review boundary from the fixed-duration D.3b1 processor registry.
-- **Planned domain boundary:** add discriminated, validated models for seamless
-  loop options/results, paragraphic-EQ bands, reusable automation curves, and
-  audio-repair modes. Specialized processors return workflow metadata where
-  required instead of pretending every operation is a same-length
-  `EffectValues -> PcmAudio` transform.
-- **Planned compatibility contracts:** seamless loop retains the 0.0007 trim
-  threshold, 1 ms edge padding, 10 ms zero-crossing search, equal-power
-  crossfade, and 1..64 repeat range while explicitly transforming selection and
-  marker time. Paragraphic EQ retains peaking/high-pass/low-pass bands, the
-  0..20 kHz frequency span, +/-35 dB gain span, and per-band Q. Automation uses
-  sorted piecewise-linear points and well-defined boundary values. Repair ports
-  the existing de-click, mains-hum detection/notching, and splice-smoothing
-  sensitivity contracts without browser audio nodes or editor globals.
-- **Planned application/UI boundary:** the session owns specialized
-  preview/apply/cancel transactions and history; the controller exposes typed
-  commands; dedicated localized React workflows own curve/band/repair forms.
-  The generic D.3a schema dialog remains limited to the fixed-duration registry.
-- **Planned proof:** focused numerical and marker-transform tests, preview/
-  cancel/undo transaction tests, controller/UI boundary tests, then repository
-  format, lint, typecheck, all TypeScript tests/builds, and the Python quality
-  suite. The completed report and overall stage totals will replace this
-  planned status before the implementation checkpoint is committed.
+- **Status:** complete on 2026-07-30. Scope was committed and pushed first as
+  `ffb0dd4` (`Plan specialized editor effect workflows`); the commit containing
+  this report is the D.3b2 implementation checkpoint
+  (`Complete framework-native editor Wave D.3b2`).
+- **Delivered:** discriminated and runtime-validated models for seamless loop,
+  paragraphic EQ, gain automation, and audio repair; immutable PCM processors
+  plus typed workflow metadata; duration-aware selection and marker transforms;
+  specialized preview/apply commands in `EditorSession`; controller capability
+  APIs; and four decomposed, localized React forms. Shared RBJ biquad design and
+  filtering moved into a common DSP module used by both graphical and
+  paragraphic EQ plus hum repair.
+- **Compatibility result:** seamless loop retains the 0.0007 trim threshold,
+  1 ms edge padding, 10 ms zero-crossing search, equal-power crossfade, and
+  1..64 repeats. Applying it now shifts later markers, maps markers inside the
+  source loop, and selects the exact replacement duration in one undoable
+  transaction. Paragraphic EQ retains enabled peaking/high-pass/low-pass bands,
+  0..20 kHz frequency, +/-35 dB gain, per-band Q, and peaking-first chain order.
+  Automation sorts unique points, linearly interpolates between them, and holds
+  first/last boundary values. Repair retains low/medium/high de-click and splice
+  thresholds, Hermite interpolation, 50/60 Hz Goertzel auto-detection, and eight
+  Q=12 harmonic notches. All workflows preserve source ownership, channel
+  count/sample rate, and finite deterministic output.
+- **Automated proof:** audio-engine has 20 passing test files / 80 tests; web has
+  23 passing test files / 86 tests; the complete TypeScript suite has 207 tests.
+  New tests cover strict workflow validation, exact loop crossfade/repeat PCM,
+  duration/selection/marker transforms, paragraphic high-pass response,
+  automation interpolation and boundaries, de-click, hum detection/notching,
+  splice smoothing, specialized preview/cancel/apply/undo, controller routing,
+  and the no-legacy React boundary. Repository format, lint, typecheck, all
+  tests, and production builds passed. Python Black, Ruff, strict mypy, and all
+  35 pytest cases passed with 87.14% coverage using isolated local temp/cache.
+- **Architectural result:** fixed-duration schema processors and specialized
+  workflows are now intentionally separate. The audio package owns validation,
+  DSP, duration/marker transforms, and metadata; the session owns preview and
+  history; the controller exposes typed capabilities; React owns only form
+  state and localized interaction. No new module imports DOM, Web Audio nodes,
+  storage, global editor objects, legacy events, or legacy HTML routes.
+- **Remaining after stage:** D.3c connects the D.1 scheduler/routing and bounce
+  services to native multitrack playback/export, then deletes the superseded
+  Wave D compatibility implementations. Wave E still completes presentation
+  parity before the final Wave F boundary deletion.
 
 ## Overall stage summary
 
@@ -544,11 +560,11 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | A    | Complete    | Typed application/domain platform and React lifecycle                          |
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
-| D    | In progress | D.1-D.3b1 complete; specialized workflows/runtime consumers are D.3b2-D.3c     |
+| D    | In progress | D.1-D.3b2 complete; native playback/export and deletion remain in D.3c         |
 | E    | Not started | Full React editor presentation replacement                                     |
 | F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
 | G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Seven structural stages are complete. This is not the final legacy deletion:
+Eight structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.

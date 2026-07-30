@@ -223,6 +223,46 @@ describe('EditorSession', () => {
     expect(engine.toPcm().channels[0]?.[2 * 48_000]).toBe(0.25);
     await session.close();
   });
+
+  it('previews, applies, and undoes duration-changing specialized workflows', async () => {
+    const engine = new FakeAudioEngine();
+    const session = new EditorSession(engine);
+    await session.load(new ArrayBuffer(1), 'loop.wav');
+    await session.dispatch({ marker: { id: 'after', time: 5 }, name: 'marker.add' });
+    await session.dispatch({ name: 'selection.set', range: { end: 4, start: 2 } });
+    const workflow = {
+      crossfadeMs: 0,
+      kind: 'seamless-loop' as const,
+      repeat: 2,
+      snapZeroCrossing: false,
+      trimSilence: false,
+    };
+
+    expect(session.supportedSpecializedEffectIds).toEqual([
+      'seamless-loop',
+      'paragraphic-equalizer',
+      'automation',
+      'audio-repair',
+    ]);
+    await session.dispatch({ name: 'specialized-effect.preview', workflow });
+    expect(session.snapshot.effectPreviewId).toBe('seamless-loop');
+    expect(engine.duration).toBe(14);
+    expect(session.getAudio()?.channels[0]).toHaveLength(12 * 48_000);
+
+    await session.dispatch({ name: 'effect.preview.cancel' });
+    expect(engine.duration).toBe(12);
+
+    await session.dispatch({ name: 'specialized-effect.apply', workflow });
+    expect(engine.duration).toBe(14);
+    expect(session.snapshot.document.selection).toEqual({ end: 6, start: 2 });
+    expect(session.snapshot.document.markers[0]?.time).toBe(7);
+
+    await session.dispatch({ name: 'history.undo' });
+    expect(engine.duration).toBe(12);
+    expect(session.snapshot.document.selection).toEqual({ end: 4, start: 2 });
+    expect(session.snapshot.document.markers[0]?.time).toBe(5);
+    await session.close();
+  });
 });
 
 describe('AudioRecorder data contract', () => {

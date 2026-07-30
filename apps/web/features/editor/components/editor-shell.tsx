@@ -11,6 +11,7 @@ import { EditorProvider, useEditorController, useEditorSnapshot } from '../state
 import { editorThemeStyle } from '../theme/editor-themes';
 import { EditToolbar } from './edit/edit-toolbar';
 import { EffectToolbar } from './effects/effect-toolbar';
+import { SpecializedEffectToolbar } from './effects/specialized-effect-toolbar';
 import { MarkerPanel } from './markers/marker-panel';
 import { NotificationProvider } from './notifications/notification-provider';
 import { Timeline } from './timeline/timeline';
@@ -63,6 +64,17 @@ function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
         copy={copy}
         onError={setError}
         selected={snapshot.document.selection !== null}
+      />
+      <SpecializedEffectToolbar
+        controller={controller}
+        copy={copy}
+        onError={setError}
+        selected={snapshot.document.selection !== null}
+        selectionDuration={
+          snapshot.document.selection
+            ? snapshot.document.selection.end - snapshot.document.selection.start
+            : 0
+        }
       />
 
       <section className={styles.workspace}>

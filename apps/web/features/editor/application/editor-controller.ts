@@ -6,6 +6,7 @@ import {
   type EditorCommand,
   type EditorSessionSnapshot,
   type EffectValues,
+  type SpecializedEffectWorkflow,
   type WavBitDepth,
 } from '@audiomass/audio-engine';
 
@@ -52,6 +53,14 @@ export class EditorController {
     return this.supportedEffectIds.some((supported) => supported === effectId);
   }
 
+  public get supportedSpecializedEffectIds(): readonly string[] {
+    return this.session.supportedSpecializedEffectIds;
+  }
+
+  public supportsSpecializedEffect(effectId: string): boolean {
+    return this.supportedSpecializedEffectIds.some((supported) => supported === effectId);
+  }
+
   public async previewEffect(effectId: string, values: EffectValues): Promise<void> {
     await this.session.dispatch({ effectId, name: 'effect.preview', values });
     await this.session.dispatch({ name: 'playback.play' });
@@ -63,6 +72,15 @@ export class EditorController {
 
   public cancelEffectPreview(): Promise<void> {
     return this.session.dispatch({ name: 'effect.preview.cancel' });
+  }
+
+  public async previewSpecializedEffect(workflow: SpecializedEffectWorkflow): Promise<void> {
+    await this.session.dispatch({ name: 'specialized-effect.preview', workflow });
+    await this.session.dispatch({ name: 'playback.play' });
+  }
+
+  public applySpecializedEffect(workflow: SpecializedEffectWorkflow): Promise<void> {
+    return this.session.dispatch({ name: 'specialized-effect.apply', workflow });
   }
 
   public async downloadWav(bitDepth: WavBitDepth = 16): Promise<void> {

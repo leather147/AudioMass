@@ -98,4 +98,32 @@ describe('EditorController export boundary', () => {
     expect(Array.from(engine.toPcm().channels[0] ?? [])).toEqual([0, 0.5, 0, -0.5]);
     await controller.close();
   });
+
+  it('routes specialized workflows through typed session commands', async () => {
+    const engine = new FakeEngine();
+    const session = new EditorSession(engine);
+    const controller = new EditorController(session);
+    await session.load(new ArrayBuffer(0), 'automation.mp3');
+    await controller.dispatch({ name: 'selection.set', range: { end: 1, start: 0 } });
+    const workflow = {
+      kind: 'automation' as const,
+      points: [
+        { timeSeconds: 0, value: 0 },
+        { timeSeconds: 1, value: 1 },
+      ],
+      target: 'gain' as const,
+    };
+
+    expect(controller.supportedSpecializedEffectIds).toHaveLength(4);
+    expect(controller.supportsSpecializedEffect('audio-repair')).toBe(true);
+    await controller.previewSpecializedEffect(workflow);
+    expect(Array.from(engine.toPcm().channels[0] ?? [])).toEqual([0, 0.25, 0, -0.75]);
+
+    await controller.cancelEffectPreview();
+    expect(Array.from(engine.toPcm().channels[0] ?? [])).toEqual([0, 1, 0, -1]);
+
+    await controller.applySpecializedEffect(workflow);
+    expect(Array.from(engine.toPcm().channels[0] ?? [])).toEqual([0, 0.25, 0, -0.75]);
+    await controller.close();
+  });
 });

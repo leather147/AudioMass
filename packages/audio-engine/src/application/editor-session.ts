@@ -16,6 +16,7 @@ import {
 } from '../domain/markers.js';
 import { clonePcm } from '../dsp/pcm.js';
 import { EffectProcessorRegistry } from '../effects/processing.js';
+import { SPECIALIZED_EFFECT_IDS } from '../effects/specialized/models.js';
 import { TypedEventEmitter } from '../typed-event-emitter.js';
 import type { AudioEngineEvents, AudioEngineSnapshot, PcmAudio } from '../types.js';
 import {
@@ -24,6 +25,10 @@ import {
   type SingleTrackEditorState,
 } from './single-track-edit.js';
 import { executeEffectEdit, type EffectCommand } from './effect-edit.js';
+import {
+  executeSpecializedEffectEdit,
+  type SpecializedEffectCommand,
+} from './specialized-effect.js';
 
 export type { EditorDocument, EditorTimeRange } from '../domain/editor-document.js';
 
@@ -62,6 +67,7 @@ export interface EditorSessionSnapshot {
 export type EditorCommand =
   | SingleTrackEditCommand
   | EffectCommand
+  | SpecializedEffectCommand
   | { name: 'document.rename'; value: string }
   | { name: 'history.redo' }
   | { name: 'history.undo' }
@@ -95,6 +101,10 @@ function isEditCommand(command: EditorCommand): command is SingleTrackEditComman
 
 function isEffectCommand(command: EditorCommand): command is EffectCommand {
   return command.name.startsWith('effect.');
+}
+
+function isSpecializedEffectCommand(command: EditorCommand): command is SpecializedEffectCommand {
+  return command.name.startsWith('specialized-effect.');
 }
 
 export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
@@ -134,6 +144,10 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     return this.effectProcessors.supportedEffectIds;
   }
 
+  public get supportedSpecializedEffectIds(): readonly string[] {
+    return SPECIALIZED_EFFECT_IDS;
+  }
+
   public getAudio(): PcmAudio | null {
     const audio = this.history.snapshot.present.audio;
     return audio ? clonePcm(audio) : null;
@@ -153,6 +167,10 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   }
 
   public async dispatch(command: EditorCommand): Promise<void> {
+    if (isSpecializedEffectCommand(command)) {
+      await this.dispatchSpecializedEffect(command);
+      return;
+    }
     if (isEffectCommand(command)) {
       await this.dispatchEffect(command);
       return;
@@ -307,6 +325,32 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
       this.effectPreviewId = null;
       this.effectPreviewRestorePosition = null;
       this.history.commit(result);
+      this.engineValue.loadPcm(result.audio);
+      await this.engineValue.seek(position);
+    }
+    this.publish();
+  }
+
+  private async dispatchSpecializedEffect(command: SpecializedEffectCommand): Promise<void> {
+    const current = this.history.snapshot.present;
+    if (!current.audio) return;
+    const result = executeSpecializedEffectEdit(
+      { audio: current.audio, document: current.document },
+      command.workflow,
+    );
+    const position = current.document.selection?.start ?? this.engineValue.snapshot.position;
+    this.engineValue.pause();
+    if (command.name === 'specialized-effect.preview') {
+      if (!this.effectPreviewId) {
+        this.effectPreviewRestorePosition = this.engineValue.snapshot.position;
+      }
+      this.effectPreviewId = command.workflow.kind;
+      this.engineValue.loadPcm(result.audio);
+      await this.engineValue.seek(position);
+    } else {
+      this.effectPreviewId = null;
+      this.effectPreviewRestorePosition = null;
+      this.history.commit({ audio: result.audio, document: result.document });
       this.engineValue.loadPcm(result.audio);
       await this.engineValue.seek(position);
     }

@@ -42,6 +42,10 @@ describe('framework-native editor boundary', () => {
     expect(sources).toContain('controller.previewEffect');
     expect(sources).toContain('controller.applyEffect');
     expect(sources).toContain('BrowserEffectPresetRepository');
+    expect(sources).toContain('controller.previewSpecializedEffect');
+    expect(sources).toContain('ParagraphicEqualizerForm');
+    expect(sources).toContain('AutomationForm');
+    expect(sources).toContain('AudioRepairForm');
     expect(sources).not.toMatch(/(?:eq|sp|compressor)\.html/);
   });
 
