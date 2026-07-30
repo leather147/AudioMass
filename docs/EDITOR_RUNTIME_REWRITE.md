@@ -145,3 +145,9 @@ These criteria prove source-language migration only. The modules still preserve
 classic initialization order and global facades; structural completion requires
 deleting this runtime after React/audio-engine parity, as defined by the
 framework-native plan.
+
+At the current structural checkpoint, the native editor has completed Waves A-C:
+its application session now owns PCM-aware edit history, selection and marker
+transactions, playback lifecycle, recording primitives, and typed WAV export.
+The compatibility runtime still remains for multitrack/effects and complete
+presentation parity tracked in Waves D-E.

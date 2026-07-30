@@ -12,11 +12,12 @@
   background: var(--editor-bg);
   color: var(--editor-text);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   font-family: system-ui, sans-serif;
 }
 
 .toolbar,
+.editToolbar,
 .statusbar {
   display: flex;
   align-items: center;
@@ -28,6 +29,9 @@
 
 .toolbar button,
 .toolbar input,
+.editToolbar button,
+.editToolbar input,
+.editToolbar select,
 .markerForm button,
 .markerForm input {
   min-height: 2.25rem;
@@ -40,9 +44,43 @@
 
 .toolbar button:focus-visible,
 .toolbar input:focus-visible,
+.editToolbar button:focus-visible,
+.editToolbar input:focus-visible,
+.editToolbar select:focus-visible,
 .dropzone:focus-visible {
   outline: 2px solid var(--editor-accent);
   outline-offset: 2px;
+}
+
+.toolbar,
+.editActions,
+.selectionForm {
+  flex-wrap: wrap;
+}
+
+.toolbar label,
+.editToolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.editToolbar {
+  display: grid;
+  gap: 0.65rem;
+  border-block-start: 0;
+}
+
+.selectionForm,
+.editActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selectionForm input,
+.editActions input {
+  width: 7rem;
 }
 
 .fileButton {

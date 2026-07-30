@@ -7,8 +7,10 @@ AudioMass — браузерный многодорожечный аудиоре
 Редактор проходит вторую, структурную миграцию. Production-маршрут `/editor`
 пока использует совместимый same-origin runtime, а `/editor/native` содержит
 новую реализацию на React-компонентах, controller/store/hooks и импортируемом
-`@audiomass/audio-engine`. Старый runtime нельзя удалять до функционального
-паритета. Точный план, карта каждого модуля и критерии удаления находятся в
+`@audiomass/audio-engine`. Native route уже выполняет PCM-aware copy/cut/paste,
+delete, trim, silence insertion, undo/redo и WAV export через типизированные
+worker/adapter-порты. Старый runtime нельзя удалять до полного UI/effects parity.
+Точный план, карта каждого модуля и критерии удаления находятся в
 [FRAMEWORK_NATIVE_EDITOR_PLAN.md](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 ## Текущий production
@@ -70,7 +72,8 @@ Trusted server-side caller
 - Текущий редактор может работать полностью локально без облачного API.
 - `packages/audio-engine` не зависит от React или backend-фреймворков: он владеет
   PCM, playback, recording, markers, history, project codec, ID3/MP4 metadata,
-  typed WAV/tempo workers и multitrack domain.
+  typed WAV/tempo workers, immutable single-track edit transactions и
+  multitrack domain.
 - Восемь неизменяемых vendor-ассетов совместимого редактора доступны новому
   React-контуру только через проверяемый `LegacyEditorVendorGateway`; их
   глобалы и URL не являются application API.

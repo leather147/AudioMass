@@ -1,4 +1,11 @@
 import { AudioEngine } from '../audio-engine.js';
+import {
+  createEditorDocument,
+  normalizeDocumentName,
+  normalizeEditorRange,
+  type EditorDocument,
+  type EditorTimeRange,
+} from '../domain/editor-document.js';
 import { EditHistory } from '../domain/edit-history.js';
 import {
   createAudioMarker,
@@ -7,14 +14,23 @@ import {
   type AudioMarker,
   type CreateAudioMarker,
 } from '../domain/markers.js';
+import { clonePcm } from '../dsp/pcm.js';
 import { TypedEventEmitter } from '../typed-event-emitter.js';
-import type { AudioEngineEvents, AudioEngineSnapshot } from '../types.js';
+import type { AudioEngineEvents, AudioEngineSnapshot, PcmAudio } from '../types.js';
+import {
+  executeSingleTrackEdit,
+  type SingleTrackEditCommand,
+  type SingleTrackEditorState,
+} from './single-track-edit.js';
+
+export type { EditorDocument, EditorTimeRange } from '../domain/editor-document.js';
 
 export interface EditorAudioEngine {
   readonly duration: number;
   readonly snapshot: AudioEngineSnapshot;
   close(): Promise<void>;
   load(input: ArrayBuffer | AudioBuffer): Promise<AudioEngineSnapshot>;
+  loadPcm(audio: PcmAudio): AudioEngineSnapshot;
   on<Name extends keyof AudioEngineEvents>(
     name: Name,
     listener: (payload: AudioEngineEvents[Name]) => void,
@@ -24,27 +40,24 @@ export interface EditorAudioEngine {
   seek(seconds: number): Promise<void>;
   setVolume(volume: number): void;
   stop(): void;
+  toPcm(): PcmAudio;
 }
 
-export interface EditorDocument {
-  markers: readonly AudioMarker[];
-  name: string;
-  selection: EditorTimeRange | null;
-}
-
-export interface EditorTimeRange {
-  end: number;
-  start: number;
+interface EditorSessionState {
+  audio: PcmAudio | null;
+  document: EditorDocument;
 }
 
 export interface EditorSessionSnapshot {
   canRedo: boolean;
   canUndo: boolean;
+  clipboardFrames: number;
   document: EditorDocument;
   engine: AudioEngineSnapshot;
 }
 
 export type EditorCommand =
+  | SingleTrackEditCommand
   | { name: 'document.rename'; value: string }
   | { name: 'history.redo' }
   | { name: 'history.undo' }
@@ -68,29 +81,18 @@ export interface EditorSessionEvents {
   statechange: EditorSessionSnapshot;
 }
 
-function emptyDocument(name = 'Untitled'): EditorDocument {
-  return { markers: [], name, selection: null };
+function emptyState(name = 'Untitled'): EditorSessionState {
+  return { audio: null, document: createEditorDocument(name) };
 }
 
-function normalizeDocumentName(name: string): string {
-  return (
-    name
-      .replace(/[\r\n\t]/g, ' ')
-      .trim()
-      .slice(0, 160) || 'Untitled'
-  );
-}
-
-function normalizeRange(range: EditorTimeRange, duration: number): EditorTimeRange | null {
-  if (!Number.isFinite(range.start) || !Number.isFinite(range.end)) return null;
-  const start = Math.min(Math.max(0, range.start), duration);
-  const end = Math.min(Math.max(0, range.end), duration);
-  return start === end ? null : { end: Math.max(start, end), start: Math.min(start, end) };
+function isEditCommand(command: EditorCommand): command is SingleTrackEditCommand {
+  return command.name.startsWith('edit.');
 }
 
 export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
+  private clipboard: PcmAudio | null = null;
   private readonly disposers: Array<() => void> = [];
-  private history = new EditHistory<EditorDocument>(emptyDocument());
+  private history = new EditHistory<EditorSessionState>(emptyState());
   private markerSequence = 1;
   private snapshotValue: EditorSessionSnapshot;
 
@@ -115,35 +117,40 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     return this.snapshotValue;
   }
 
-  private createSnapshot(): EditorSessionSnapshot {
-    const history = this.history.snapshot;
-    return {
-      canRedo: history.canRedo,
-      canUndo: history.canUndo,
-      document: history.present,
-      engine: this.engineValue.snapshot,
-    };
+  public getAudio(): PcmAudio | null {
+    const audio = this.history.snapshot.present.audio;
+    return audio ? clonePcm(audio) : null;
   }
 
   public async load(input: ArrayBuffer | AudioBuffer, name = 'Untitled'): Promise<void> {
     await this.engineValue.load(input);
+    this.clipboard = null;
     this.markerSequence = 1;
-    this.history.reset(emptyDocument(normalizeDocumentName(name)));
+    this.history.reset({
+      audio: this.engineValue.toPcm(),
+      document: createEditorDocument(name),
+    });
     this.publish();
   }
 
   public async dispatch(command: EditorCommand): Promise<void> {
+    if (isEditCommand(command)) {
+      await this.dispatchEdit(command);
+      return;
+    }
+
     switch (command.name) {
       case 'document.rename':
-        this.commit({ ...this.snapshot.document, name: normalizeDocumentName(command.value) });
+        this.commitDocument({
+          ...this.snapshot.document,
+          name: normalizeDocumentName(command.value),
+        });
         break;
       case 'history.redo':
-        this.history.redo();
-        this.publish();
+        await this.restoreHistory('redo');
         break;
       case 'history.undo':
-        this.history.undo();
-        this.publish();
+        await this.restoreHistory('undo');
         break;
       case 'marker.add': {
         const document = this.snapshot.document;
@@ -154,7 +161,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
           document.markers.length,
         );
         this.markerSequence += 1;
-        this.commit({
+        this.commitDocument({
           ...document,
           markers: sortAudioMarkers([...document.markers, marker]),
         });
@@ -163,7 +170,8 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
       case 'marker.remove': {
         const document = this.snapshot.document;
         const markers = document.markers.filter((marker) => marker.id !== command.id);
-        if (markers.length !== document.markers.length) this.commit({ ...document, markers });
+        if (markers.length !== document.markers.length)
+          this.commitDocument({ ...document, markers });
         break;
       }
       case 'marker.update': {
@@ -173,7 +181,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
             ? updateAudioMarker(marker, command.update, this.engineValue.duration)
             : marker,
         );
-        this.commit({ ...document, markers: sortAudioMarkers(markers) });
+        this.commitDocument({ ...document, markers: sortAudioMarkers(markers) });
         break;
       }
       case 'playback.pause':
@@ -192,12 +200,12 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
         this.engineValue.setVolume(command.value);
         break;
       case 'selection.clear':
-        this.commit({ ...this.snapshot.document, selection: null });
+        this.commitDocument({ ...this.snapshot.document, selection: null });
         break;
       case 'selection.set':
-        this.commit({
+        this.commitDocument({
           ...this.snapshot.document,
-          selection: normalizeRange(command.range, this.engineValue.duration),
+          selection: normalizeEditorRange(command.range, this.engineValue.duration),
         });
         break;
     }
@@ -206,11 +214,52 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   public async close(): Promise<void> {
     for (const dispose of this.disposers.splice(0)) dispose();
     await this.engineValue.close();
+    this.clipboard = null;
     this.removeAllListeners();
   }
 
-  private commit(document: EditorDocument): void {
-    this.history.commit(document);
+  private createSnapshot(): EditorSessionSnapshot {
+    const history = this.history.snapshot;
+    return {
+      canRedo: history.canRedo,
+      canUndo: history.canUndo,
+      clipboardFrames: this.clipboard?.channels[0]?.length ?? 0,
+      document: history.present.document,
+      engine: this.engineValue.snapshot,
+    };
+  }
+
+  private commitDocument(document: EditorDocument): void {
+    const state = this.history.snapshot.present;
+    this.history.commit({ ...state, document });
+    this.publish();
+  }
+
+  private async dispatchEdit(command: SingleTrackEditCommand): Promise<void> {
+    const current = this.history.snapshot.present;
+    if (!current.audio) return;
+    const result = executeSingleTrackEdit(
+      { audio: current.audio, document: current.document },
+      command,
+      { clipboard: this.clipboard, cursor: this.engineValue.snapshot.position },
+    );
+    this.clipboard = result.clipboard;
+    if (result.state.audio !== current.audio || result.state.document !== current.document) {
+      this.history.commit(result.state satisfies SingleTrackEditorState);
+      if (result.audioChanged) this.engineValue.loadPcm(result.state.audio);
+    }
+    if (result.position !== undefined) await this.engineValue.seek(result.position);
+    this.publish();
+  }
+
+  private async restoreHistory(direction: 'redo' | 'undo'): Promise<void> {
+    const before = this.history.snapshot.present;
+    const restored = this.history[direction]().present;
+    if (restored === before) return;
+    if (restored.audio && restored.audio !== before.audio) this.engineValue.loadPcm(restored.audio);
+    await this.engineValue.seek(
+      Math.min(this.engineValue.snapshot.position, this.engineValue.duration),
+    );
     this.publish();
   }
 

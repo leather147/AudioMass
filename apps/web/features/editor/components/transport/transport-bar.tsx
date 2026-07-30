@@ -43,6 +43,13 @@ export function TransportBar({
         {copy('pause')}
       </button>
       <button
+        disabled={!loaded}
+        onClick={() => void controller.dispatch({ name: 'playback.stop' })}
+        type="button"
+      >
+        {copy('stop')}
+      </button>
+      <button
         disabled={!snapshot.canUndo}
         onClick={() => void controller.dispatch({ name: 'history.undo' })}
         type="button"
@@ -56,6 +63,23 @@ export function TransportBar({
       >
         {copy('redo')}
       </button>
+      <label>
+        {copy('volume')}
+        <input
+          aria-label={copy('volume')}
+          max={2}
+          min={0}
+          onChange={(event) =>
+            void controller.dispatch({
+              name: 'playback.volume',
+              value: Number(event.target.value),
+            })
+          }
+          step={0.01}
+          type="range"
+          value={snapshot.engine.volume}
+        />
+      </label>
       <strong>{documentName}</strong>
     </header>
   );

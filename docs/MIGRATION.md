@@ -49,6 +49,10 @@ Each feature phase is independently reviewable and has package-level tests. The 
 - The leaf-infrastructure wave completed native ID3/MP4 metadata, discriminated
   WAV and tempo worker protocols/clients, and a fail-closed Next.js gateway for
   all eight retained vendor assets.
+- The single-track wave made PCM part of the bounded editor history, added pure
+  copy/cut/paste/delete/trim/silence transactions with marker-time transforms,
+  verified the Web Audio playback lifecycle with a fake graph, and exposed WAV
+  export through encoder and browser-download ports in the React editor.
 - NestJS and FastAPI now validate each remote operation with matching
   operation-specific contracts instead of passing generic parameter maps.
 

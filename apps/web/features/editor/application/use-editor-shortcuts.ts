@@ -1,6 +1,6 @@
 'use client';
 
-import type { AudioEngineState } from '@audiomass/audio-engine';
+import type { EditorSessionSnapshot } from '@audiomass/audio-engine';
 import { useEffect } from 'react';
 
 import type { EditorController } from './editor-controller';
@@ -12,12 +12,32 @@ function isEditableTarget(target: EventTarget | null): boolean {
   );
 }
 
-export function useEditorShortcuts(controller: EditorController, state: AudioEngineState) {
+export function useEditorShortcuts(controller: EditorController, snapshot: EditorSessionSnapshot) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditableTarget(event.target)) return;
       const accelerator = event.ctrlKey || event.metaKey;
 
+      if (accelerator && event.code === 'KeyA') {
+        event.preventDefault();
+        void controller.dispatch({ name: 'edit.select-all' });
+        return;
+      }
+      if (accelerator && event.code === 'KeyC') {
+        event.preventDefault();
+        void controller.dispatch({ name: 'edit.copy' });
+        return;
+      }
+      if (accelerator && event.code === 'KeyX') {
+        event.preventDefault();
+        void controller.dispatch({ name: 'edit.cut' });
+        return;
+      }
+      if (accelerator && event.code === 'KeyV') {
+        event.preventDefault();
+        void controller.dispatch({ name: 'edit.paste' });
+        return;
+      }
       if (accelerator && event.code === 'KeyZ') {
         event.preventDefault();
         void controller.dispatch({ name: event.shiftKey ? 'history.redo' : 'history.undo' });
@@ -31,8 +51,15 @@ export function useEditorShortcuts(controller: EditorController, state: AudioEng
       if (event.code === 'Space') {
         event.preventDefault();
         void controller.dispatch({
-          name: state === 'playing' ? 'playback.pause' : 'playback.play',
+          name: snapshot.engine.state === 'playing' ? 'playback.pause' : 'playback.play',
         });
+        return;
+      }
+      if (event.code === 'Delete' || event.code === 'Backspace') {
+        if (snapshot.document.selection) {
+          event.preventDefault();
+          void controller.dispatch({ name: 'edit.delete' });
+        }
         return;
       }
       if (event.code === 'Home') {
@@ -43,5 +70,5 @@ export function useEditorShortcuts(controller: EditorController, state: AudioEng
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [controller, state]);
+  }, [controller, snapshot.document.selection, snapshot.engine.state]);
 }

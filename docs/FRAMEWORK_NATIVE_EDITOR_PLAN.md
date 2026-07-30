@@ -242,8 +242,9 @@ FastAPI remains a private compute service:
       codec, IndexedDB repository, ID3/MP4 metadata, WAV and tempo worker
       clients/protocols, loudness, typed leaf DSP, and the eight-asset vendor
       gateway are native and tested.
-- [ ] Wave C (in progress): playback/session/history, PCM editing, recording and
-      recorder worklet are native; full edit-command and export UI parity remains.
+- [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
+      silence insertion, selection/marker transforms, recording/worklet,
+      keyboard controls, and typed WAV export UI are native and tested.
 - [ ] Wave D (in progress): project/track/clip domain and scheduler are native;
       mixer graph, effects UI/presets, bounce and crossfade parity remain.
 - [ ] Wave E.
@@ -298,18 +299,44 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   mixer/effects parity, Wave E React presentation, then Wave F compatibility
   deletion and the final Wave G browser/release proof.
 
+### Stage 3 — Wave C single-track state, playback, editing, and export
+
+- **Status:** complete on 2026-07-30; the commit containing this report is the
+  Wave C checkpoint (`Complete framework-native editor Wave C`).
+- **Delivered:** immutable document/PCM session state; PCM-aware bounded
+  undo/redo; pure copy, cut, paste, delete, trim, select-all, and sample-aligned
+  silence commands; deterministic marker insert/remove/replace/trim transforms;
+  browser selection/edit controls; stop/volume transport controls; keyboard
+  copy/cut/paste/delete/select-all; typed 16/24/32-bit WAV export and download
+  ports.
+- **Compatibility result:** edits operate on owned channel data, paste preserves
+  the clipboard, deletion keeps a Web-Audio-compatible minimal buffer, markers
+  remain aligned after duration changes, and undo/redo restores the actual audio
+  graph rather than only visual metadata.
+- **Automated proof:** audio-engine has 12 passing test files / 43 tests; web has
+  22 passing test files / 80 tests. Tests cover fake Web Audio playback,
+  PCM ownership, edit/marker transactions, full-buffer deletion, history audio
+  restoration, filename safety, encoder cleanup, controller download routing,
+  shortcuts/import boundaries, and the existing compatibility contracts.
+- **Architectural result:** Wave C is complete. React components emit typed
+  commands; the session owns transactions; pure audio/domain modules own data
+  changes; browser infrastructure alone owns Blob/download behavior.
+- **Remaining after stage:** Wave D mixer/effect graph, presets, crossfade and
+  bounce parity; Wave E completes the waveform/tracks/menus/analyzers React UI;
+  Wave F can then remove the compatibility runtime atomically.
+
 ## Overall stage summary
 
-| Wave | State       | Current result                                                                    |
-| ---- | ----------- | --------------------------------------------------------------------------------- |
-| A    | Complete    | Typed application/domain platform and React lifecycle                             |
-| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation      |
-| C    | In progress | Session/history/PCM/recording exist; complete edit/playback/export parity remains |
-| D    | In progress | Project/track/clip scheduling exists; mixer, effects, bounce, crossfade remain    |
-| E    | Not started | Full React editor presentation replacement                                        |
-| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity           |
-| G    | In progress | Documentation is current; final browser and release proof remains                 |
+| Wave | State       | Current result                                                                 |
+| ---- | ----------- | ------------------------------------------------------------------------------ |
+| A    | Complete    | Typed application/domain platform and React lifecycle                          |
+| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
+| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
+| D    | In progress | Project/track/clip scheduling exists; mixer, effects, bounce, crossfade remain |
+| E    | Not started | Full React editor presentation replacement                                     |
+| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
+| G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Two structural stages are complete. This is not the final legacy deletion:
+Three structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.

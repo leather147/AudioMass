@@ -10,6 +10,8 @@ export { AudioEngineError } from './errors.js';
 export { AudioWorkletRegistry } from './audio-worklet-registry.js';
 export { encodePcmAsWav, encodeWav, interleaveWavChannels } from './codecs/wav.js';
 export { EditorSession } from './application/editor-session.js';
+export { AudioExportService } from './application/export-audio.js';
+export { executeSingleTrackEdit } from './application/single-track-edit.js';
 export { EditHistory } from './domain/edit-history.js';
 export {
   readAudioMetadata,
@@ -30,6 +32,11 @@ export {
   sortAudioMarkers,
   updateAudioMarker,
 } from './domain/markers.js';
+export {
+  createEditorDocument,
+  normalizeDocumentName,
+  normalizeEditorRange,
+} from './domain/editor-document.js';
 export { PeakWorkerClient } from './peak-worker-client.js';
 export {
   activeTracks,
@@ -61,6 +68,7 @@ export type {
   PcmAudio,
   WaveformPeaks,
 } from './types.js';
+export type { AudioBinaryEncoder, ExportedAudioFile } from './application/export-audio.js';
 export type {
   EditorAudioEngine,
   EditorCommand,
@@ -69,6 +77,12 @@ export type {
   EditorSessionSnapshot,
   EditorTimeRange,
 } from './application/editor-session.js';
+export type {
+  SingleTrackEditCommand,
+  SingleTrackEditContext,
+  SingleTrackEditResult,
+  SingleTrackEditorState,
+} from './application/single-track-edit.js';
 export type { EditHistorySnapshot } from './domain/edit-history.js';
 export type { AudioMarker, CreateAudioMarker } from './domain/markers.js';
 export type {

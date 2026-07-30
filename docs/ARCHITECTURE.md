@@ -49,6 +49,14 @@ bounded history, markers, versioned project parsing, multitrack entities, and
 scheduling. Browser persistence implements an `AudioProjectRepository` through
 IndexedDB. No package module reads React context, cookies, or Next.js APIs.
 
+Single-track editing is an application transaction, not a React state mutation.
+The session history stores immutable document/PCM states; copy, cut, paste,
+delete, trim, and silence insertion transform audio, selection, and marker time
+together. Undo/redo reloads the restored PCM into the playback graph. WAV export
+uses an encoder port in the audio package and a browser-download adapter in the
+Next.js infrastructure layer, so neither the controller nor components create
+workers, blobs, or anchors directly.
+
 The eight retained codec, compression, noise-suppression, and WaveSurfer assets
 are not imported as application globals. The Next.js editor infrastructure owns
 their absolute asset allowlist, script lifecycle, worker factories, and runtime

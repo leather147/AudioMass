@@ -9,6 +9,7 @@ import { useEditorShortcuts } from '../application/use-editor-shortcuts';
 import { useAudioFileDrop } from '../infrastructure/use-audio-file-drop';
 import { EditorProvider, useEditorController, useEditorSnapshot } from '../state/editor-store';
 import { editorThemeStyle } from '../theme/editor-themes';
+import { EditToolbar } from './edit/edit-toolbar';
 import { MarkerPanel } from './markers/marker-panel';
 import { NotificationProvider } from './notifications/notification-provider';
 import { Timeline } from './timeline/timeline';
@@ -40,7 +41,7 @@ function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
   };
 
   const drop = useAudioFileDrop(openFile);
-  useEditorShortcuts(controller, snapshot.engine.state);
+  useEditorShortcuts(controller, snapshot);
 
   return (
     <main
@@ -55,6 +56,7 @@ function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
         onFileInput={onFileInput}
         snapshot={snapshot}
       />
+      <EditToolbar controller={controller} copy={copy} onError={setError} snapshot={snapshot} />
 
       <section className={styles.workspace}>
         <section

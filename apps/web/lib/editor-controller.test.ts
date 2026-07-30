@@ -1,0 +1,80 @@
+import {
+  AudioExportService,
+  EditorSession,
+  type AudioEngineEvents,
+  type AudioEngineSnapshot,
+  type EditorAudioEngine,
+  type ExportedAudioFile,
+  type PcmAudio,
+  type WavBitDepth,
+} from '@audiomass/audio-engine';
+import { describe, expect, it } from 'vitest';
+
+import { EditorController } from '@/features/editor/application/editor-controller';
+
+class FakeEngine implements EditorAudioEngine {
+  public duration = 1;
+  public snapshot: AudioEngineSnapshot = {
+    duration: 1,
+    position: 0,
+    sampleRate: 4,
+    state: 'ready',
+    volume: 1,
+  };
+  private audio: PcmAudio = { channels: [Float32Array.from([0, 1, 0, -1])], sampleRate: 4 };
+
+  public async close() {}
+  public async load() {
+    return this.snapshot;
+  }
+  public loadPcm(audio: PcmAudio) {
+    this.audio = audio;
+    return this.snapshot;
+  }
+  public on<Name extends keyof AudioEngineEvents>(
+    _name: Name,
+    _listener: (payload: AudioEngineEvents[Name]) => void,
+  ) {
+    return () => undefined;
+  }
+  public pause() {}
+  public async play() {}
+  public async seek() {}
+  public setVolume() {}
+  public stop() {}
+  public toPcm() {
+    return this.audio;
+  }
+}
+
+describe('EditorController export boundary', () => {
+  it('exports session PCM through injected worker and download ports', async () => {
+    const session = new EditorSession(new FakeEngine());
+    await session.load(new ArrayBuffer(0), 'mix.mp3');
+    const downloads: ExportedAudioFile[] = [];
+    let destroyed = false;
+    let depth: WavBitDepth | null = null;
+    const controller = new EditorController(
+      session,
+      new AudioExportService(),
+      { save: (file) => downloads.push(file) },
+      () => ({
+        destroy: () => {
+          destroyed = true;
+        },
+        encode: async (_audio, bitDepth) => {
+          depth = bitDepth;
+          return Uint8Array.from([1, 2, 3]).buffer;
+        },
+      }),
+    );
+
+    await controller.downloadWav(24);
+
+    expect(depth).toBe(24);
+    expect(downloads).toHaveLength(1);
+    expect(downloads[0]).toMatchObject({ fileName: 'mix.wav', mimeType: 'audio/wav' });
+    expect(destroyed).toBe(true);
+    await controller.close();
+  });
+});

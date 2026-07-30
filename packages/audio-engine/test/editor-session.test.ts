@@ -8,11 +8,12 @@ import {
   sortAudioMarkers,
   updateAudioMarker,
 } from '@audio-engine/domain/markers';
-import type { AudioEngineEvents, AudioEngineSnapshot } from '@audio-engine/types';
+import type { AudioEngineEvents, AudioEngineSnapshot, PcmAudio } from '@audio-engine/types';
 import { mergeRecordedChunks } from '@audio-engine/recording/audio-recorder';
 
 class FakeAudioEngine implements EditorAudioEngine {
   duration = 0;
+  private pcm: PcmAudio = { channels: [new Float32Array(0)], sampleRate: 48_000 };
   snapshot: AudioEngineSnapshot = {
     duration: 0,
     position: 0,
@@ -28,7 +29,25 @@ class FakeAudioEngine implements EditorAudioEngine {
 
   async load() {
     this.duration = 12;
+    this.pcm = { channels: [new Float32Array(12 * 48_000)], sampleRate: 48_000 };
     this.snapshot = { ...this.snapshot, duration: 12, sampleRate: 48_000, state: 'ready' };
+    this.emit('loaded', this.snapshot);
+    return this.snapshot;
+  }
+
+  loadPcm(audio: PcmAudio) {
+    this.pcm = {
+      channels: audio.channels.map((channel) => channel.slice()),
+      sampleRate: audio.sampleRate,
+    };
+    this.duration = (audio.channels[0]?.length ?? 0) / audio.sampleRate;
+    this.snapshot = {
+      ...this.snapshot,
+      duration: this.duration,
+      position: 0,
+      sampleRate: audio.sampleRate,
+      state: 'ready',
+    };
     this.emit('loaded', this.snapshot);
     return this.snapshot;
   }
@@ -66,6 +85,13 @@ class FakeAudioEngine implements EditorAudioEngine {
   stop() {
     this.snapshot = { ...this.snapshot, position: 0, state: 'ready' };
     this.emit('statechange', this.snapshot);
+  }
+
+  toPcm() {
+    return {
+      channels: this.pcm.channels.map((channel) => channel.slice()),
+      sampleRate: this.pcm.sampleRate,
+    };
   }
 
   private emit<Name extends keyof AudioEngineEvents>(name: Name, payload: AudioEngineEvents[Name]) {
@@ -138,6 +164,26 @@ describe('EditorSession', () => {
 
     await session.dispatch({ name: 'history.undo' });
     expect(session.snapshot.document.markers).toEqual([]);
+    await session.close();
+  });
+
+  it('stores PCM edits in bounded history and restores engine audio on undo and redo', async () => {
+    const engine = new FakeAudioEngine();
+    const session = new EditorSession(engine);
+    await session.load(new ArrayBuffer(1), 'voice.wav');
+
+    await session.dispatch({ name: 'selection.set', range: { end: 4, start: 2 } });
+    await session.dispatch({ name: 'edit.cut' });
+    expect(session.snapshot.engine.duration).toBe(10);
+    expect(session.snapshot.clipboardFrames).toBe(96_000);
+
+    await session.dispatch({ name: 'history.undo' });
+    expect(session.snapshot.engine.duration).toBe(12);
+    expect(session.snapshot.document.selection).toEqual({ end: 4, start: 2 });
+
+    await session.dispatch({ name: 'history.redo' });
+    expect(session.snapshot.engine.duration).toBe(10);
+    expect(session.snapshot.document.selection).toBeNull();
     await session.close();
   });
 });
