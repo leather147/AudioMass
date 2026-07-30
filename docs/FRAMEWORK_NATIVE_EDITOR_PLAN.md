@@ -509,6 +509,34 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   specialized effects; D.3c then connects native multitrack playback/export and
   deletes superseded Wave D compatibility paths.
 
+### Stage 8 — Wave D.3b2 specialized effect workflows
+
+- **Status:** in progress on 2026-07-30. This scope is committed before the
+  implementation so duration-changing and non-generic workflows remain a
+  separate review boundary from the fixed-duration D.3b1 processor registry.
+- **Planned domain boundary:** add discriminated, validated models for seamless
+  loop options/results, paragraphic-EQ bands, reusable automation curves, and
+  audio-repair modes. Specialized processors return workflow metadata where
+  required instead of pretending every operation is a same-length
+  `EffectValues -> PcmAudio` transform.
+- **Planned compatibility contracts:** seamless loop retains the 0.0007 trim
+  threshold, 1 ms edge padding, 10 ms zero-crossing search, equal-power
+  crossfade, and 1..64 repeat range while explicitly transforming selection and
+  marker time. Paragraphic EQ retains peaking/high-pass/low-pass bands, the
+  0..20 kHz frequency span, +/-35 dB gain span, and per-band Q. Automation uses
+  sorted piecewise-linear points and well-defined boundary values. Repair ports
+  the existing de-click, mains-hum detection/notching, and splice-smoothing
+  sensitivity contracts without browser audio nodes or editor globals.
+- **Planned application/UI boundary:** the session owns specialized
+  preview/apply/cancel transactions and history; the controller exposes typed
+  commands; dedicated localized React workflows own curve/band/repair forms.
+  The generic D.3a schema dialog remains limited to the fixed-duration registry.
+- **Planned proof:** focused numerical and marker-transform tests, preview/
+  cancel/undo transaction tests, controller/UI boundary tests, then repository
+  format, lint, typecheck, all TypeScript tests/builds, and the Python quality
+  suite. The completed report and overall stage totals will replace this
+  planned status before the implementation checkpoint is committed.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
