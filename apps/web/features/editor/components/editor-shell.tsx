@@ -10,6 +10,7 @@ import { useAudioFileDrop } from '../infrastructure/use-audio-file-drop';
 import { EditorProvider, useEditorController, useEditorSnapshot } from '../state/editor-store';
 import { editorThemeStyle } from '../theme/editor-themes';
 import { EditToolbar } from './edit/edit-toolbar';
+import { EffectToolbar } from './effects/effect-toolbar';
 import { MarkerPanel } from './markers/marker-panel';
 import { NotificationProvider } from './notifications/notification-provider';
 import { Timeline } from './timeline/timeline';
@@ -57,6 +58,12 @@ function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
         snapshot={snapshot}
       />
       <EditToolbar controller={controller} copy={copy} onError={setError} snapshot={snapshot} />
+      <EffectToolbar
+        controller={controller}
+        copy={copy}
+        onError={setError}
+        selected={snapshot.document.selection !== null}
+      />
 
       <section className={styles.workspace}>
         <section

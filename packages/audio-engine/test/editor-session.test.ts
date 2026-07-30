@@ -29,7 +29,10 @@ class FakeAudioEngine implements EditorAudioEngine {
 
   async load() {
     this.duration = 12;
-    this.pcm = { channels: [new Float32Array(12 * 48_000)], sampleRate: 48_000 };
+    this.pcm = {
+      channels: [new Float32Array(12 * 48_000).fill(0.25)],
+      sampleRate: 48_000,
+    };
     this.snapshot = { ...this.snapshot, duration: 12, sampleRate: 48_000, state: 'ready' };
     this.emit('loaded', this.snapshot);
     return this.snapshot;
@@ -184,6 +187,40 @@ describe('EditorSession', () => {
     await session.dispatch({ name: 'history.redo' });
     expect(session.snapshot.engine.duration).toBe(10);
     expect(session.snapshot.document.selection).toBeNull();
+    await session.close();
+  });
+
+  it('previews effects without changing history and restores PCM and position on cancel', async () => {
+    const engine = new FakeAudioEngine();
+    const session = new EditorSession(engine);
+    await session.load(new ArrayBuffer(1), 'voice.wav');
+    await session.dispatch({ name: 'selection.set', range: { end: 4, start: 2 } });
+    await engine.seek(6);
+
+    await session.dispatch({ effectId: 'gain', name: 'effect.preview', values: { amount: 0 } });
+    expect(session.snapshot.effectPreviewId).toBe('gain');
+    expect(engine.toPcm().channels[0]?.[2 * 48_000]).toBe(0);
+    expect(session.getAudio()?.channels[0]?.[2 * 48_000]).toBe(0.25);
+
+    await session.dispatch({ name: 'effect.preview.cancel' });
+    expect(session.snapshot.effectPreviewId).toBeNull();
+    expect(engine.snapshot.position).toBe(6);
+    expect(engine.toPcm().channels[0]?.[2 * 48_000]).toBe(0.25);
+    await session.close();
+  });
+
+  it('commits selection-scoped effects as one undoable transaction', async () => {
+    const engine = new FakeAudioEngine();
+    const session = new EditorSession(engine);
+    await session.load(new ArrayBuffer(1), 'voice.wav');
+    await session.dispatch({ name: 'selection.set', range: { end: 4, start: 2 } });
+
+    await session.dispatch({ effectId: 'gain', name: 'effect.apply', values: { amount: 2 } });
+    expect(engine.toPcm().channels[0]?.[2 * 48_000]).toBe(0.5);
+    expect(engine.toPcm().channels[0]?.[48_000]).toBe(0.25);
+
+    await session.dispatch({ name: 'history.undo' });
+    expect(engine.toPcm().channels[0]?.[2 * 48_000]).toBe(0.25);
     await session.close();
   });
 });

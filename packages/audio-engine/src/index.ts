@@ -12,7 +12,9 @@ export { encodePcmAsWav, encodeWav, interleaveWavChannels } from './codecs/wav.j
 export { EditorSession } from './application/editor-session.js';
 export { AudioExportService } from './application/export-audio.js';
 export { executeSingleTrackEdit } from './application/single-track-edit.js';
+export { executeEffectEdit } from './application/effect-edit.js';
 export { EFFECT_SCHEMAS, getEffectSchema } from './effects/catalog.js';
+export { EffectProcessorRegistry, NATIVE_EFFECT_PROCESSOR_IDS } from './effects/processing.js';
 export {
   defaultEffectValues,
   effectSchemaById,
@@ -124,6 +126,13 @@ export type {
   SingleTrackEditResult,
   SingleTrackEditorState,
 } from './application/single-track-edit.js';
+export type {
+  ApplyEffectCommand,
+  CancelEffectPreviewCommand,
+  EffectCommand,
+  EffectEditorState,
+  PreviewEffectCommand,
+} from './application/effect-edit.js';
 export type { EditHistorySnapshot } from './domain/edit-history.js';
 export type {
   BooleanEffectParameter,
@@ -138,6 +147,7 @@ export type {
   SelectEffectParameterOption,
 } from './effects/schema.js';
 export type { CreateEffectPreset, EffectPreset, EffectPresetDocument } from './effects/presets.js';
+export type { NativeEffectProcessor, NativeEffectProcessorId } from './effects/processing.js';
 export type { AudioMarker, CreateAudioMarker } from './domain/markers.js';
 export type {
   AudioComment,

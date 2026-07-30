@@ -20,6 +20,7 @@ dist/
 apps/python-api/.mypy_cache/
 apps/python-api/.pytest_cache/
 apps/python-api/.ruff_cache/
+apps/python-api/.codex-pytest-*/
 .venv/*
 **/.venv/
 **/__pycache__/

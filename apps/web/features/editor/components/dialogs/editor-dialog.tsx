@@ -1,17 +1,28 @@
 'use client';
 
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useId, useRef } from 'react';
 
 export interface EditorDialogProps {
   children: ReactNode;
+  className?: string;
+  closeLabel?: string;
   footer?: ReactNode;
   onClose(): void;
   open: boolean;
   title: string;
 }
 
-export function EditorDialog({ children, footer, onClose, open, title }: EditorDialogProps) {
+export function EditorDialog({
+  children,
+  className,
+  closeLabel = 'Close',
+  footer,
+  onClose,
+  open,
+  title,
+}: EditorDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -21,10 +32,10 @@ export function EditorDialog({ children, footer, onClose, open, title }: EditorD
   }, [open]);
 
   return (
-    <dialog aria-labelledby="editor-dialog-title" onCancel={onClose} ref={dialogRef}>
+    <dialog aria-labelledby={titleId} className={className} onCancel={onClose} ref={dialogRef}>
       <header>
-        <h2 id="editor-dialog-title">{title}</h2>
-        <button aria-label="Close" onClick={onClose} type="button">
+        <h2 id={titleId}>{title}</h2>
+        <button aria-label={closeLabel} onClick={onClose} type="button">
           ×
         </button>
       </header>

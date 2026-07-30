@@ -12,12 +12,13 @@
   background: var(--editor-bg);
   color: var(--editor-text);
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   font-family: system-ui, sans-serif;
 }
 
 .toolbar,
 .editToolbar,
+.effectToolbar,
 .statusbar {
   display: flex;
   align-items: center;
@@ -32,6 +33,10 @@
 .editToolbar button,
 .editToolbar input,
 .editToolbar select,
+.effectToolbar button,
+.effectDialog button,
+.effectDialog input,
+.effectDialog select,
 .markerForm button,
 .markerForm input {
   min-height: 2.25rem;
@@ -47,6 +52,10 @@
 .editToolbar button:focus-visible,
 .editToolbar input:focus-visible,
 .editToolbar select:focus-visible,
+.effectToolbar button:focus-visible,
+.effectDialog button:focus-visible,
+.effectDialog input:focus-visible,
+.effectDialog select:focus-visible,
 .dropzone:focus-visible {
   outline: 2px solid var(--editor-accent);
   outline-offset: 2px;
@@ -69,6 +78,98 @@
   display: grid;
   gap: 0.65rem;
   border-block-start: 0;
+}
+
+.effectToolbar {
+  border-block-start: 0;
+}
+
+.effectToolbar > span {
+  color: var(--editor-text-muted);
+}
+
+.effectDialog {
+  width: min(34rem, calc(100vw - 2rem));
+  border: 1px solid var(--editor-border);
+  border-radius: 0.75rem;
+  background: var(--editor-panel);
+  color: var(--editor-text);
+  padding: 0;
+}
+
+.effectDialog::backdrop {
+  background: color-mix(in srgb, var(--editor-bg) 78%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.effectDialog > header,
+.effectDialog > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--editor-border);
+}
+
+.effectDialog > header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.effectDialog > header button {
+  margin-inline-start: auto;
+}
+
+.effectDialog > section {
+  padding: 1rem;
+}
+
+.effectDialog > footer {
+  justify-content: flex-end;
+  border-block-start: 1px solid var(--editor-border);
+  border-block-end: 0;
+}
+
+.effectForm {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.effectForm > label,
+.effectPresetForm label,
+.effectNumberList label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.effectCheckbox {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.effectNumberInput,
+.effectPresetForm {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.effectNumberList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.5rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.55rem;
+}
+
+.effectNumberList legend {
+  padding-inline: 0.35rem;
+}
+
+.effectPresetForm label {
+  flex: 1;
 }
 
 .selectionForm,

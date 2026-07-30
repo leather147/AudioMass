@@ -77,4 +77,24 @@ describe('EditorController export boundary', () => {
     expect(destroyed).toBe(true);
     await controller.close();
   });
+
+  it('routes effect preview, cancellation, and apply through the native session', async () => {
+    const engine = new FakeEngine();
+    const session = new EditorSession(engine);
+    const controller = new EditorController(session);
+    await session.load(new ArrayBuffer(0), 'mix.mp3');
+    await controller.dispatch({ name: 'selection.set', range: { end: 1, start: 0 } });
+
+    expect(controller.supportedEffectIds).toEqual(['gain', 'normalize']);
+    expect(controller.supportsEffect('compressor')).toBe(false);
+    await controller.previewEffect('gain', { amount: 0 });
+    expect(engine.toPcm().channels[0]?.every((sample) => sample === 0)).toBe(true);
+
+    await controller.cancelEffectPreview();
+    expect(Array.from(engine.toPcm().channels[0] ?? [])).toEqual([0, 1, 0, -1]);
+
+    await controller.applyEffect('gain', { amount: 0.5 });
+    expect(Array.from(engine.toPcm().channels[0] ?? [])).toEqual([0, 0.5, 0, -0.5]);
+    await controller.close();
+  });
 });

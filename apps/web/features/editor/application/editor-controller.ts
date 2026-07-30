@@ -1,10 +1,12 @@
 import {
   AudioExportService,
   EditorSession,
+  NATIVE_EFFECT_PROCESSOR_IDS,
   WavEncoderWorkerClient,
   type AudioBinaryEncoder,
   type EditorCommand,
   type EditorSessionSnapshot,
+  type EffectValues,
   type WavBitDepth,
 } from '@audiomass/audio-engine';
 
@@ -41,6 +43,27 @@ export class EditorController {
 
   public dispatch(command: EditorCommand): Promise<void> {
     return this.session.dispatch(command);
+  }
+
+  public get supportedEffectIds(): readonly string[] {
+    return NATIVE_EFFECT_PROCESSOR_IDS;
+  }
+
+  public supportsEffect(effectId: string): boolean {
+    return this.supportedEffectIds.some((supported) => supported === effectId);
+  }
+
+  public async previewEffect(effectId: string, values: EffectValues): Promise<void> {
+    await this.session.dispatch({ effectId, name: 'effect.preview', values });
+    await this.session.dispatch({ name: 'playback.play' });
+  }
+
+  public applyEffect(effectId: string, values: EffectValues): Promise<void> {
+    return this.session.dispatch({ effectId, name: 'effect.apply', values });
+  }
+
+  public cancelEffectPreview(): Promise<void> {
+    return this.session.dispatch({ name: 'effect.preview.cancel' });
   }
 
   public async downloadWav(bitDepth: WavBitDepth = 16): Promise<void> {

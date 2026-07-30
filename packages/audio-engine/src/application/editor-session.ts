@@ -15,6 +15,7 @@ import {
   type CreateAudioMarker,
 } from '../domain/markers.js';
 import { clonePcm } from '../dsp/pcm.js';
+import { EffectProcessorRegistry } from '../effects/processing.js';
 import { TypedEventEmitter } from '../typed-event-emitter.js';
 import type { AudioEngineEvents, AudioEngineSnapshot, PcmAudio } from '../types.js';
 import {
@@ -22,6 +23,7 @@ import {
   type SingleTrackEditCommand,
   type SingleTrackEditorState,
 } from './single-track-edit.js';
+import { executeEffectEdit, type EffectCommand } from './effect-edit.js';
 
 export type { EditorDocument, EditorTimeRange } from '../domain/editor-document.js';
 
@@ -54,10 +56,12 @@ export interface EditorSessionSnapshot {
   clipboardFrames: number;
   document: EditorDocument;
   engine: AudioEngineSnapshot;
+  effectPreviewId: string | null;
 }
 
 export type EditorCommand =
   | SingleTrackEditCommand
+  | EffectCommand
   | { name: 'document.rename'; value: string }
   | { name: 'history.redo' }
   | { name: 'history.undo' }
@@ -89,14 +93,23 @@ function isEditCommand(command: EditorCommand): command is SingleTrackEditComman
   return command.name.startsWith('edit.');
 }
 
+function isEffectCommand(command: EditorCommand): command is EffectCommand {
+  return command.name.startsWith('effect.');
+}
+
 export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   private clipboard: PcmAudio | null = null;
   private readonly disposers: Array<() => void> = [];
   private history = new EditHistory<EditorSessionState>(emptyState());
   private markerSequence = 1;
+  private effectPreviewId: string | null = null;
+  private effectPreviewRestorePosition: number | null = null;
   private snapshotValue: EditorSessionSnapshot;
 
-  public constructor(private readonly engineValue: EditorAudioEngine = new AudioEngine()) {
+  public constructor(
+    private readonly engineValue: EditorAudioEngine = new AudioEngine(),
+    private readonly effectProcessors = new EffectProcessorRegistry(),
+  ) {
     super();
     this.snapshotValue = this.createSnapshot();
     for (const event of ['ended', 'loaded', 'position', 'statechange', 'volumechange'] as const) {
@@ -125,6 +138,8 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   public async load(input: ArrayBuffer | AudioBuffer, name = 'Untitled'): Promise<void> {
     await this.engineValue.load(input);
     this.clipboard = null;
+    this.effectPreviewId = null;
+    this.effectPreviewRestorePosition = null;
     this.markerSequence = 1;
     this.history.reset({
       audio: this.engineValue.toPcm(),
@@ -134,6 +149,13 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   }
 
   public async dispatch(command: EditorCommand): Promise<void> {
+    if (isEffectCommand(command)) {
+      await this.dispatchEffect(command);
+      return;
+    }
+    if (this.effectPreviewId && !command.name.startsWith('playback.')) {
+      await this.restoreEffectPreview();
+    }
     if (isEditCommand(command)) {
       await this.dispatchEdit(command);
       return;
@@ -215,6 +237,8 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     for (const dispose of this.disposers.splice(0)) dispose();
     await this.engineValue.close();
     this.clipboard = null;
+    this.effectPreviewId = null;
+    this.effectPreviewRestorePosition = null;
     this.removeAllListeners();
   }
 
@@ -225,6 +249,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
       canUndo: history.canUndo,
       clipboardFrames: this.clipboard?.channels[0]?.length ?? 0,
       document: history.present.document,
+      effectPreviewId: this.effectPreviewId,
       engine: this.engineValue.snapshot,
     };
   }
@@ -250,6 +275,49 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     }
     if (result.position !== undefined) await this.engineValue.seek(result.position);
     this.publish();
+  }
+
+  private async dispatchEffect(command: EffectCommand): Promise<void> {
+    if (command.name === 'effect.preview.cancel') {
+      await this.restoreEffectPreview();
+      this.publish();
+      return;
+    }
+    const current = this.history.snapshot.present;
+    if (!current.audio) return;
+    const result = executeEffectEdit(
+      { audio: current.audio, document: current.document },
+      command,
+      this.effectProcessors,
+    );
+    const position = current.document.selection?.start ?? this.engineValue.snapshot.position;
+    this.engineValue.pause();
+    if (command.name === 'effect.preview') {
+      if (!this.effectPreviewId) {
+        this.effectPreviewRestorePosition = this.engineValue.snapshot.position;
+      }
+      this.effectPreviewId = command.effectId;
+      this.engineValue.loadPcm(result.audio);
+      await this.engineValue.seek(position);
+    } else {
+      this.effectPreviewId = null;
+      this.effectPreviewRestorePosition = null;
+      this.history.commit(result);
+      this.engineValue.loadPcm(result.audio);
+      await this.engineValue.seek(position);
+    }
+    this.publish();
+  }
+
+  private async restoreEffectPreview(): Promise<void> {
+    if (!this.effectPreviewId) return;
+    const position = this.effectPreviewRestorePosition ?? this.engineValue.snapshot.position;
+    const audio = this.history.snapshot.present.audio;
+    this.effectPreviewId = null;
+    this.effectPreviewRestorePosition = null;
+    this.engineValue.pause();
+    if (audio) this.engineValue.loadPcm(audio);
+    await this.engineValue.seek(Math.min(position, this.engineValue.duration));
   }
 
   private async restoreHistory(direction: 'redo' | 'undo'): Promise<void> {

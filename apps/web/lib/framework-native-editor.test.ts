@@ -34,6 +34,17 @@ describe('framework-native editor boundary', () => {
     expect(sources).not.toContain('<iframe');
   });
 
+  it('owns schema-driven effect workflows inside React and the typed controller', () => {
+    const root = join(process.cwd(), 'features', 'editor');
+    const sources = featureSources(root);
+
+    expect(sources).toContain('EFFECT_SCHEMAS');
+    expect(sources).toContain('controller.previewEffect');
+    expect(sources).toContain('controller.applyEffect');
+    expect(sources).toContain('BrowserEffectPresetRepository');
+    expect(sources).not.toMatch(/(?:eq|sp|compressor)\.html/);
+  });
+
   it('keeps direct vendor asset paths in the one infrastructure registry', () => {
     const root = join(process.cwd(), 'features', 'editor');
     const sources = featureSources(root);

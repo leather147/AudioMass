@@ -4,7 +4,8 @@ export type AudioEngineErrorCode =
   | 'BUFFER_NOT_LOADED'
   | 'ENGINE_CLOSED'
   | 'INVALID_AUDIO_DATA'
-  | 'SHARED_MEMORY_UNAVAILABLE';
+  | 'SHARED_MEMORY_UNAVAILABLE'
+  | 'UNSUPPORTED_OPERATION';
 
 export class AudioEngineError extends Error {
   readonly code: AudioEngineErrorCode;

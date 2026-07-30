@@ -224,6 +224,22 @@ Wave D is delivered as independently reviewable substages:
    receive explicit React workflows rather than being forced through a lossy
    generic schema.
 
+D.3 is implemented through reviewable checkpoints so the native UI never
+advertises an effect that still resolves through the compatibility runtime:
+
+- **D.3a — schema form and PCM transaction:** add a processor registry, native
+  gain and peak/RMS/LUFS normalization, selection-scoped preview/apply/cancel
+  commands, and a localized React dialog generated from the D.2 schemas. The
+  registry must expose support explicitly; effects without a native processor
+  remain unavailable instead of silently opening a legacy page.
+- **D.3b — remaining primary processors and specialized workflows:** port the
+  compressor, limiter, delay, distortion, reverb, graphical/paragraphic EQ,
+  seamless-loop, automation, and repair algorithms with focused parity tests;
+  only then enable their React workflows.
+- **D.3c — multitrack runtime consumers:** connect native scheduling/routing to
+  playback and the D.1 bounce service to export, then remove the superseded
+  compatibility implementations and paths covered by Wave D.
+
 ### Wave E — React presentation replacement
 
 - Port toolbar, timeline, waveform host, channels, markers, selection, menus,
@@ -268,9 +284,11 @@ Wave D is delivered as independently reviewable substages:
 - [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
       silence insertion, selection/marker transforms, recording/worklet,
       keyboard controls, and typed WAV export UI are native and tested.
-- [ ] Wave D (D.1-D.2 complete): project/track/clip, scheduler, mixer/routing,
-      crossfade, bounce, primary effect schemas, and versioned presets are
-      native; React and specialized effect/runtime integration remain in D.3.
+- [ ] Wave D (D.1-D.3a complete): project/track/clip, scheduler,
+      mixer/routing, crossfade, bounce, primary effect schemas, versioned
+      presets, and the first native React effect transaction are complete;
+      remaining processors and multitrack runtime consumers continue in
+      D.3b-D.3c.
 - [ ] Wave E.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
@@ -409,6 +427,39 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   paragraphic-EQ/automation/repair workflows, and native multitrack playback/
   export integration; then Wave E presentation parity and Wave F deletion.
 
+### Stage 6 — Wave D.3a native React effect transaction
+
+- **Status:** complete on 2026-07-30; the commit containing this report is the
+  Wave D.3a checkpoint (`Complete framework-native editor Wave D.3a`).
+- **Delivered:** an injectable native effect-processor registry; immutable gain
+  and peak/RMS/LUFS normalization processors; selection-scoped typed
+  preview/apply/cancel commands; preview restoration of original PCM and cursor;
+  a localized schema-driven React dialog for number, boolean, select, and
+  number-list fields; D.2 built-in/custom preset loading and saving through the
+  browser repository.
+- **Compatibility result:** gain retains its 0..2.5 contract; linked and
+  independent peak/RMS normalization retain channel semantics; LUFS uses the
+  shared BS.1770 analysis and true-peak ceiling. Preview PCM never enters undo
+  history, apply is one undoable transaction, transport remains usable during
+  preview, and unavailable processors fail closed instead of opening legacy
+  HTML pages. Duration-changing effects are reserved for specialized workflows.
+- **Automated proof:** audio-engine has 18 passing test files / 64 tests; web has
+  23 passing test files / 85 tests. New tests cover immutable gain, linked and
+  independent peak/RMS behavior, LUFS processing, invalid/unavailable effects,
+  preview cancellation, cursor/PCM restoration, undo, controller routing, and
+  the no-legacy React boundary. Repository format, lint, typecheck, tests, and
+  production builds passed. Python Black, Ruff, strict mypy, and all 35 pytest
+  cases passed with 87.14% coverage using an isolated local pytest temp/cache.
+- **Architectural result:** React renders domain schemas and sends typed
+  commands; the session owns preview/history transactions; the audio package
+  owns validation and PCM processing; browser storage remains infrastructure.
+  Native support is capability-driven, so UI availability cannot drift from
+  the processor registry or fall through to a compatibility popup.
+- **Remaining after stage:** D.3b ports the remaining primary and specialized
+  processors/workflows; D.3c connects native multitrack playback/export and
+  deletes the superseded Wave D compatibility paths. Wave E then completes
+  presentation parity before the final Wave F deletion.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
@@ -416,11 +467,11 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | A    | Complete    | Typed application/domain platform and React lifecycle                          |
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
-| D    | In progress | D.1-D.2 domains/presets complete; D.3 React and runtime integration remains    |
+| D    | In progress | D.1-D.3a complete; remaining processors and runtime consumers are D.3b-D.3c    |
 | E    | Not started | Full React editor presentation replacement                                     |
 | F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
 | G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Five structural stages are complete. This is not the final legacy deletion:
+Six structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.
