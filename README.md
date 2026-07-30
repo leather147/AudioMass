@@ -73,9 +73,10 @@ Trusted server-side caller
 - `packages/audio-engine` не зависит от React или backend-фреймворков: он владеет
   PCM, playback, recording, markers, history, project codec, ID3/MP4 metadata,
   typed WAV/tempo workers, immutable single-track edit transactions и
-  multitrack domain. Mixer channel/master state, Web Audio routing,
-  equal-power crossfades и deterministic PCM bounce также являются importable
-  API пакета, а не методами глобального runtime.
+  multitrack domain. Owned PCM sources, whole-project scheduling, mixer state,
+  Web Audio playback/routing, equal-power crossfades и deterministic PCM bounce
+  являются importable API пакета. Native React mixer/transport, WAV export и
+  полные IndexedDB-документы используют эти API без глобального runtime.
 - Девять основных audio effects описаны валидируемыми discriminated schemas;
   45 встроенных пресетов используют typed values, а пользовательские пресеты
   сохраняются браузерным адаптером в versioned JSON вместо DOM-порядка и

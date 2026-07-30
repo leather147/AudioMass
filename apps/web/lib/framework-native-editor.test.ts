@@ -49,6 +49,18 @@ describe('framework-native editor boundary', () => {
     expect(sources).not.toMatch(/(?:eq|sp|compressor)\.html/);
   });
 
+  it('owns multitrack transport, routing, mixer, and export consumers without compatibility globals', () => {
+    const root = join(process.cwd(), 'features', 'editor');
+    const sources = featureSources(root);
+
+    expect(sources).toContain('MultitrackController');
+    expect(sources).toContain('useMultitrackSnapshot');
+    expect(sources).toContain('controller.updateTrack');
+    expect(sources).toContain('controller.downloadWav');
+    expect(sources).toContain('BrowserPcmDecoder');
+    expect(sources).not.toMatch(/editor-runtime|legacyMixerHost|MixerData\(/);
+  });
+
   it('keeps direct vendor asset paths in the one infrastructure registry', () => {
     const root = join(process.cwd(), 'features', 'editor');
     const sources = featureSources(root);

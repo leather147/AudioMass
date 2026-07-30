@@ -46,11 +46,12 @@ own transport, timeline, markers, dialogs, notifications, effects, and tracks.
 Web Audio graph, PCM edits, WAV encoding, typed WAV/tempo worker clients,
 recording/worklet protocols, loudness and tempo analysis, ID3/MP4 metadata,
 bounded history, markers, versioned project parsing, multitrack entities, and
-scheduling. Its multitrack boundary also owns mute/solo and channel/master gain
-rules, a disposable Web Audio mixer graph, equal-power crossfade pairs, and a
-deterministic stereo PCM bounce fallback. Browser persistence implements an
-`AudioProjectRepository` through IndexedDB. No package module reads React
-context, cookies, or Next.js APIs.
+scheduling. Its multitrack application boundary owns copied PCM sources,
+mute/solo and channel/master gain rules, transport snapshots, a disposable Web
+Audio playback/mixer graph, equal-power crossfade pairs, and deterministic
+stereo PCM bounce. Browser infrastructure decodes files and persists complete
+project/source/mixer/crossfade documents in IndexedDB. No package module reads
+React context, cookies, or Next.js APIs.
 
 Single-track editing is an application transaction, not a React state mutation.
 The session history stores immutable document/PCM states; copy, cut, paste,
@@ -79,7 +80,15 @@ This is a deliberate strangler boundary, not the target architecture. The old
 IIFEs, globals, manifest, iframe bridge, generated runtime build and patch CSS
 are deleted together only after the parity matrix passes.
 
-The frequency analyser, spectral analyser, and multitrack mixer have already crossed that boundary. They live under `/tools/*` as shared React/Canvas routes and retain the editor's dock, popup, frequency-stream, and mixer-control contracts through a narrow same-origin host adapter. Locale and theme changes use the versioned editor bridge. Preference application suppresses intermediate bridge events, and the Next.js shell serializes validated cookie writes so an older request cannot restore a stale language. The About surface and offline cache are also owned by Next.js and a root service worker rather than standalone HTML/AppCache entrypoints.
+The native multitrack transport and mixer now live directly inside the editor
+feature and never access a runtime global. The frequency analyser, spectral
+analyser, and behavior-complete fallback mixer remain under `/tools/*`; the
+fallback mixer's same-origin global access is isolated in one temporary adapter.
+Locale and theme changes use the versioned editor bridge. Preference application
+suppresses intermediate bridge events, and the Next.js shell serializes
+validated cookie writes so an older request cannot restore a stale language.
+The About surface and offline cache are also owned by Next.js and a root service
+worker rather than standalone HTML/AppCache entrypoints.
 
 Cross-origin isolation headers are emitted by Next.js so supported browsers can use `SharedArrayBuffer`. The engine provides a typed event surface, worklet registration, worker-backed peak extraction, PCM helpers, and a lock-free ring buffer. The UI must feature-detect browser capabilities and retain a non-shared-memory path.
 

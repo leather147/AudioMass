@@ -13,6 +13,7 @@ import { EditToolbar } from './edit/edit-toolbar';
 import { EffectToolbar } from './effects/effect-toolbar';
 import { SpecializedEffectToolbar } from './effects/specialized-effect-toolbar';
 import { MarkerPanel } from './markers/marker-panel';
+import { MultitrackPanel } from './multitrack/multitrack-panel';
 import { NotificationProvider } from './notifications/notification-provider';
 import { Timeline } from './timeline/timeline';
 import { TransportBar } from './transport/transport-bar';
@@ -76,6 +77,7 @@ function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
             : 0
         }
       />
+      <MultitrackPanel copy={copy} onError={setError} />
 
       <section className={styles.workspace}>
         <section

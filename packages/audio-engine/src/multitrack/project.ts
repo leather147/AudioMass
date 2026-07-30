@@ -49,8 +49,24 @@ export interface CreateAudioTrack {
   name: string;
 }
 
+export interface CreateAudioProject {
+  id: string;
+  name: string;
+  sampleRate?: number;
+}
+
 function finite(value: number, fallback: number): number {
   return Number.isFinite(value) ? value : fallback;
+}
+
+export function createAudioProject(input: CreateAudioProject): AudioProject {
+  return {
+    id: input.id,
+    markers: [],
+    name: input.name.trim() || 'Untitled project',
+    sampleRate: Math.max(1, Math.floor(finite(input.sampleRate ?? 48_000, 48_000))),
+    tracks: [],
+  };
 }
 
 export function createAudioClip(input: CreateAudioClip): AudioClip {
@@ -173,6 +189,10 @@ export function removeClip(project: AudioProject, clipId: string): AudioProject 
       clips: track.clips.filter((clip) => clip.id !== clipId),
     })),
   };
+}
+
+export function removeTrack(project: AudioProject, trackId: string): AudioProject {
+  return { ...project, tracks: project.tracks.filter((track) => track.id !== trackId) };
 }
 
 export function projectDuration(project: AudioProject): number {

@@ -1,5 +1,7 @@
 import { parseAudioProject, type AudioProject } from '@audiomass/audio-engine';
 
+import { indexedDbRequest, indexedDbTransaction } from './indexed-db';
+
 export interface StoredAudioProject {
   project: AudioProject;
   updatedAt: string;
@@ -22,33 +24,6 @@ const DATABASE_NAME = 'audiomass-editor';
 const DATABASE_VERSION = 1;
 const PROJECT_STORE = 'projects';
 
-function requestResult<Result>(request: IDBRequest<Result>): Promise<Result> {
-  return new Promise((resolve, reject) => {
-    request.addEventListener('success', () => resolve(request.result), { once: true });
-    request.addEventListener(
-      'error',
-      () => reject(request.error ?? new Error('IndexedDB request failed.')),
-      { once: true },
-    );
-  });
-}
-
-function transactionComplete(transaction: IDBTransaction): Promise<void> {
-  return new Promise((resolve, reject) => {
-    transaction.addEventListener('complete', () => resolve(), { once: true });
-    transaction.addEventListener(
-      'abort',
-      () => reject(transaction.error ?? new Error('IndexedDB transaction was aborted.')),
-      { once: true },
-    );
-    transaction.addEventListener(
-      'error',
-      () => reject(transaction.error ?? new Error('IndexedDB transaction failed.')),
-      { once: true },
-    );
-  });
-}
-
 function parseRecord(value: unknown): StoredAudioProject {
   if (!value || typeof value !== 'object') throw new TypeError('Stored project is invalid.');
   const record = value as Partial<ProjectRecord>;
@@ -64,16 +39,16 @@ export class IndexedDbAudioProjectRepository implements AudioProjectRepository {
   public async get(projectId: string): Promise<StoredAudioProject | null> {
     const database = await this.database();
     const transaction = database.transaction(PROJECT_STORE, 'readonly');
-    const value = await requestResult(transaction.objectStore(PROJECT_STORE).get(projectId));
-    await transactionComplete(transaction);
+    const value = await indexedDbRequest(transaction.objectStore(PROJECT_STORE).get(projectId));
+    await indexedDbTransaction(transaction);
     return value === undefined ? null : parseRecord(value);
   }
 
   public async list(): Promise<readonly StoredAudioProject[]> {
     const database = await this.database();
     const transaction = database.transaction(PROJECT_STORE, 'readonly');
-    const values = await requestResult(transaction.objectStore(PROJECT_STORE).getAll());
-    await transactionComplete(transaction);
+    const values = await indexedDbRequest(transaction.objectStore(PROJECT_STORE).getAll());
+    await indexedDbTransaction(transaction);
     return values
       .map(parseRecord)
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
@@ -89,7 +64,7 @@ export class IndexedDbAudioProjectRepository implements AudioProjectRepository {
     transaction
       .objectStore(PROJECT_STORE)
       .put({ id: project.id, ...stored } satisfies ProjectRecord);
-    await transactionComplete(transaction);
+    await indexedDbTransaction(transaction);
     return stored;
   }
 
@@ -97,7 +72,7 @@ export class IndexedDbAudioProjectRepository implements AudioProjectRepository {
     const database = await this.database();
     const transaction = database.transaction(PROJECT_STORE, 'readwrite');
     transaction.objectStore(PROJECT_STORE).delete(projectId);
-    await transactionComplete(transaction);
+    await indexedDbTransaction(transaction);
   }
 
   public close(): void {

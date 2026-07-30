@@ -12,7 +12,7 @@
   background: var(--editor-bg);
   color: var(--editor-text);
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto;
   font-family: system-ui, sans-serif;
 }
 
@@ -45,6 +45,109 @@
   background: var(--editor-surface);
   color: inherit;
   padding-inline: 0.75rem;
+}
+
+.multitrackPanel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-panel);
+}
+
+.multitrackHeader,
+.multitrackHeader label,
+.multitrackToggles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.multitrackHeader button,
+.multitrackHeader input,
+.multitrackChannel button,
+.multitrackChannel input {
+  min-height: 2rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.5rem;
+  background: var(--editor-surface);
+  color: inherit;
+}
+
+.multitrackHeader .fileButton {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.5rem;
+  background: var(--editor-surface);
+  padding-inline: 0.65rem;
+}
+
+.multitrackTimeline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.multitrackTimeline input,
+.multitrackChannel input {
+  accent-color: var(--editor-accent);
+}
+
+.multitrackMixer {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(11rem, 1fr);
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding-block-end: 0.25rem;
+}
+
+.multitrackChannel {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.6rem;
+  background: var(--editor-surface);
+}
+
+.multitrackChannel > header {
+  display: grid;
+  grid-template-columns: 0.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.multitrackChannel > header i {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+}
+
+.multitrackChannel > header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multitrackChannel > label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--editor-text-muted);
+}
+
+.multitrackChannel button[aria-pressed='true'] {
+  border-color: var(--editor-accent);
+  color: var(--editor-accent);
+}
+
+.multitrackEmpty {
+  margin: 0;
+  color: var(--editor-text-muted);
 }
 
 .toolbar button:focus-visible,

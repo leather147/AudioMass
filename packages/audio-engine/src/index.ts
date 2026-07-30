@@ -10,6 +10,7 @@ export { AudioEngineError } from './errors.js';
 export { AudioWorkletRegistry } from './audio-worklet-registry.js';
 export { encodePcmAsWav, encodeWav, interleaveWavChannels } from './codecs/wav.js';
 export { EditorSession } from './application/editor-session.js';
+export { MultitrackSession } from './application/multitrack-session.js';
 export { AudioExportService } from './application/export-audio.js';
 export { executeSingleTrackEdit } from './application/single-track-edit.js';
 export { executeEffectEdit } from './application/effect-edit.js';
@@ -84,14 +85,16 @@ export {
   addTrack,
   clipEnvelope,
   createAudioClip,
+  createAudioProject,
   createAudioTrack,
   moveClip,
   projectDuration,
   removeClip,
+  removeTrack,
   updateClip,
   updateTrack,
 } from './multitrack/project.js';
-export { clipsAt } from './multitrack/scheduler.js';
+export { clipsAt, scheduleProject } from './multitrack/scheduler.js';
 export {
   clampMixerGain,
   clampPan,
@@ -113,6 +116,8 @@ export {
   toggleClipCrossfades,
 } from './multitrack/crossfade.js';
 export { bounceProject } from './multitrack/bounce.js';
+export { InMemoryAudioSourceRepository } from './multitrack/source-repository.js';
+export { MultitrackPlayback } from './multitrack/playback.js';
 export { AudioRecorder, mergeRecordedChunks } from './recording/audio-recorder.js';
 export { RECORDER_PROCESSOR_NAME } from './recording/recorder-protocol.js';
 export { SharedAudioRingBuffer } from './shared-ring-buffer.js';
@@ -121,6 +126,13 @@ export { WavEncoderWorkerClient } from './workers/wav-encoder-client.js';
 export type { SharedRingBufferDescriptor } from './shared-ring-buffer.js';
 export type { LoudnessNormalization, LoudnessReport } from './analysis/loudness.js';
 export type { AudioBufferView, TempoOptions, TempoResult } from './analysis/tempo.js';
+export type {
+  MultitrackSessionEvents,
+  MultitrackSessionDocument,
+  MultitrackSessionSnapshot,
+  MultitrackSourceInput,
+  MultitrackStoredSource,
+} from './application/multitrack-session.js';
 export type {
   AudioEngineEvents,
   AudioEngineOptions,
@@ -215,9 +227,10 @@ export type {
   AudioProject,
   AudioTrack,
   CreateAudioClip,
+  CreateAudioProject,
   CreateAudioTrack,
 } from './multitrack/project.js';
-export type { ScheduledClip } from './multitrack/scheduler.js';
+export type { ScheduledClip, ScheduledPlaybackClip } from './multitrack/scheduler.js';
 export type {
   MixerChannelGraph,
   MixerState,
@@ -230,5 +243,12 @@ export type {
   BounceProjectOptions,
   BounceRange,
 } from './multitrack/bounce.js';
+export type { MutableAudioSourceRepository } from './multitrack/source-repository.js';
+export type {
+  MultitrackPlaybackEvents,
+  MultitrackPlaybackOptions,
+  MultitrackPlaybackPort,
+  MultitrackPlaybackSnapshot,
+} from './multitrack/playback.js';
 export type { TempoAnalyzeRequest, TempoAnalyzeResponse } from './workers/tempo-worker-protocol.js';
 export type { WavEncodeRequest, WavEncodeResponse } from './workers/wav-encoder-protocol.js';

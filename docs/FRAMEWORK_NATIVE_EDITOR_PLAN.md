@@ -315,11 +315,10 @@ D.3c uses the following explicit integration boundary:
 - [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
       silence insertion, selection/marker transforms, recording/worklet,
       keyboard controls, and typed WAV export UI are native and tested.
-- [ ] Wave D (D.1-D.3b2 complete): project/track/clip, scheduler,
-      mixer/routing, crossfade, bounce, primary effect schemas, versioned
-      presets, the native React effect transaction, and all fixed-duration
-      primary processors are complete; specialized/duration-changing workflows
-      multitrack runtime consumers and compatibility deletion continue in D.3c.
+- [x] Wave D: project/track/clip, scheduling, mixer/routing, crossfade, bounce,
+      typed effects/presets, fixed-duration and specialized workflows, native
+      multitrack playback/export, full local project persistence, and React
+      consumers are complete and tested.
 - [ ] Wave E.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
@@ -578,6 +577,52 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   Wave D compatibility implementations. Wave E still completes presentation
   parity before the final Wave F boundary deletion.
 
+### Stage 9 — Wave D.3c native multitrack runtime consumers
+
+- **Status:** complete on 2026-07-30. Scope was committed and pushed first as
+  `12c7103` (`Plan native multitrack runtime integration`); the commit containing
+  this report is the D.3c implementation checkpoint
+  (`Complete framework-native editor Wave D.3c`).
+- **Delivered:** a whole-project scheduler for active and delayed clips; an
+  owned in-memory PCM source repository; a disposable Web Audio playback
+  adapter that schedules buffer/envelope nodes through the D.1 mixer graph; a
+  typed multitrack application session for project, source, mixer, crossfade,
+  transport, and bounce state; and public package contracts for every boundary.
+  The Next.js feature now has a browser PCM decoder, controller, stable external
+  store, localized React transport/timeline/mixer, multi-file track creation,
+  track/master controls, full/range WAV export, and complete IndexedDB document
+  save/restore including owned PCM, mixer, and crossfade data.
+- **Compatibility result:** clips already under the playhead start at their
+  exact source offset while future clips retain timeline-relative delay. The
+  adapter preserves clip fades and active equal-power crossfades, routes
+  mute/solo/gain/pan/master changes without rescheduling React state, validates
+  every source before starting any node, and stops/disconnects all nodes on
+  pause, seek, stop, structural mutation, and close. Export consumes the same immutable
+  project/source/mixer/crossfade state through D.1 `bounceProject`. The retained
+  `/tools/multitrack-mixer` fallback no longer reaches into its host from the
+  component; its temporary global contract is isolated in one tested adapter.
+- **Automated proof:** audio-engine has 22 passing test files / 85 tests; web
+  has 25 passing test files / 90 tests; the complete JavaScript/TypeScript suite
+  has 64 files / 216 tests. New tests cover active/future scheduling, offsets,
+  fade and equal-power crossfade curves, atomic missing-source failure, node
+  cleanup, PCM copy ownership, session document round trips, mixer/bounce
+  coordination, controller decode/save/restore/export routing, legacy-host
+  isolation, and the no-compatibility native boundary. Repository formatting,
+  lint, TypeScript typecheck, Prisma generation, all tests, and all production
+  builds passed. Python Black, Ruff, strict mypy, and all 35 pytest cases passed
+  with 87.14% coverage using isolated local temp/cache directories.
+- **Architectural result:** React dispatches typed multitrack intent and renders
+  snapshots; the Next.js controller owns browser orchestration; infrastructure
+  owns decoding, IndexedDB, workers, blobs, and downloads; the audio package
+  owns source data, scheduling, routing, transport, and export. No native module
+  imports the classic runtime, editor globals, iframe messaging, or old HTML
+  routes. Wave D is complete.
+- **Remaining after stage:** Wave E still replaces the full production waveform,
+  track-lane, menu, analyser, and docking presentation and promotes the native
+  route to `/editor`. Wave F then deletes `apps/web/editor-runtime`, the iframe
+  bridge/manifest/build, the temporary legacy mixer adapter, and compatibility
+  CSS atomically; Wave G records browser/release proof.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
@@ -585,11 +630,11 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | A    | Complete    | Typed application/domain platform and React lifecycle                          |
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
-| D    | In progress | D.1-D.3b2 complete; native playback/export and deletion remain in D.3c         |
+| D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export  |
 | E    | Not started | Full React editor presentation replacement                                     |
 | F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
 | G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Eight structural stages are complete. This is not the final legacy deletion:
+Nine structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.

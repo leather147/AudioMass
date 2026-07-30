@@ -13,27 +13,14 @@ import type { EditorToolId } from '@/lib/editor-tool-routes';
 import { editorCopy } from '@/lib/editor-copy';
 import type { EditorLocale } from '@/lib/editor-preferences';
 
+import {
+  legacyMixerHost,
+  type LegacyMixerData as MixerData,
+  type LegacyMixerTrack as MixerTrack,
+} from './legacy-mixer-host-adapter';
 import styles from './editor-tools.module.css';
 
 type FrequencyData = ArrayLike<number> | null | undefined;
-
-interface MixerTrack {
-  id: string;
-  meter: number;
-  mute: boolean;
-  name: string;
-  pan: number;
-  rec: boolean;
-  sel: boolean;
-  solo: boolean;
-  vol: number;
-}
-
-interface MixerData {
-  master: { meter: number; vol: number };
-  on: boolean;
-  tracks: MixerTrack[];
-}
 
 interface EditorRuntimeWindow extends Window {
   AMI18n?: { getLocale(): string };
@@ -43,10 +30,6 @@ interface EditorRuntimeWindow extends Window {
     tokens(id: string): Record<string, string>;
   };
   PKAudioEditor?: {
-    multitrack?: {
-      MixerData(): MixerData;
-      MixerSet(id: string, key: string, value: boolean | number | string, done: number): boolean;
-    };
     ui: { Dock(event: string, toolOrKey: EditorToolId | number, data?: unknown): void };
   };
   destroy?: (embedded?: number) => void;
@@ -438,13 +421,13 @@ export function MixerTool({ initialLocale }: { initialLocale: EditorLocale }) {
   useEffect(() => {
     let frame = 0;
     let last = 0;
+    const host = legacyMixerHost(
+      new URLSearchParams(window.location.search).get('embedded') === '1',
+    );
     const poll = (time: number) => {
       if (time - last > 50) {
         last = time;
-        const next = getHost(
-          new URLSearchParams(window.location.search).get('embedded') === '1',
-        )?.PKAudioEditor?.multitrack?.MixerData();
-        setData(next?.on ? next : null);
+        setData(host.read());
       }
       frame = window.requestAnimationFrame(poll);
     };
@@ -454,7 +437,7 @@ export function MixerTool({ initialLocale }: { initialLocale: EditorLocale }) {
 
   const setValue = useCallback((id: string, key: string, value: boolean | number, done: number) => {
     const embedded = new URLSearchParams(window.location.search).get('embedded') === '1';
-    getHost(embedded)?.PKAudioEditor?.multitrack?.MixerSet(id, key, value, done);
+    legacyMixerHost(embedded).set(id, key, value, done);
   }, []);
 
   const master: MixerTrack | null = data

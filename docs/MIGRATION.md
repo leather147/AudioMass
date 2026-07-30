@@ -53,14 +53,15 @@ Each feature phase is independently reviewable and has package-level tests. The 
   copy/cut/paste/delete/trim/silence transactions with marker-time transforms,
   verified the Web Audio playback lifecycle with a fake graph, and exposed WAV
   export through encoder and browser-download ports in the React editor.
-- The first multitrack structural substage moved mixer channel/master state,
-  mute/solo routing, a disposable Web Audio graph, equal-power crossfades, and
-  deterministic stereo PCM bounce into importable audio-engine modules. Runtime
-  playback/export integration and schema-driven effects remain separate gates.
-- The effect-schema substage replaced DOM-order/comma-string preset contracts for
-  nine primary effects with discriminated parameter schemas, typed built-ins, a
-  strict versioned document codec, conservative legacy migration, and a browser
-  storage repository. React and specialized FX workflows remain a separate gate.
+- The multitrack wave is complete: mixer/channel state, owned PCM sources,
+  whole-project scheduling, disposable Web Audio routing/playback, equal-power
+  crossfades, deterministic stereo bounce, complete IndexedDB documents, and
+  localized React transport/mixer consumers now communicate through typed
+  package and controller contracts. The old mixer host access is isolated in
+  one temporary fallback adapter until the production presentation switches.
+- The effect wave replaced DOM-order/comma-string contracts with discriminated
+  schemas, typed presets, immutable primary processors, and explicit React
+  workflows for seamless loop, paragraphic EQ, automation, and audio repair.
 - NestJS and FastAPI now validate each remote operation with matching
   operation-specific contracts instead of passing generic parameter maps.
 
