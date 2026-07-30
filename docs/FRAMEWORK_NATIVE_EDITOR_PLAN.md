@@ -232,10 +232,16 @@ advertises an effect that still resolves through the compatibility runtime:
   commands, and a localized React dialog generated from the D.2 schemas. The
   registry must expose support explicitly; effects without a native processor
   remain unavailable instead of silently opening a legacy page.
-- **D.3b — remaining primary processors and specialized workflows:** port the
-  compressor, limiter, delay, distortion, reverb, graphical/paragraphic EQ,
-  seamless-loop, automation, and repair algorithms with focused parity tests;
-  only then enable their React workflows.
+- **D.3b1 — fixed-duration primary processors:** port compressor, hard limiter,
+  feedback delay, waveshaping distortion, generated-impulse reverb, and the
+  ten-band graphical EQ as deterministic immutable PCM processors. Characterize
+  the established parameter mapping first, keep processed selections the same
+  length, add focused numerical tests, and only expose a processor after it is
+  registered.
+- **D.3b2 — duration-changing and specialized workflows:** port seamless-loop,
+  paragraphic EQ, automation, repair, and the remaining non-generic effects.
+  These workflows own their duration/marker or curve models explicitly instead
+  of being forced through the fixed-duration transaction from D.3a.
 - **D.3c — multitrack runtime consumers:** connect native scheduling/routing to
   playback and the D.1 bounce service to export, then remove the superseded
   compatibility implementations and paths covered by Wave D.
