@@ -246,6 +246,31 @@ advertises an effect that still resolves through the compatibility runtime:
   playback and the D.1 bounce service to export, then remove the superseded
   compatibility implementations and paths covered by Wave D.
 
+D.3c uses the following explicit integration boundary:
+
+- the audio package owns a typed multitrack application session, transport
+  state, source ownership, scheduling decisions, mixer mutations, crossfade
+  normalization, and deterministic bounce orchestration;
+- a Web Audio playback adapter owns `AudioContext`, source/envelope nodes, the
+  D.1 routing graph, transport clock, and disposal; React never schedules or
+  connects audio nodes;
+- the Next.js feature controller/store owns browser file decoding, project
+  import/save, WAV download, and stable subscriptions, while decomposed React
+  components only render project, transport, and mixer snapshots and dispatch
+  typed commands;
+- the native editor must load multiple audio files as independent source/clip
+  records, update mute/solo/gain/pan/master controls without a global editor
+  object, play/seek/pause/stop through the scheduler, and export the same
+  project/range through `bounceProject`;
+- tests must prove delayed and in-progress clip scheduling, source offsets,
+  fade/crossfade envelopes, routing updates, transport cleanup, PCM source
+  ownership, deterministic export, and the absence of `PKAudioEditor` or
+  compatibility-asset imports from the native feature;
+- only Wave D paths replaced by this native boundary are deleted in this
+  checkpoint. The behavior-complete `/editor` runtime remains an isolated
+  fallback until Wave E makes the React presentation complete and Wave F
+  removes that boundary atomically.
+
 ### Wave E — React presentation replacement
 
 - Port toolbar, timeline, waveform host, channels, markers, selection, menus,
