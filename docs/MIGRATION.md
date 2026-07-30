@@ -53,6 +53,10 @@ Each feature phase is independently reviewable and has package-level tests. The 
   copy/cut/paste/delete/trim/silence transactions with marker-time transforms,
   verified the Web Audio playback lifecycle with a fake graph, and exposed WAV
   export through encoder and browser-download ports in the React editor.
+- The first multitrack structural substage moved mixer channel/master state,
+  mute/solo routing, a disposable Web Audio graph, equal-power crossfades, and
+  deterministic stereo PCM bounce into importable audio-engine modules. Runtime
+  playback/export integration and schema-driven effects remain separate gates.
 - NestJS and FastAPI now validate each remote operation with matching
   operation-specific contracts instead of passing generic parameter maps.
 

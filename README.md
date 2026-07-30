@@ -73,7 +73,9 @@ Trusted server-side caller
 - `packages/audio-engine` не зависит от React или backend-фреймворков: он владеет
   PCM, playback, recording, markers, history, project codec, ID3/MP4 metadata,
   typed WAV/tempo workers, immutable single-track edit transactions и
-  multitrack domain.
+  multitrack domain. Mixer channel/master state, Web Audio routing,
+  equal-power crossfades и deterministic PCM bounce также являются importable
+  API пакета, а не методами глобального runtime.
 - Восемь неизменяемых vendor-ассетов совместимого редактора доступны новому
   React-контуру только через проверяемый `LegacyEditorVendorGateway`; их
   глобалы и URL не являются application API.

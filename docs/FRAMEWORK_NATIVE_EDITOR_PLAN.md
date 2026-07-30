@@ -201,6 +201,21 @@ FastAPI remains a private compute service:
   package.
 - Implement schema-driven React effect dialogs and presets.
 
+Wave D is delivered as independently reviewable substages:
+
+1. **D.1 — mixer, routing, crossfade, and bounce domain:** move mute/solo,
+   channel/master gain, pan routing, active crossfade pairs, and deterministic
+   PCM mixdown behind importable audio-package APIs. Preserve the established
+   5 ms overlap threshold, sine/cosine equal-power crossfade, and CPU fallback
+   pan behavior with focused parity tests.
+2. **D.2 — effect schemas and preset repository:** replace stringly modal
+   payloads and comma-delimited custom presets with validated effect schemas,
+   typed parameters, and versioned persistence.
+3. **D.3 — React effect workflows and runtime integration:** render effect
+   forms from schemas, connect preview/apply commands to the native editor, and
+   switch multitrack playback/export consumers to the new routing and bounce
+   services before deleting the compatibility implementation.
+
 ### Wave E — React presentation replacement
 
 - Port toolbar, timeline, waveform host, channels, markers, selection, menus,
@@ -245,8 +260,9 @@ FastAPI remains a private compute service:
 - [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
       silence insertion, selection/marker transforms, recording/worklet,
       keyboard controls, and typed WAV export UI are native and tested.
-- [ ] Wave D (in progress): project/track/clip domain and scheduler are native;
-      mixer graph, effects UI/presets, bounce and crossfade parity remain.
+- [ ] Wave D (D.1 complete): project/track/clip, scheduler, mixer/routing,
+      crossfade, and bounce domains are native; effect schemas/presets and React
+      runtime integration remain in D.2-D.3.
 - [ ] Wave E.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
@@ -325,18 +341,47 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   bounce parity; Wave E completes the waveform/tracks/menus/analyzers React UI;
   Wave F can then remove the compatibility runtime atomically.
 
+### Stage 4 — Wave D.1 multitrack mixer, routing, crossfade, and bounce
+
+- **Status:** complete on 2026-07-30; the commit containing this report is the
+  Wave D.1 checkpoint (`Complete framework-native editor Wave D.1`).
+- **Delivered:** validated channel/master mixer updates; shared mute/solo
+  audibility and gain rules; legacy-compatible linear CPU pan gains; a
+  disposable, synchronizable Web Audio track/master routing graph; normalized
+  crossfade-pair lifecycle; deterministic stereo PCM bounce through an audio
+  source repository port.
+- **Compatibility result:** channel and master controls retain their 0..1
+  bounds, pan remains -1..1, stale crossfade pairs are removed after project
+  mutations, overlaps must exceed 5 ms, and active overlaps use the established
+  cosine/sine equal-power curve. CPU bounce preserves the compatibility
+  mixer's interpolation, mute/solo behavior, mono duplication, linear pan
+  fallback, selection-relative offsets, and unclipped summing.
+- **Automated proof:** audio-engine has 15 passing test files / 52 tests. New
+  tests cover mixer clamping and audibility, graph creation/synchronization/
+  disposal, pan endpoints, crossfade ordering/toggling/stale cleanup/thresholds,
+  stereo bounce, solo, master gain, selection offsets, and missing-source
+  failure. Repository format, lint, typecheck, all JavaScript/TypeScript tests,
+  and production builds passed; web remains at 22 files / 80 tests. Python
+  Black, Ruff, strict mypy, and 35 pytest cases passed with 87.14% coverage.
+- **Architectural result:** React and compatibility globals no longer own the
+  reusable multitrack calculations or graph lifecycle. Playback/export adapters
+  can consume stable package APIs in D.3 without reaching into `PKAudioEditor`.
+- **Remaining after stage:** D.2 effect schemas and versioned presets; D.3 React
+  effect workflows plus native scheduler/export integration; Wave E presentation
+  parity; then Wave F compatibility deletion.
+
 ## Overall stage summary
 
-| Wave | State       | Current result                                                                 |
-| ---- | ----------- | ------------------------------------------------------------------------------ |
-| A    | Complete    | Typed application/domain platform and React lifecycle                          |
-| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
-| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
-| D    | In progress | Project/track/clip scheduling exists; mixer, effects, bounce, crossfade remain |
-| E    | Not started | Full React editor presentation replacement                                     |
-| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
-| G    | In progress | Documentation is current; final browser and release proof remains              |
+| Wave | State       | Current result                                                                  |
+| ---- | ----------- | ------------------------------------------------------------------------------- |
+| A    | Complete    | Typed application/domain platform and React lifecycle                           |
+| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation    |
+| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI  |
+| D    | In progress | D.1 mixer/routing/crossfade/bounce complete; D.2-D.3 effects/integration remain |
+| E    | Not started | Full React editor presentation replacement                                      |
+| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity         |
+| G    | In progress | Documentation is current; final browser and release proof remains               |
 
-Three structural stages are complete. This is not the final legacy deletion:
+Four structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.

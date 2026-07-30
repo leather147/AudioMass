@@ -52,6 +52,27 @@ export {
   updateTrack,
 } from './multitrack/project.js';
 export { clipsAt } from './multitrack/scheduler.js';
+export {
+  clampMixerGain,
+  clampPan,
+  createMixerState,
+  effectiveTrackGain,
+  isTrackAudible,
+  linearPanGains,
+  MultitrackMixerGraph,
+  updateMasterGain,
+  updateMixerTrack,
+} from './multitrack/mixer.js';
+export {
+  clipMixEnvelope,
+  clipOverlap,
+  createCrossfade,
+  crossfadeKey,
+  MINIMUM_CROSSFADE_SECONDS,
+  normalizeCrossfades,
+  toggleClipCrossfades,
+} from './multitrack/crossfade.js';
+export { bounceProject } from './multitrack/bounce.js';
 export { AudioRecorder, mergeRecordedChunks } from './recording/audio-recorder.js';
 export { RECORDER_PROCESSOR_NAME } from './recording/recorder-protocol.js';
 export { SharedAudioRingBuffer } from './shared-ring-buffer.js';
@@ -112,5 +133,17 @@ export type {
   CreateAudioTrack,
 } from './multitrack/project.js';
 export type { ScheduledClip } from './multitrack/scheduler.js';
+export type {
+  MixerChannelGraph,
+  MixerState,
+  MixerTrackUpdate,
+  StereoGains,
+} from './multitrack/mixer.js';
+export type { AudioCrossfade, ClipOverlap } from './multitrack/crossfade.js';
+export type {
+  AudioSourceRepository,
+  BounceProjectOptions,
+  BounceRange,
+} from './multitrack/bounce.js';
 export type { TempoAnalyzeRequest, TempoAnalyzeResponse } from './workers/tempo-worker-protocol.js';
 export type { WavEncodeRequest, WavEncodeResponse } from './workers/wav-encoder-protocol.js';

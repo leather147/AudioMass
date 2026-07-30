@@ -15,9 +15,10 @@
 React-controller/store и feature-компоненты Next.js, versioned project codec,
 IndexedDB repository, typed recording/worklet/WAV/DSP/multitrack primitives,
 ID3/MP4 metadata, typed WAV/tempo worker clients, isolated vendor gateway,
-PCM-aware single-track history/edit commands, WAV export UI,
-operation-specific NestJS DTO и discriminated FastAPI job schemas. Production
-остаётся на compatibility runtime до effects/presentation parity gate.
+PCM-aware single-track history/edit commands, WAV export UI, native multitrack
+mixer/routing/crossfade/bounce services, operation-specific NestJS DTO и
+discriminated FastAPI job schemas. Production остаётся на compatibility runtime
+до effects/presentation parity gate.
 
 - Активная ветка структурной миграции: `agent/repository-hardening`.
 - Базовая версия: полнофункциональный статический AudioMass с multitrack, темами, записью, эффектами и экспортом.
@@ -294,7 +295,7 @@ IndexedDB остаётся только как offline cache/device draft и н�
 | `src/index.html` и assets | `/editor-runtime` + `editor-runtime/static` | HTML генерируется Route Handler, assets собираются    |
 | `app.js` event bus        | typed bridge + internal runtime events      | Совместимый adapter и проверяемый message protocol    |
 | `engine.js`               | `packages/audio-engine`                     | Постепенно разделить transport, edit, effects, export |
-| `multitrack.js`           | `packages/audio-engine/multitrack`          | Сохранить runtime, добавить typed facade              |
+| `multitrack.js`           | `packages/audio-engine/multitrack`          | Domain/mixer/bounce перенесены; UI integration далее  |
 | `ui.js`, `ui-fx.js`       | Next client boundary + runtime assets       | Сохранить поведение за изолированной границей         |
 | `recorder-worklet.js`     | `apps/web/public/worklets` и audio package  | Сохранить и типизировать protocol                     |
 | `tempo-worker.js`         | `apps/web/workers`                          | Перенести с typed messages                            |

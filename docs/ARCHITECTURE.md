@@ -46,8 +46,11 @@ own transport, timeline, markers, dialogs, notifications, effects, and tracks.
 Web Audio graph, PCM edits, WAV encoding, typed WAV/tempo worker clients,
 recording/worklet protocols, loudness and tempo analysis, ID3/MP4 metadata,
 bounded history, markers, versioned project parsing, multitrack entities, and
-scheduling. Browser persistence implements an `AudioProjectRepository` through
-IndexedDB. No package module reads React context, cookies, or Next.js APIs.
+scheduling. Its multitrack boundary also owns mute/solo and channel/master gain
+rules, a disposable Web Audio mixer graph, equal-power crossfade pairs, and a
+deterministic stereo PCM bounce fallback. Browser persistence implements an
+`AudioProjectRepository` through IndexedDB. No package module reads React
+context, cookies, or Next.js APIs.
 
 Single-track editing is an application transaction, not a React state mutation.
 The session history stores immutable document/PCM states; copy, cut, paste,
