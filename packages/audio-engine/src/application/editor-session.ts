@@ -130,6 +130,10 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     return this.snapshotValue;
   }
 
+  public get supportedEffectIds(): readonly string[] {
+    return this.effectProcessors.supportedEffectIds;
+  }
+
   public getAudio(): PcmAudio | null {
     const audio = this.history.snapshot.present.audio;
     return audio ? clonePcm(audio) : null;

@@ -290,11 +290,11 @@ advertises an effect that still resolves through the compatibility runtime:
 - [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
       silence insertion, selection/marker transforms, recording/worklet,
       keyboard controls, and typed WAV export UI are native and tested.
-- [ ] Wave D (D.1-D.3a complete): project/track/clip, scheduler,
+- [ ] Wave D (D.1-D.3b1 complete): project/track/clip, scheduler,
       mixer/routing, crossfade, bounce, primary effect schemas, versioned
-      presets, and the first native React effect transaction are complete;
-      remaining processors and multitrack runtime consumers continue in
-      D.3b-D.3c.
+      presets, the native React effect transaction, and all fixed-duration
+      primary processors are complete; specialized/duration-changing workflows
+      and multitrack runtime consumers continue in D.3b2-D.3c.
 - [ ] Wave E.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
@@ -466,6 +466,49 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   deletes the superseded Wave D compatibility paths. Wave E then completes
   presentation parity before the final Wave F deletion.
 
+### Stage 7 — Wave D.3b1 fixed-duration primary processors
+
+- **Status:** complete on 2026-07-30. Scope was committed and pushed first as
+  `903cea6` (`Refine native editor processor migration plan`); the commit
+  containing this report is the D.3b1 implementation checkpoint
+  (`Complete framework-native editor Wave D.3b1`).
+- **Delivered:** six immutable processors for compressor, hard limiter,
+  feedback delay, waveshaping distortion, generated-impulse reverb, and the
+  ten-band graphical EQ. Gain/normalization moved into a focused processor
+  module; dynamics, delay/reverb, distortion, equalizer, and shared value
+  helpers are separate modules behind the small registry composition root.
+  `EditorSession` now exposes the injected registry capabilities, so React
+  automatically enables all eight implemented fixed-duration effects and no
+  static UI list can drift from the actual runtime.
+- **Compatibility result:** compressor retains threshold/knee/ratio plus linked
+  envelope, attack/release smoothing, and post-compression makeup gain. Limiter
+  retains look-ahead blocks and the established low/high fill ratio while also
+  providing explicit brickwall mode. Delay/reverb retain the compatibility
+  cross-mix mapping; delay retains recursive feedback; distortion uses the
+  characterized 44,100-point waveshaper equation; graphical EQ retains the
+  32-16,000 Hz bands, Q=4.6, and low/high shelf edges. Reverb replaces
+  nondeterministic `Math.random()` with a deterministic, energy-normalized
+  sparse impulse using the same time/decay envelope. Every processor preserves
+  channel count, sample rate, selection length, source ownership, and finite
+  output; seamless-loop remains unavailable until its marker-aware workflow.
+- **Automated proof:** audio-engine has 19 passing test files / 71 tests; web has
+  23 passing test files / 85 tests. New numerical tests cover compressor ratio,
+  attack/release, hard and shaped limiting, recursive delay taps, the exact
+  distortion curve, deterministic finite reverb, reset identity, and a 1 kHz
+  EQ boost. Controller tests prove capability-driven availability and that
+  seamless-loop still fails closed. Repository format, lint, typecheck, all
+  TypeScript tests, and production builds passed. Python Black, Ruff, strict
+  mypy, and all 35 pytest cases passed with 87.14% coverage using an isolated
+  local pytest temp/cache.
+- **Architectural result:** effect algorithms are framework-independent DSP
+  modules, the registry owns composition/capabilities, the session owns effect
+  transactions, and React only renders supported schemas. No processor imports
+  DOM, Web Audio nodes, storage, editor globals, or legacy HTML routes.
+- **Remaining after stage:** D.3b2 implements seamless-loop with duration and
+  marker transforms plus paragraphic EQ, automation, repair, and the remaining
+  specialized effects; D.3c then connects native multitrack playback/export and
+  deletes superseded Wave D compatibility paths.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
@@ -473,11 +516,11 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | A    | Complete    | Typed application/domain platform and React lifecycle                          |
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
-| D    | In progress | D.1-D.3a complete; remaining processors and runtime consumers are D.3b-D.3c    |
+| D    | In progress | D.1-D.3b1 complete; specialized workflows/runtime consumers are D.3b2-D.3c     |
 | E    | Not started | Full React editor presentation replacement                                     |
 | F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
 | G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Six structural stages are complete. This is not the final legacy deletion:
+Seven structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.

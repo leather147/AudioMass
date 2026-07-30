@@ -15,7 +15,16 @@ describe('native effect processor registry', () => {
 
     expect(Array.from(output.channels[0] ?? [])).toEqual([0.5, -1]);
     expect(Array.from(stereo.channels[0] ?? [])).toEqual([0.25, -0.5]);
-    expect(registry.supportedEffectIds).toEqual(['gain', 'normalize']);
+    expect(registry.supportedEffectIds).toEqual([
+      'gain',
+      'compressor',
+      'normalize',
+      'hard-limiter',
+      'delay',
+      'distortion',
+      'reverb',
+      'graphic-equalizer',
+    ]);
   });
 
   it('normalizes peaks either as linked channels or independently', () => {
@@ -72,7 +81,7 @@ describe('native effect processor registry', () => {
   it('fails closed for unavailable processors and invalid values', () => {
     const registry = new EffectProcessorRegistry();
 
-    expect(() => registry.apply(stereo, 'compressor', {})).toThrow(/native processor/i);
+    expect(() => registry.apply(stereo, 'seamless-loop', {})).toThrow(/native processor/i);
     expect(() => registry.apply(stereo, 'gain', { amount: 9 })).toThrow(/0 to 2.5/);
   });
 });

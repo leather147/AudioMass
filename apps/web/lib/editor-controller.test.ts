@@ -85,8 +85,9 @@ describe('EditorController export boundary', () => {
     await session.load(new ArrayBuffer(0), 'mix.mp3');
     await controller.dispatch({ name: 'selection.set', range: { end: 1, start: 0 } });
 
-    expect(controller.supportedEffectIds).toEqual(['gain', 'normalize']);
-    expect(controller.supportsEffect('compressor')).toBe(false);
+    expect(controller.supportedEffectIds).toHaveLength(8);
+    expect(controller.supportsEffect('compressor')).toBe(true);
+    expect(controller.supportsEffect('seamless-loop')).toBe(false);
     await controller.previewEffect('gain', { amount: 0 });
     expect(engine.toPcm().channels[0]?.every((sample) => sample === 0)).toBe(true);
 

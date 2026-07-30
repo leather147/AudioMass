@@ -110,7 +110,13 @@ function ParameterField({ label, onChange, optionLabel, parameter, value }: Para
 
 function effectName(copy: EffectToolbarProps['copy'], schema: EffectSchema): string {
   if (schema.id === 'gain') return copy('effectGain');
+  if (schema.id === 'compressor') return copy('effectCompressor');
   if (schema.id === 'normalize') return copy('effectNormalize');
+  if (schema.id === 'hard-limiter') return copy('effectHardLimiter');
+  if (schema.id === 'delay') return copy('effectDelay');
+  if (schema.id === 'distortion') return copy('effectDistortion');
+  if (schema.id === 'reverb') return copy('effectReverb');
+  if (schema.id === 'graphic-equalizer') return copy('effectGraphicEqualizer');
   return schema.name;
 }
 
@@ -123,8 +129,29 @@ function parameterLabel(
   if (parameter.id === 'linked') return copy('effectLinked');
   if (parameter.id === 'targetLufs') return copy('effectTargetLufs');
   if (parameter.id === 'peakCeiling') return copy('effectPeakCeiling');
+  if (parameter.id === 'threshold') return copy('effectParameterThreshold');
+  if (parameter.id === 'knee') return copy('effectParameterKnee');
+  if (parameter.id === 'ratio') {
+    return effectId === 'hard-limiter'
+      ? copy('effectParameterLowHighRatio')
+      : copy('effectParameterRatio');
+  }
+  if (parameter.id === 'attack') return copy('effectParameterAttack');
+  if (parameter.id === 'release') return copy('effectParameterRelease');
+  if (parameter.id === 'makeup') return copy('effectParameterMakeup');
+  if (parameter.id === 'hard') return copy('effectParameterHard');
+  if (parameter.id === 'limit') return copy('effectParameterLimit');
+  if (parameter.id === 'lookAheadMs') return copy('effectParameterLookAhead');
+  if (parameter.id === 'delaySeconds') return copy('effectParameterDelayTime');
+  if (parameter.id === 'timeSeconds') return copy('effectParameterTime');
+  if (parameter.id === 'feedback') return copy('effectParameterFeedback');
+  if (parameter.id === 'mix') return copy('effectParameterWet');
+  if (parameter.id === 'decay') return copy('effectParameterDecay');
+  if (parameter.id === 'gains') return copy('effectParameterBandGains');
   if (parameter.id === 'amount') {
-    return effectId === 'gain' ? copy('effectGain') : copy('effectParameterAmount');
+    return effectId === 'gain' || effectId === 'distortion'
+      ? copy('effectGain')
+      : copy('effectParameterAmount');
   }
   return parameter.label;
 }

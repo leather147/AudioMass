@@ -1,7 +1,6 @@
 import {
   AudioExportService,
   EditorSession,
-  NATIVE_EFFECT_PROCESSOR_IDS,
   WavEncoderWorkerClient,
   type AudioBinaryEncoder,
   type EditorCommand,
@@ -46,7 +45,7 @@ export class EditorController {
   }
 
   public get supportedEffectIds(): readonly string[] {
-    return NATIVE_EFFECT_PROCESSOR_IDS;
+    return this.session.supportedEffectIds;
   }
 
   public supportsEffect(effectId: string): boolean {
