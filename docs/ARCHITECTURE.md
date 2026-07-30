@@ -60,6 +60,13 @@ uses an encoder port in the audio package and a browser-download adapter in the
 Next.js infrastructure layer, so neither the controller nor components create
 workers, blobs, or anchors directly.
 
+Primary effect dialogs consume discriminated schemas from the audio package.
+Each parameter declares its kind, default, range/options, step, and unit; built-in
+presets contain typed values validated against the same contract. Custom presets
+use a versioned document codec. Only the browser repository reads `Storage` and
+performs the conservative migration from unambiguous legacy positional values;
+React, DSP, and domain modules never parse comma-delimited preset strings.
+
 The eight retained codec, compression, noise-suppression, and WaveSurfer assets
 are not imported as application globals. The Next.js editor infrastructure owns
 their absolute asset allowlist, script lifecycle, worker factories, and runtime

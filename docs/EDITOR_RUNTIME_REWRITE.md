@@ -151,5 +151,7 @@ and Wave D.1. Its application session owns PCM-aware edit history, selection and
 marker transactions, playback lifecycle, recording primitives, and typed WAV
 export. The audio package now also owns multitrack mixer/routing state,
 equal-power crossfades, and deterministic PCM bounce. The compatibility runtime
-still remains for effect schemas/workflows, native playback integration, and
-complete presentation parity tracked in the rest of Waves D-E.
+no longer owns the reusable schema/preset contract for the nine primary effect
+dialogs. The compatibility runtime still remains for React effect workflows,
+specialized paragraphic-EQ/automation/repair surfaces, native playback
+integration, and complete presentation parity tracked in the rest of Waves D-E.

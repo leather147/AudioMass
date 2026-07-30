@@ -17,8 +17,9 @@ IndexedDB repository, typed recording/worklet/WAV/DSP/multitrack primitives,
 ID3/MP4 metadata, typed WAV/tempo worker clients, isolated vendor gateway,
 PCM-aware single-track history/edit commands, WAV export UI, native multitrack
 mixer/routing/crossfade/bounce services, operation-specific NestJS DTO и
-discriminated FastAPI job schemas. Production остаётся на compatibility runtime
-до effects/presentation parity gate.
+discriminated FastAPI job schemas, typed effect schemas и versioned preset
+repository. Production остаётся на compatibility runtime до
+effects/presentation parity gate.
 
 - Активная ветка структурной миграции: `agent/repository-hardening`.
 - Базовая версия: полнофункциональный статический AudioMass с multitrack, темами, записью, эффектами и экспортом.

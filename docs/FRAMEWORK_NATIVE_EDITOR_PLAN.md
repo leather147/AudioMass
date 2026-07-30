@@ -210,11 +210,19 @@ Wave D is delivered as independently reviewable substages:
    pan behavior with focused parity tests.
 2. **D.2 — effect schemas and preset repository:** replace stringly modal
    payloads and comma-delimited custom presets with validated effect schemas,
-   typed parameters, and versioned persistence.
+   typed parameters, and versioned persistence. The schema catalog must retain
+   established parameter ranges and built-in preset values for the primary
+   effects, reject unknown/out-of-range persisted values, and migrate only
+   legacy preset shapes whose positional contract is unambiguous. A browser
+   storage adapter owns persistence; neither React nor the audio domain reads
+   `localStorage` directly.
 3. **D.3 — React effect workflows and runtime integration:** render effect
    forms from schemas, connect preview/apply commands to the native editor, and
    switch multitrack playback/export consumers to the new routing and bounce
-   services before deleting the compatibility implementation.
+   services before deleting the compatibility implementation. Specialized
+   paragraphic-EQ, automation, repair, and other non-generic effect surfaces
+   receive explicit React workflows rather than being forced through a lossy
+   generic schema.
 
 ### Wave E — React presentation replacement
 
@@ -260,9 +268,9 @@ Wave D is delivered as independently reviewable substages:
 - [x] Wave C: playback/session, PCM-aware undo/redo, copy/cut/paste/delete/trim,
       silence insertion, selection/marker transforms, recording/worklet,
       keyboard controls, and typed WAV export UI are native and tested.
-- [ ] Wave D (D.1 complete): project/track/clip, scheduler, mixer/routing,
-      crossfade, and bounce domains are native; effect schemas/presets and React
-      runtime integration remain in D.2-D.3.
+- [ ] Wave D (D.1-D.2 complete): project/track/clip, scheduler, mixer/routing,
+      crossfade, bounce, primary effect schemas, and versioned presets are
+      native; React and specialized effect/runtime integration remain in D.3.
 - [ ] Wave E.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
@@ -370,18 +378,49 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   effect workflows plus native scheduler/export integration; Wave E presentation
   parity; then Wave F compatibility deletion.
 
+### Stage 5 — Wave D.2 effect schemas and versioned presets
+
+- **Status:** complete on 2026-07-30; the commit containing this report is the
+  Wave D.2 checkpoint (`Complete framework-native editor Wave D.2`).
+- **Delivered:** discriminated number, boolean, select, and fixed number-list
+  parameter contracts; validated schemas for gain, compressor, normalize, hard
+  limiter, delay, distortion, reverb, ten-band graphical EQ, and seamless loop;
+  45 typed built-in presets; strict `audiomass-effect-presets` v1 codec and
+  immutable CRUD helpers; a browser `Storage` repository with injected clock/id
+  ports.
+- **Compatibility result:** established parameter bounds/defaults and built-in
+  values are preserved, custom names retain the legacy 16-character limit, and
+  corrupt/unknown/out-of-range values fail closed. Existing `pk_presetfx` or
+  nested `effectPresets` data migrates once only for known positional contracts;
+  ambiguous paragraphic/automation data stays on the compatibility path until
+  its explicit D.3 workflow exists.
+- **Automated proof:** audio-engine has 17 passing test files / 58 tests; web has
+  23 passing test files / 83 tests. Tests cover schema uniqueness/defaults,
+  exact legacy presets, unknown/null/range/list validation, codec round trips,
+  timestamps, duplicate IDs, conservative legacy migration, repository CRUD,
+  one-time preference migration, and corrupt-storage behavior. Repository-wide
+  format, lint, typecheck, tests, and production builds passed. Python Black,
+  Ruff, strict mypy, and 35 pytest cases remain green at 87.14% coverage.
+- **Architectural result:** effect parameters and presets are data contracts,
+  not markup order or global event payloads. The audio package has no DOM/storage
+  dependency; browser infrastructure alone owns persistence; D.3 React forms can
+  render and validate the same schemas used by commands.
+- **Remaining after stage:** D.3 React forms, preview/apply ports, specialized
+  paragraphic-EQ/automation/repair workflows, and native multitrack playback/
+  export integration; then Wave E presentation parity and Wave F deletion.
+
 ## Overall stage summary
 
-| Wave | State       | Current result                                                                  |
-| ---- | ----------- | ------------------------------------------------------------------------------- |
-| A    | Complete    | Typed application/domain platform and React lifecycle                           |
-| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation    |
-| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI  |
-| D    | In progress | D.1 mixer/routing/crossfade/bounce complete; D.2-D.3 effects/integration remain |
-| E    | Not started | Full React editor presentation replacement                                      |
-| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity         |
-| G    | In progress | Documentation is current; final browser and release proof remains               |
+| Wave | State       | Current result                                                                 |
+| ---- | ----------- | ------------------------------------------------------------------------------ |
+| A    | Complete    | Typed application/domain platform and React lifecycle                          |
+| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
+| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
+| D    | In progress | D.1-D.2 domains/presets complete; D.3 React and runtime integration remains    |
+| E    | Not started | Full React editor presentation replacement                                     |
+| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
+| G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Four structural stages are complete. This is not the final legacy deletion:
+Five structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Waves C-E pass parity and Wave F removes the entire boundary atomically.

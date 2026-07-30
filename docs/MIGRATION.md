@@ -57,6 +57,10 @@ Each feature phase is independently reviewable and has package-level tests. The 
   mute/solo routing, a disposable Web Audio graph, equal-power crossfades, and
   deterministic stereo PCM bounce into importable audio-engine modules. Runtime
   playback/export integration and schema-driven effects remain separate gates.
+- The effect-schema substage replaced DOM-order/comma-string preset contracts for
+  nine primary effects with discriminated parameter schemas, typed built-ins, a
+  strict versioned document codec, conservative legacy migration, and a browser
+  storage repository. React and specialized FX workflows remain a separate gate.
 - NestJS and FastAPI now validate each remote operation with matching
   operation-specific contracts instead of passing generic parameter maps.
 

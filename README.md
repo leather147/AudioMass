@@ -76,6 +76,10 @@ Trusted server-side caller
   multitrack domain. Mixer channel/master state, Web Audio routing,
   equal-power crossfades и deterministic PCM bounce также являются importable
   API пакета, а не методами глобального runtime.
+- Девять основных audio effects описаны валидируемыми discriminated schemas;
+  45 встроенных пресетов используют typed values, а пользовательские пресеты
+  сохраняются браузерным адаптером в versioned JSON вместо DOM-порядка и
+  comma-separated строк.
 - Восемь неизменяемых vendor-ассетов совместимого редактора доступны новому
   React-контуру только через проверяемый `LegacyEditorVendorGateway`; их
   глобалы и URL не являются application API.

@@ -12,6 +12,26 @@ export { encodePcmAsWav, encodeWav, interleaveWavChannels } from './codecs/wav.j
 export { EditorSession } from './application/editor-session.js';
 export { AudioExportService } from './application/export-audio.js';
 export { executeSingleTrackEdit } from './application/single-track-edit.js';
+export { EFFECT_SCHEMAS, getEffectSchema } from './effects/catalog.js';
+export {
+  defaultEffectValues,
+  effectSchemaById,
+  parseEffectValues,
+  validateEffectSchema,
+} from './effects/schema.js';
+export {
+  createEffectPreset,
+  deserializeEffectPresetDocument,
+  EFFECT_PRESET_FORMAT,
+  EFFECT_PRESET_VERSION,
+  effectPresetsFor,
+  emptyEffectPresetDocument,
+  migrateLegacyEffectPresets,
+  parseEffectPresetDocument,
+  removeEffectPreset,
+  serializeEffectPresetDocument,
+  upsertEffectPreset,
+} from './effects/presets.js';
 export { EditHistory } from './domain/edit-history.js';
 export {
   readAudioMetadata,
@@ -105,6 +125,19 @@ export type {
   SingleTrackEditorState,
 } from './application/single-track-edit.js';
 export type { EditHistorySnapshot } from './domain/edit-history.js';
+export type {
+  BooleanEffectParameter,
+  BuiltInEffectPreset,
+  EffectParameter,
+  EffectParameterValue,
+  EffectSchema,
+  EffectValues,
+  NumberEffectParameter,
+  NumberListEffectParameter,
+  SelectEffectParameter,
+  SelectEffectParameterOption,
+} from './effects/schema.js';
+export type { CreateEffectPreset, EffectPreset, EffectPresetDocument } from './effects/presets.js';
 export type { AudioMarker, CreateAudioMarker } from './domain/markers.js';
 export type {
   AudioComment,
