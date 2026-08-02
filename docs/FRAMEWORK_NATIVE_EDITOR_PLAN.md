@@ -322,6 +322,40 @@ E.2 uses the following explicit native presentation boundary:
   ownership/lifecycle, revision-stable controller routing, panel/menu registry,
   localization, accessibility structure, and the no-compatibility import rule.
 
+E.3 uses the following production-promotion boundary:
+
+- `/editor` becomes a Server Component entry that reads validated preferences
+  and awaited query state, then renders the framework-native `EditorShell`
+  directly. `/editor/native` remains only as a compatibility redirect that
+  preserves a validated panel selection; it must not maintain a second editor
+  composition;
+- `apps/web/editor-runtime`, `/editor-runtime`, its bridge, generated assets,
+  fallback `/tools/*` routes, and temporary host adapters remain unchanged and
+  isolated until Wave F. Production promotion removes their `/editor` consumer,
+  but deletion is a separate atomic checkpoint with its own inventory and proof;
+- the React menu implements roving top-level focus and keyboard navigation for
+  Arrow keys, Home, End, Enter/Space, Escape, and Tab; popup focus returns to its
+  trigger, separators are semantic, disabled commands are skipped, and Settings
+  and About use App Router links rather than popup windows;
+- panel selection is represented by the typed registry and a canonical
+  `/editor?panel=...` URL without remounting editor domain state. Focus rings,
+  status announcements, dialog behavior, waveform keyboard seeking, and global
+  shortcuts must remain usable without a pointer;
+- every user-facing native fallback, navigation label, state, and accessibility
+  label is sourced from the English/Russian catalog. The root Server Component
+  remains the owner of the cookie-derived document language and the native shell
+  receives only serializable preference data;
+- responsive CSS must avoid page-level horizontal overflow at 320 CSS pixels,
+  clamp menus to the viewport, make dialogs internally scrollable, preserve
+  usable touch targets, and keep waveform, analyzer, mixer, marker, toolbar, and
+  status surfaces reachable at phone, tablet, and desktop sizes;
+- browser proof covers `/editor` at desktop, tablet, and phone viewports; menu
+  keyboard/focus behavior; every registered workspace; Russian/default and
+  English/light preference round trips; absence of framework error overlays,
+  blank output, failed runtime requests, and console errors. Automated boundary
+  tests must prove `/editor` no longer imports `EditorFrame`, iframe/runtime
+  bridge code, legacy globals, classic HTML routes, or tool adapters.
+
 ### Wave F — server contracts and compatibility deletion
 
 - Complete NestJS operation DTOs and FastAPI discriminated schemas.
