@@ -60,6 +60,31 @@ Next.js application. There is no runtime copy step, `/editor-assets` output, or
 environment-variable, deployment-order, and troubleshooting procedure, use
 [VERCEL_ONLY_DEPLOYMENT.md](VERCEL_ONLY_DEPLOYMENT.md).
 
+## Release preflight
+
+Run the release gate from a clean checkout of the exact commit that will be
+deployed:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm audit --audit-level moderate
+pnpm format:check
+pnpm docs:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Then run the Python checks from `apps/python-api` with its development
+dependencies installed: Black, Ruff, mypy, pytest, `pip check`, and `pip-audit`.
+Validate and generate Prisma from `packages/database`. Finally, deploy a Preview
+of all affected services and exercise health, API schema, signed upload,
+processing, download, editor import/playback/effect, theme/locale, redirects,
+and offline reload before promoting traffic. A local pass does not replace the
+provider-specific Preview smoke test.
+
 ## Security checklist
 
 - Generate high-entropy API and internal keys; never commit deployed values.

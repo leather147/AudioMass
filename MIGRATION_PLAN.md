@@ -5,10 +5,9 @@
 
 ## Статус документа
 
-Первая миграция инфраструктуры и перенос first-party `.js` в TypeScript
-завершены. Текущая фаза не считает эти файлы современными только из-за
-расширения `.ts`: IIFE, ordered scripts, globals и прямое построение DOM должны
-быть заменены framework-native модулями. Исполняемый план этой фазы находится в
+Первая миграция инфраструктуры, промежуточный перенос first-party `.js` в
+TypeScript и последующая framework-native перепись завершены. Исполняемый план,
+финальная инвентаризация и отчёты всех волн находятся в
 [`docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md`](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 На текущем checkpoint созданы доменные/application-модули audio-engine,
@@ -20,6 +19,8 @@ mixer/routing/crossfade/bounce services, operation-specific NestJS DTO и
 discriminated FastAPI job schemas, typed effect schemas и versioned preset
 repository. Waves A-F завершили production promotion и удаление classic
 runtime, iframe bridge, globals, copied assets и compatibility-компилятора.
+Wave G синхронизировал tracked-документацию с итоговой структурой и закрепил
+documentation/release gate в CI.
 
 - Активная ветка структурной миграции: `agent/repository-hardening`.
 - Базовая версия: полнофункциональный статический AudioMass с multitrack, темами, записью, эффектами и экспортом.
@@ -149,8 +150,6 @@ apps/
 packages/
   audio-engine/ TypeScript Web Audio engine, DSP, workers and domain modules
   plugin-sdk/   Plugin contracts, registry and lazy loader
-  shared/       DTO, result/error and domain contracts
-  ui/           Shared React UI primitives
   config/       Shared TypeScript, ESLint and environment config
   database/     Prisma schema and generated client
 tooling/        Repository scripts and OpenAPI generation
@@ -346,16 +345,20 @@ IndexedDB остаётся только как offline cache/device draft и н�
 ## 8. Финальная матрица качества
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
+pnpm audit --audit-level moderate
+pnpm format:check
+pnpm docs:check
 pnpm lint
+pnpm typecheck
 pnpm test
 pnpm build
-pnpm e2e
 ```
 
 ```bash
 cd apps/python-api
 pytest
+python -m pip_audit -r requirements.txt
 ruff check .
 black --check .
 mypy app
@@ -365,12 +368,13 @@ mypy app
 
 - Prisma schema validates and client generates.
 - FastAPI OpenAPI schema generates.
-- Nest typed client matches committed OpenAPI schema.
+- NestJS and FastAPI OpenAPI contracts are generated and exercised by tests.
 - Docker images for API and Python build.
 - Next.js frontend builds for Vercel.
 - Nest and FastAPI start independently.
 - Production environment validation rejects missing secrets.
-- License notices include all migrated vendor codecs.
+- License notices distinguish current dependencies from removed historical
+  vendor bundles.
 
 ## 9. Риски и меры
 
@@ -396,7 +400,7 @@ mypy app
 - browser сохраняет простые audio операции;
 - frontend общается с Python только через NestJS;
 - production projects хранятся в PostgreSQL и cloud object storage;
-- plugin SDK используется хотя бы одним реальным browser plugin;
+- plugin SDK сохраняет versioned, capability-scoped public contract;
 - FastAPI выполняет реальные DSP endpoints;
 - документация соответствует реальным routes;
 - все команды из master prompt проходят;

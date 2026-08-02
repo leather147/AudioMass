@@ -165,6 +165,26 @@ build сначала собирает только workspace-пакет audio-en
 
 ## 6. Порядок деплоя
 
+Перед созданием Preview зафиксируйте точный commit SHA и выполните из корня
+чистого checkout:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm audit --audit-level moderate
+pnpm format:check
+pnpm docs:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Отдельно выполните Prisma validate/generate и полный Python gate из
+`apps/python-api`: Black, Ruff, mypy, pytest, `pip check` и `pip-audit`. Все три
+Vercel Project должны собирать тот же SHA; сравните поле Source в Deployment,
+а не только имя ветки.
+
 ### Шаг 1 — FastAPI
 
 1. Добавьте все переменные `audio-mass-python-api`.
@@ -237,4 +257,9 @@ https://audio-mass-api.vercel.app/docs
 - API `/health/ready` видит Neon;
 - Prisma migrations завершились в Build Logs;
 - Preview Web открывает редактор без ошибок консоли;
+- `/editor-runtime` возвращает ожидаемый `404`, а три `/tools/*` URL приводят к
+  нативным панелям `/editor`;
+- manifest, icon и service worker доступны, а `/editor` перезагружается offline
+  после первого успешного online load;
+- deployment Web, API и Python ссылаются на один проверенный commit SHA;
 - production branch меняется только после успешного Preview.

@@ -82,6 +82,28 @@ ruff check app tests
 mypy app
 pytest
 python -m pip check
+python -m pip_audit -r requirements.txt
 ```
 
 The test suite enforces at least 85% line coverage for the Python application.
+
+## Contract and deployment verification
+
+Pydantic request/response models and the operation registry under
+`apps/python-api/app` are the source of truth. The test suite creates the ASGI
+application, validates `/openapi.json`, checks authentication and remote-storage
+boundaries, and exercises real audio fixtures. After deployment, compare the
+published schema and readiness response with the same release commit:
+
+```text
+GET /openapi.json
+GET /health/live
+GET /health/ready
+```
+
+The Vercel project Root Directory is `apps/python-api`. Its `vercel.json` uses
+the FastAPI framework preset, installs `requirements.txt` into Vercel's managed
+Python virtual environment, enables Fluid compute, and caps the function at 300
+seconds. This does not remove Vercel body, memory, temporary-storage, or model
+cold-start limits; production audio continues to move through signed object
+URLs rather than large function request bodies.

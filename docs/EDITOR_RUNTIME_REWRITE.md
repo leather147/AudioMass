@@ -160,3 +160,15 @@ native shell directly and `/editor/native` redirects to it. Wave F deleted all
 assets, globals, vendor gateway, classic tests, and patch CSS. App Router panel
 redirects and native PWA metadata/service-worker registration preserve the
 remaining public URL and offline contracts without classic code.
+
+## Archive status
+
+This document describes a deleted compatibility boundary and is retained only
+to explain the migration sequence and parity rules. None of the paths, globals,
+manifests, vendor allowlists, or build steps above may be used as current
+implementation guidance. Current editor work belongs in
+`apps/web/features/editor` or `packages/audio-engine`, current deployment work
+uses the application-level `vercel.json` files, and current verification uses
+the root workspace scripts. The final Wave G release inventory and Stage 14
+closure are in
+[FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md).

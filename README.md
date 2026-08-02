@@ -4,7 +4,8 @@ AudioMass — браузерный многодорожечный аудиоре
 движком, Next.js-оболочкой, NestJS API, PostgreSQL, облачным хранилищем и
 изолированным FastAPI-сервисом для тяжёлого DSP и транскрипции.
 
-Структурная миграция browser editor завершена через Wave F. Production-маршрут
+Структурная миграция browser editor и её release-документация завершены через
+Wave G. Production-маршрут
 `/editor` напрямую рендерит App Router/React-реализацию на
 controller/store/hooks и `@audiomass/audio-engine`; `/editor/native` оставлен
 только как проверяемый redirect. Classic runtime, iframe bridge, ordered script
@@ -278,6 +279,7 @@ pnpm --filter @audiomass/web dev
 | `pnpm test`                         | Vitest во всех JS/TS workspace-пакетах          |
 | `pnpm format`                       | форматирование поддерживаемых исходников        |
 | `pnpm format:check`                 | проверка форматирования без записи              |
+| `pnpm docs:check`                   | проверка набора документов и локальных ссылок   |
 | `pnpm clean`                        | удаление только известных build/cache artifacts |
 | `pnpm audit --audit-level moderate` | аудит npm-зависимостей                          |
 
@@ -292,8 +294,9 @@ pytest
 pip-audit -r requirements.txt
 ```
 
-CI выполняет frozen install, форматирование, lint, typecheck, тесты, production
-build и Python dependency audit. Workflow находится в `.github/workflows/ci.yml`.
+CI выполняет frozen install, npm/Python dependency audit, форматирование,
+проверку документации, lint, typecheck, тесты и production build. Workflow
+находится в `.github/workflows/ci.yml`.
 
 # Полный деплой только через Vercel
 
@@ -640,7 +643,8 @@ HTML-страницы. `/tools/*` URL существуют только как �
 - [Vercel + Neon + Private Blob](docs/VERCEL_ONLY_DEPLOYMENT.md)
 - [Operations runbook](docs/OPERATIONS.md)
 - [Migration record](docs/MIGRATION.md)
-- [План полной переписи editor runtime](docs/EDITOR_RUNTIME_REWRITE.md)
+- [Финальный framework-native план и отчёты Waves A–G](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md)
+- [Архив TypeScript-переписи удалённого runtime](docs/EDITOR_RUNTIME_REWRITE.md)
 - [Исходный migration audit](MIGRATION_PLAN.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 

@@ -469,9 +469,10 @@ Wave G uses the following release-documentation boundary:
 - [x] Wave F: Nest operation DTOs and FastAPI discriminated jobs are implemented;
       the compatibility runtime, route, assets, globals, host adapters, build
       hooks, and configuration exceptions were deleted in `89e1d83`.
-- [ ] Wave G (in progress): all tracked documentation, integrity enforcement,
-      final inventories, dependency audits, and release proof are the remaining
-      checkpoint.
+- [x] Wave G: all 12 tracked documents are synchronized; documentation
+      integrity, final inventories, zero-vulnerability dependency audits, full
+      builds/tests, Prisma/OpenAPI proof, and production browser smoke are
+      complete.
 
 ## Stage reports
 
@@ -966,20 +967,82 @@ deletion`); the commit containing this report is the Wave F implementation
   consistency pass, records the post-deletion source/config inventory and
   deployment proof, then closes the structural rewrite plan.
 
+### Stage 14 — Wave G documentation and release closure
+
+- **Status:** complete on 2026-08-03. Scope was committed and pushed first as
+  `a2c3198` (`Plan final documentation release wave`); the commit containing
+  this report is the Wave G implementation checkpoint (`Close framework-native
+editor migration Wave G`).
+- **Delivered:** all 12 tracked Markdown documents were reviewed against the
+  post-Wave-F tree and updated with current routes, commands, ownership,
+  deployment, operations, security, archival, and release contracts. The root
+  `docs:check` command validates the canonical document set, level-one headings,
+  and local inline link targets; CI now runs it after formatting. The final
+  check covered 12 documents and 23 local links. Historical runtime and vendor
+  names remain only in explicitly marked migration/license records.
+- **Dependency result:** the release audit exposed 18 advisories (10 high and 8
+  moderate) in the previous lockfile. Direct compatible updates moved Next.js
+  to 16.2.12, React/React DOM to 19.2.8, Prisma to 7.9.1, Fastify static to
+  10.1.2, Fastify rate-limit to 11.2.0, and typescript-eslint to 8.65.0;
+  reviewed pnpm overrides pin patched transitive Hono, brace-expansion,
+  find-my-way, js-yaml, PostCSS, Sharp, and Valibot releases. Frozen install is
+  reproducible and both `pnpm audit --audit-level moderate` and Python
+  `pip-audit` now report no known vulnerabilities. The production pnpm license
+  inventory and Python `pip check` also completed successfully.
+- **Final inventory:** tracked sources contain 208 `.ts`, 30 `.tsx`, and 47
+  `.py` files. The only tracked `.js` is `apps/web/public/sw.js`, the native PWA
+  service-worker entrypoint. Searches across production `apps`, `packages`, and
+  `tooling` found no `PKAudioEditor`, `PKAudioFX`, runtime manifest,
+  `editor-runtime`, `editor-assets`, `LegacyEditor`, or `module: none` symbols;
+  the three removed runtime paths are absent. The repository contains the three
+  documented applications, four shared packages, and three valid application
+  `vercel.json` files.
+- **Automated proof:** formatting, documentation integrity, ESLint, strict
+  TypeScript, Prisma 7.9.1 validate/generate, and every production build passed.
+  The JavaScript/TypeScript suite remains 52 passing files / 167 tests:
+  audio-engine 24/91, Web 11/35, NestJS 13/32, plugin SDK 3/8, and database 1/1.
+  Black checked 47 Python files; Ruff and strict mypy passed; all 35 pytest cases
+  passed with 87.14% coverage. FastAPI `/openapi.json` remained covered by its
+  public contract test. A production NestJS process served a 21-path OpenAPI
+  document and healthy liveness response with the upgraded Fastify stack. The
+  optimized Next.js route table contains `/editor`, `/editor/native`, the
+  manifest, and all three tool redirects, with no `/editor-runtime` route.
+- **Browser proof:** optimized Next.js 16.2.12 was served to headless Chromium.
+  `/editor` loaded without console/page errors; desktop and 320×720 layouts had
+  no page-level horizontal overflow. `/editor/native` and all three `/tools/*`
+  URLs reached their typed panels, while `/editor-runtime` returned the required 404. The preferences API accepted English/`github-light`, the reloaded React
+  shell rendered the English locale and light theme token, manifest/icon/service
+  worker returned 200, `audiomass-app-v5` became active, and `/editor` reloaded
+  successfully offline.
+- **Resolved local verification conditions:** a protected global Windows pytest
+  temp/cache directory initially caused `WinError 5`; the documented ignored
+  workspace temp boundary and disabled pytest cache produced the clean 35-test
+  run. Docker is not installed in this workstation, so container-image builds
+  remain a release-environment check; Vercel application builds/configuration
+  and both service runtime contracts were verified locally.
+- **Architectural result:** Waves A–G and all fourteen structural stages are
+  complete. Documentation, CI, source inventory, dependency state, route output,
+  service schemas, and browser behavior now describe and prove one
+  framework-native editor boundary.
+- **Remaining after stage:** no migration or compatibility-runtime wave remains.
+  Future work is routine product delivery: run the same release gate, build
+  containers where Docker is available, deploy Preview for the exact commit,
+  verify provider health/data flows, and promote only that verified artifact.
+
 ## Overall stage summary
 
-| Wave | State       | Current result                                                                  |
-| ---- | ----------- | ------------------------------------------------------------------------------- |
-| A    | Complete    | Typed application/domain platform and React lifecycle                           |
-| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation    |
-| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI  |
-| D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export   |
-| E    | Complete    | Native production route, React presentation, accessibility, and browser parity  |
-| F    | Complete    | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted |
-| G    | In progress | Final documentation inventory and release/deployment proof remain               |
+| Wave | State    | Current result                                                                   |
+| ---- | -------- | -------------------------------------------------------------------------------- |
+| A    | Complete | Typed application/domain platform and React lifecycle                            |
+| B    | Complete | Leaf services, metadata, workers, persistence adapters, and vendor isolation     |
+| C    | Complete | PCM-aware history, playback proof, edit commands, recording, and WAV export UI   |
+| D    | Complete | Native multitrack/effect domain, workflows, playback, persistence, and export    |
+| E    | Complete | Native production route, React presentation, accessibility, and browser parity   |
+| F    | Complete | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted  |
+| G    | Complete | Documentation, audits, inventories, schemas, builds, and release proof are final |
 
-Thirteen structural stages and Waves A-F are complete. The first-party classic
+Fourteen structural stages and Waves A-G are complete. The first-party classic
 editor runtime and every route, bridge, global, asset build, host adapter, and
-configuration exception that could execute it are gone. Wave G is the final
-documentation and release-evidence checkpoint; it does not carry a remaining
-legacy implementation boundary.
+configuration exception that could execute it are gone. The canonical
+documentation and CI release gate now describe and continuously protect that
+state; no legacy implementation boundary or planned migration wave remains.

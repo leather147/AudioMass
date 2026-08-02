@@ -15,8 +15,11 @@ historical source releases; new dependencies must add their own current notice.
 | RNNoise                                | BSD-3-Clause |
 | lz4-wasm                               | BSD-2-Clause |
 
-The enterprise workspace also depends on separately distributed packages. Their license texts
-remain with their published packages and container distributions.
+The enterprise workspace also depends on separately distributed packages. Their
+license texts remain with their published packages and container distributions.
+The pnpm lockfile and `apps/python-api/requirements.txt` are the authoritative
+version inventories; this file is a project-level notice, not a replacement for
+the complete license text shipped by each dependency.
 
 | Runtime project                | License                                                                 |
 | ------------------------------ | ----------------------------------------------------------------------- |
@@ -35,3 +38,12 @@ remain with their published packages and container distributions.
 | faster-whisper and CTranslate2 | MIT                                                                     |
 | HTTPX/HTTPX2                   | BSD-3-Clause                                                            |
 | FFmpeg                         | LGPL-2.1-or-later; optional components can change the effective license |
+
+## Release review
+
+Wave G reviewed this notice against the current workspace manifests after the
+compatibility bundles were deleted. A release must run the dependency audits in
+CI and review any newly introduced direct runtime dependency before publishing.
+Dependencies with copyleft, source-offer, patent, codec, or model-license terms
+require a separate distribution review; do not infer compatibility solely from
+this summary table.

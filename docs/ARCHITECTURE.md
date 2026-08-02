@@ -152,3 +152,19 @@ S3-compatible storage, MinIO, Supabase Storage, and Vercel Blob implement the sa
 ## Scaling model
 
 The web and API images are stateless and can scale horizontally. FastAPI is also stateless, but each replica enforces a local concurrency ceiling; production schedulers should combine that limit with CPU, memory, and GPU resource limits. PostgreSQL and object storage are external durable services. Long-running work is represented in the database so execution can later move to a queue without changing the browser contract.
+
+## Final migration boundary
+
+Waves A–G are closed. Executable editor code has one framework-native path:
+Next.js App Router and React presentation under `apps/web`, with browser audio
+domain/application behavior in `packages/audio-engine`. The only tracked
+first-party JavaScript file in the Web application is the root service worker,
+`apps/web/public/sw.js`; it is a browser entrypoint, not a classic editor module.
+There is no `apps/web/editor-runtime`, generated `/editor-assets`, iframe bridge,
+ordered-script manifest, runtime global, or standalone tool page.
+
+Repository documentation is part of this boundary. `pnpm docs:check` requires
+the canonical document set and validates relative Markdown links; CI runs it
+alongside format, lint, typecheck, tests, builds, and dependency audits. The
+per-wave evidence and the post-deletion inventory are recorded in
+[FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md).

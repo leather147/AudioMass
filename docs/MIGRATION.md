@@ -72,3 +72,19 @@ Each feature phase is independently reviewable and has package-level tests. The 
 ## Success criteria
 
 The workspace is considered releasable when frozen dependency installation, formatting, lint, TypeScript typechecking, JavaScript/TypeScript tests, production builds, Prisma validation/generation, Black, Ruff, mypy, Python tests, and dependency checks all pass. Container builds should also run in the release environment where a Docker daemon is available.
+
+## Structural closure
+
+Wave G closes the migration record: all tracked documentation describes the
+post-runtime repository, CI validates the canonical documents and their local
+links, and the complete release gate is rerun against one reviewable commit.
+Historical module names remain only in explicit migration records and license
+attributions; they are not executable code or supported extension points.
+
+Future changes are ordinary product development. They must preserve the current
+ownership boundaries—Next.js/React for Web presentation and routing,
+`@audiomass/audio-engine` for browser audio behavior, NestJS for public
+orchestration, and FastAPI for private heavy processing—rather than reopening a
+compatibility runtime. Detailed evidence and the overall Waves A–G result are
+recorded in
+[FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md).

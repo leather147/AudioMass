@@ -104,3 +104,27 @@ NestJS obtains signed storage URLs, invokes the private FastAPI job endpoint, ve
 NestJS uses standard HTTP status codes. Validation failures are `400`; missing owner-scoped resources are `404`; stale versions and duplicate unique operations are `409`; missing/invalid keys are `401`; rate limiting is `429`; an unavailable dependency is `503`.
 
 List routes use bounded page-based pagination. Send `page` starting at `1` and `pageSize` from `1` through `100`; responses contain `items`, `page`, `pageSize`, and `total`.
+
+## Contract ownership and verification
+
+Controllers, DTOs, guards, and orchestration under `apps/api/src` are the source
+of truth. This guide summarizes that executable contract; clients should use the
+OpenAPI document served by the deployed version instead of copying tables from
+documentation into handwritten validators.
+
+From the repository root, validate the API before a release:
+
+```bash
+pnpm --filter @audiomass/database exec prisma validate
+pnpm --filter @audiomass/database exec prisma generate
+pnpm --filter @audiomass/api lint
+pnpm --filter @audiomass/api typecheck
+pnpm --filter @audiomass/api test
+pnpm --filter @audiomass/api build
+```
+
+The Vercel project uses `apps/api` as its Root Directory. Its checked-in
+`vercel.json` invokes `tooling/vercel-api-build.mjs`, which deploys database
+migrations before building the database package and NestJS application. Review
+the migration and backup plan before redeploying production; do not replace that
+command with a generic framework preset.

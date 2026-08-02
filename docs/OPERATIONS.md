@@ -16,6 +16,12 @@ points to an App Router route; an offline reload failure points to service-worke
 registration, the manifest, or a missing same-origin resource. No runtime build
 or copied editor asset tree exists after Wave F.
 
+`/editor-runtime` is intentionally absent and must return `404`; a successful
+response indicates that a stale deployment or compatibility artifact has been
+revived. Browser smoke checks should also fail on console errors, framework
+error overlays, unexpected application-request failures, page-level horizontal
+overflow at 320 px, or an offline reload that cannot reopen `/editor`.
+
 Monitor these endpoints from their appropriate network:
 
 - Web: `GET /`
@@ -64,3 +70,14 @@ Track API latency, event-loop saturation, PostgreSQL pool usage, object transfer
 ## Data lifecycle
 
 Storage records move through `PENDING`, `READY`, `REJECTED`, and `DELETED`. Alert on old pending objects and clean their remote counterparts with a reviewed maintenance job. Retention and tenant deletion workflows must remove both database references and underlying objects; database deletion alone does not satisfy data erasure.
+
+## Release handoff
+
+Record the exact Git commit and Vercel deployment IDs for Web, API, and Python.
+Before promotion, require the repository release gate (`pnpm format:check`,
+`pnpm docs:check`, lint, typecheck, tests, builds, Prisma, Python quality and
+dependency checks), then verify the deployed health and OpenAPI endpoints. Run a
+real editor import/playback/effect transaction, both locales, representative
+themes, the three tool redirects, service-worker registration, and offline
+reload. Keep the previous deployment addresses and database backup available
+until the canary completes.
