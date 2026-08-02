@@ -278,6 +278,27 @@ D.3c uses the following explicit integration boundary:
 - Consolidate CSS and remove direct DOM builders.
 - Make the framework-native editor the only `/editor` implementation.
 
+Wave E is delivered through presentation checkpoints that keep rendering,
+editor commands, and audio processing in their owning layers:
+
+1. **E.1 — waveform and track presentation:** add a revision-aware waveform
+   analysis contract, worker-backed overview and per-channel peaks, responsive
+   Canvas renderers, a semantic ruler, zoom/scroll viewport, playhead,
+   selection gestures, marker overlays, and multitrack clip lanes. Canvas owns
+   pixels only; React owns accessible structure and dispatches typed commands.
+   Playback position updates must not recompute peaks, and stale worker results
+   must be ignored after revision, size, or lifecycle changes.
+2. **E.2 — menus, analyzers, and workspace composition:** replace the remaining
+   presentation gaps with accessible React menus/panels, typed frequency and
+   spectral-analysis ports, integrated analyzer surfaces, and a unified mixer
+   workspace. No menu or analyzer may open a classic HTML page or mutate a
+   document-global editor object.
+3. **E.3 — production promotion:** complete responsive, keyboard, focus,
+   localization, and browser-parity proof, then make the framework-native shell
+   the `/editor` implementation. Keep the isolated compatibility runtime only
+   until Wave F removes its route, assets, compiler, and declarations as one
+   verified deletion.
+
 ### Wave F — server contracts and compatibility deletion
 
 - Complete NestJS operation DTOs and FastAPI discriminated schemas.
