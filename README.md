@@ -4,13 +4,12 @@ AudioMass — браузерный многодорожечный аудиоре
 движком, Next.js-оболочкой, NestJS API, PostgreSQL, облачным хранилищем и
 изолированным FastAPI-сервисом для тяжёлого DSP и транскрипции.
 
-Редактор проходит вторую, структурную миграцию. Production-маршрут `/editor`
-уже напрямую рендерит App Router/React-реализацию на controller/store/hooks и
-`@audiomass/audio-engine`; `/editor/native` оставлен только как проверяемый
-redirect на тот же маршрут. Совместимый same-origin runtime больше не имеет
-production-потребителя, но его маршрут, сборка и assets удаляются одной
-проверяемой операцией в Wave F. Точный план, карта каждого модуля и критерии
-удаления находятся в
+Структурная миграция browser editor завершена через Wave F. Production-маршрут
+`/editor` напрямую рендерит App Router/React-реализацию на
+controller/store/hooks и `@audiomass/audio-engine`; `/editor/native` оставлен
+только как проверяемый redirect. Classic runtime, iframe bridge, ordered script
+manifest, копируемые assets, глобальные facades и runtime-компилятор удалены.
+Точный план, карта модулей и отчёты этапов находятся в
 [FRAMEWORK_NATIVE_EDITOR_PLAN.md](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 ## Текущий production
@@ -29,7 +28,7 @@ Vercel Project.
 
 ```text
 apps/
-  web/            Next.js 16, React 19, native editor и временный compatibility runtime
+  web/            Next.js 16, React 19, App Router editor и PWA-оболочка
   api/            NestJS 11/Fastify, OpenAPI и orchestration
   python-api/     FastAPI, DSP, export, анализ и Faster-Whisper
 packages/
@@ -51,7 +50,6 @@ Browser
   -> Next.js web shell
        -> React editor features
        -> @audiomass/audio-engine / workers / AudioWorklet
-       -> temporary same-origin compatibility runtime
 
 Trusted server-side caller
   -> NestJS API
@@ -81,9 +79,9 @@ Trusted server-side caller
   45 встроенных пресетов используют typed values, а пользовательские пресеты
   сохраняются браузерным адаптером в versioned JSON вместо DOM-порядка и
   comma-separated строк.
-- Восемь неизменяемых vendor-ассетов совместимого редактора доступны новому
-  React-контуру только через проверяемый `LegacyEditorVendorGateway`; их
-  глобалы и URL не являются application API.
+- Удалённые compatibility-bundles WaveSurfer, MP3/FLAC, RNNoise и compression
+  больше не входят в Web build; их исторические лицензии сохранены в
+  `THIRD_PARTY_NOTICES.md`. Нативный редактор не загружает vendor globals.
 - NestJS проверяет параметры каждой remote operation отдельным DTO, FastAPI —
   соответствующей discriminated Pydantic-моделью.
 
@@ -597,42 +595,29 @@ wildcard в production.
 Vercel Project. Для этой монорепы правильный Web root — `apps/web`; старый
 статический root-деплой не соответствует текущей структуре.
 
-## Временная совместимость до Wave F
+## Правила разработки browser editor
 
 Production-редактор находится в `apps/web/features/editor` и
-`packages/audio-engine`. `apps/web/editor-runtime` — изолированный совместимый
-контур без потребителя со стороны `/editor`; он сохраняется только до атомарного
-удаления в Wave F. Ручное редактирование `apps/web/public/editor-assets`
-запрещено: это полностью генерируемый build output, который пока очищается и
-пересобирается командой `pnpm --filter @audiomass/web runtime:build`.
+`packages/audio-engine`. React владеет доступной структурой и interaction,
+контроллеры — application-командами, audio-engine — PCM/Web Audio/DSP/workers,
+а App Router — route state, settings, metadata и redirects.
 
 Нативные анализаторы, микшер, меню, About, темы и локализация принадлежат App
 Router и React feature-модулям. `/api/editor-preferences` сохраняет валидированные
-cookie-настройки; production UI не синхронизируется через iframe bridge и не
-открывает старые HTML-страницы. Временные `/tools/*` adapters, bridge и runtime
-manifest не импортируются нативным feature-графом.
+cookie-настройки; production UI не использует iframe, runtime globals или старые
+HTML-страницы. `/tools/*` URL существуют только как серверные redirects на
+зарегистрированные панели `/editor?panel=...`.
 
-Операции копирования, обрезки, вставки, тишины и замены `AudioBuffer` находятся
-в `editor-runtime/audio-buffer-operations.ts`; `actions.js` сохраняет прежние
-имена методов только как совместимый фасад для движка и эффектов.
-
-Общие Web Audio/DSP-примитивы усиления, peak/RMS-нормализации, fade-кривых и
-профилей скорости находятся в `editor-runtime/audio-effect-utilities.ts`.
-`actions.js` использует их через прежние локальные имена, поэтому существующий
-банк эффектов и формат его параметров остаются совместимыми.
-
-- Не расширяйте временный `editor-runtime-manifest.ts`: любые новые механики
-  реализуются в нативном feature/audio-engine контуре.
-- Совместимые глобальные `PKAudioEditor`, `PKAudioFX`, bridge hooks и CSS tokens
-  являются внутренним API runtime; изменение требует контрактного теста.
+- Не возвращайте `PKAudioEditor`, `PKAudioFX`, `module: none`, ordered scripts,
+  runtime manifests или прямое построение DOM.
 - Общие цвета меняйте через theme tokens; не добавляйте новые hardcoded popup
   backgrounds.
 - Локализацию production UI добавляйте через `apps/web/lib/editor-copy.ts`, без
   параллельных словарей и прямого `localStorage + reload` в UI-модулях.
 - После UI-изменений вручную проверьте пустой проект, загруженный multitrack,
   широкий и узкий viewport, zoom браузера, темы, popup-окна и обе локали.
-- Генерируемые `public/editor-assets`, `.next`, `dist`, coverage, Prisma client
-  и Python caches не коммитятся.
+- Генерируемые `.next`, `dist`, coverage, Prisma client и Python caches не
+  коммитятся.
 
 ## API, данные и безопасность
 

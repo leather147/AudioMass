@@ -1,5 +1,5 @@
-const CACHE_NAME = 'audiomass-runtime-v4';
-const CORE_ROUTES = ['/editor', '/editor-runtime'];
+const CACHE_NAME = 'audiomass-app-v5';
+const CORE_ROUTES = ['/editor', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ROUTES)));
@@ -23,14 +23,19 @@ self.addEventListener('message', (event) => {
     .map((value) => {
       try {
         const url = new URL(value, self.location.origin);
-        return url.origin === self.location.origin ? url.href : null;
+        return url.origin === self.location.origin && !url.pathname.startsWith('/api/')
+          ? url.href
+          : null;
       } catch {
         return null;
       }
     })
     .filter(Boolean);
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => Promise.allSettled(urls.map((url) => cache.add(url)))),
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => Promise.allSettled(urls.map((url) => cache.add(url))))
+      .then(() => event.ports[0]?.postMessage({ type: 'CACHE_URLS_COMPLETE' })),
   );
 });
 

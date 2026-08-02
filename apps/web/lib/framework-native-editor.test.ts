@@ -30,7 +30,9 @@ describe('framework-native editor boundary', () => {
     const sources = featureSources(root);
 
     expect(sources).not.toMatch(/PKAudioEditor|PKAudioFX|AMLateRuntimeValue/);
-    expect(sources).not.toContain('postMessage');
+    expect(sources).not.toMatch(
+      /EDITOR_BRIDGE_CHANNEL|contentWindow.*postMessage|parent\.postMessage/,
+    );
     expect(sources).not.toContain('<iframe');
   });
 
@@ -91,12 +93,11 @@ describe('framework-native editor boundary', () => {
     expect(sources).not.toMatch(/(?:eq|sp|mix)\.html/);
   });
 
-  it('keeps direct vendor asset paths in the one infrastructure registry', () => {
+  it('contains no compatibility runtime asset gateway', () => {
     const root = join(process.cwd(), 'features', 'editor');
     const sources = featureSources(root);
-    const references = sources.match(/path:\s*'\/editor-assets\//g) ?? [];
 
-    expect(references).toHaveLength(8);
-    expect(sources).not.toMatch(/globalThis\.(?:WaveSurfer|lz4BlockCodec|Module)/);
+    expect(sources).not.toMatch(/editor-assets|LegacyEditorVendorGateway|WaveSurfer/);
+    expect(sources).not.toMatch(/globalThis\.(?:lz4BlockCodec|Module)/);
   });
 });

@@ -156,12 +156,12 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 
 Не публикуйте `API_KEYS` в Web. Текущий браузерный редактор не должен хранить серверный API key.
 
-Production `/editor` уже использует нативную App Router/React-реализацию, а
+Production `/editor` использует нативную App Router/React-реализацию, а
 `/editor/native` перенаправляет на неё. Оба маршрута входят в один Vercel
-Project; отдельный Root Directory или deployment не нужен. До атомарного
-удаления Wave F не переопределяйте Build Command так, чтобы пропустить
-`pnpm runtime:build`: он всё ещё собирает изолированный `/editor-runtime` и его
-совместимые assets.
+Project; отдельный Root Directory или deployment не нужен. Wave F удалил
+`runtime:build`, `/editor-runtime` и копируемые assets, поэтому стандартный Web
+build сначала собирает только workspace-пакет audio-engine, затем выполняет
+`next build`.
 
 ## 6. Порядок деплоя
 

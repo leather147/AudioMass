@@ -14,5 +14,5 @@
     "**/*.ts",
     "**/*.tsx"
   ],
-  "exclude": ["node_modules", "editor-runtime/static"]
+  "exclude": ["node_modules"]
 }

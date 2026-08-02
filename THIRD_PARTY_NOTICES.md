@@ -1,25 +1,19 @@
 # Third-party notices
 
-## Editor migration note
+## Removed compatibility bundles
 
-The framework-native rewrite does not relicense or silently rewrite codec and
-waveform vendors. The temporary compatibility runtime still contains the eight
-allowlisted generated/vendor assets documented in
-[`docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md`](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
-They must remain isolated behind typed adapters, keep their upstream notices,
-and may be deleted only when an equivalent licensed ESM dependency or tested
-adapter preserves the existing import/export behavior.
+Wave F removed the classic compatibility runtime and its bundled codec,
+noise-suppression, compression, and WaveSurfer files. They are not distributed
+by the current Web build. The table is retained as an attribution record for
+historical source releases; new dependencies must add their own current notice.
 
-The bundled third-party files keep their own licenses. File paths in the table
-below are relative to `apps/web/editor-runtime/static`.
-
-| Project                                | Files                                                        | License      |
-| -------------------------------------- | ------------------------------------------------------------ | ------------ |
-| WaveSurfer.js 2.0.5 and regions plugin | `dist/wavesurfer.js`, `dist/plugin/wavesurfer.regions.js`    | BSD-3-Clause |
-| lamejs / LAME MP3 encoder              | `lame.js`                                                    | LGPL         |
-| libFLAC 1.3.3                          | `flac.js`, `flac.min.js`, `libflac.js`, `libflac.wasm`       | Xiph/New BSD |
-| RNNoise                                | `rnn_denoise.js`, `rnn_denoise.wasm`                         | BSD-3-Clause |
-| lz4-wasm                               | `lzma.js`, `lz4-block-codec-wasm.js`, `lz4-block-codec.wasm` | BSD-2-Clause |
+| Historical project                     | License      |
+| -------------------------------------- | ------------ |
+| WaveSurfer.js 2.0.5 and regions plugin | BSD-3-Clause |
+| lamejs / LAME MP3 encoder              | LGPL         |
+| libFLAC 1.3.3                          | Xiph/New BSD |
+| RNNoise                                | BSD-3-Clause |
+| lz4-wasm                               | BSD-2-Clause |
 
 The enterprise workspace also depends on separately distributed packages. Their license texts
 remain with their published packages and container distributions.

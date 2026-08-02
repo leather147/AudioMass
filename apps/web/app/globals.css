@@ -33,21 +33,6 @@ select {
   font: inherit;
 }
 
-.editor-page {
-  width: 100dvw;
-  height: 100dvh;
-  overflow: hidden;
-  background: var(--shell-bg);
-}
-
-.editor-frame {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: var(--shell-bg);
-}
-
 .editor-status {
   position: fixed;
   inset: 0;
@@ -58,11 +43,6 @@ select {
   color: var(--shell-muted);
   letter-spacing: 0.02em;
   transition: opacity 160ms ease;
-}
-
-.editor-status[data-hidden='true'] {
-  pointer-events: none;
-  opacity: 0;
 }
 
 .settings-page {

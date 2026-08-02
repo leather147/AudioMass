@@ -7,7 +7,7 @@ export const metadata = {
 
 const FEATURES = [
   'Waveform editing, markers, tempo grid and beat snapping',
-  'Recording, MP3 export and non-destructive undo history',
+  'WAV export and non-destructive undo history',
   'Compression, equalization, reverb, delay, repair and pitch tools',
   'Multitrack clips, crossfades, mixer controls and session files',
   'Frequency and spectral analysers that can be docked or opened separately',
@@ -31,8 +31,8 @@ export default function AboutPage() {
           ))}
         </ul>
         <p>
-          The application combines a modern Next.js shell and tool routes with the proven Web Audio
-          editing runtime while that runtime is migrated module by module.
+          The application combines a Next.js App Router interface with a typed Web Audio engine,
+          workers and local browser persistence without an embedded legacy document.
         </p>
         <div className="about-actions">
           <Link href="/editor">Open editor</Link>

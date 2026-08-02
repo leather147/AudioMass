@@ -1,8 +1,9 @@
 # Editor runtime source-language migration record
 
-> This record describes the completed JavaScript-to-TypeScript compatibility
-> migration. It is not the plan for removing the legacy architecture. Continue
-> with [FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md).
+> This is the historical record of the JavaScript-to-TypeScript compatibility
+> migration. Wave F subsequently removed that entire runtime boundary. The
+> structural implementation and reports live in
+> [FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 ## Baseline
 
@@ -21,7 +22,7 @@ The line count is only a progress indicator. A module is complete when its old
 file is deleted, its replacement has strict types and tests, and the runtime
 manifest loads only the replacement.
 
-## Current checkpoint
+## Historical TypeScript checkpoint
 
 After completing the final wave:
 
@@ -49,11 +50,10 @@ vendor dependencies and are isolated rather than rewritten:
 Vendor files may only be referenced through an explicit allowlist in the runtime
 manifest and notices. Any local patch to them must be documented.
 
-The framework-native editor additionally isolates the same eight assets behind
-`features/editor/infrastructure/LegacyEditorVendorGateway`. The gateway owns
-their absolute URLs, script ordering, classic worker construction, and runtime
-shape validation. New React, controller, and audio-domain modules must never
-read the vendor globals directly.
+The later framework-native editor temporarily isolated the same eight assets
+behind `features/editor/infrastructure/LegacyEditorVendorGateway`. That gateway
+and its unreachable bundled assets were deleted with the compatibility runtime
+after native parity passed.
 
 ## Migration rules
 
@@ -146,7 +146,7 @@ classic initialization order and global facades; structural completion requires
 deleting this runtime after React/audio-engine parity, as defined by the
 framework-native plan.
 
-At the current structural checkpoint, the native editor has completed Waves A-E.
+At the final structural checkpoint, the native editor has completed Waves A-F.
 Its application services own PCM-aware single-track history, all primary and
 specialized effect transactions, copied multitrack sources, project scheduling,
 Web Audio routing/playback, complete local documents, and deterministic WAV
@@ -154,7 +154,9 @@ export. React owns the native transport, effects, responsive waveform, ruler,
 selection, marker overlay, clip lanes, typed menus, mixer workspace, frequency
 analyser, and spectral analyser without editor globals or classic tool routes.
 Worker-backed peaks and bounded FFT/STFT results are keyed by rendered-audio
-revision so playhead updates do not repeat analysis. `/editor` now renders that
-native shell directly and `/editor/native` redirects to it. The compatibility
-runtime has no production editor consumer; Wave F deletes its route, compiler,
-bridge, tool adapters, generated assets, globals, and patch CSS atomically.
+revision so playhead updates do not repeat analysis. `/editor` renders that
+native shell directly and `/editor/native` redirects to it. Wave F deleted all
+116 tracked runtime files, the route/compiler/bridge, tool hosts, generated
+assets, globals, vendor gateway, classic tests, and patch CSS. App Router panel
+redirects and native PWA metadata/service-worker registration preserve the
+remaining public URL and offline contracts without classic code.

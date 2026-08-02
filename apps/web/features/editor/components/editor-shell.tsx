@@ -8,6 +8,7 @@ import type { EditorPreferences } from '@/lib/editor-preferences';
 
 import { useEditorShortcuts } from '../application/use-editor-shortcuts';
 import { useAudioFileDrop } from '../infrastructure/use-audio-file-drop';
+import { useOfflineCache } from '../infrastructure/use-offline-cache';
 import { EditorProvider, useEditorController, useEditorSnapshot } from '../state/editor-store';
 import { editorThemeStyle } from '../theme/editor-themes';
 import { AnalysisPanel } from './analysis/analysis-panel';
@@ -67,6 +68,7 @@ function EditorWorkspace({
 
   const drop = useAudioFileDrop(openFile);
   useEditorShortcuts(controller, snapshot);
+  useOfflineCache();
 
   const selectPanel = useCallback((panel: EditorPanelId) => {
     setActivePanel(panel);

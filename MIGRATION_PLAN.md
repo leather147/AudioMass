@@ -14,18 +14,18 @@
 На текущем checkpoint созданы доменные/application-модули audio-engine,
 React-controller/store и feature-компоненты Next.js, versioned project codec,
 IndexedDB repository, typed recording/worklet/WAV/DSP/multitrack primitives,
-ID3/MP4 metadata, typed WAV/tempo worker clients, isolated vendor gateway,
+ID3/MP4 metadata, typed WAV/tempo worker clients,
 PCM-aware single-track history/edit commands, WAV export UI, native multitrack
 mixer/routing/crossfade/bounce services, operation-specific NestJS DTO и
 discriminated FastAPI job schemas, typed effect schemas и versioned preset
-repository. Production остаётся на compatibility runtime до
-effects/presentation parity gate.
+repository. Waves A-F завершили production promotion и удаление classic
+runtime, iframe bridge, globals, copied assets и compatibility-компилятора.
 
 - Активная ветка структурной миграции: `agent/repository-hardening`.
 - Базовая версия: полнофункциональный статический AudioMass с multitrack, темами, записью, эффектами и экспортом.
 - Стратегия: поэтапная миграция существующего приложения без функционального переписывания с нуля.
 - Цель: production-ready Turborepo с Next.js 16, NestJS 11, FastAPI, Prisma и типизированными пакетами.
-- Минимальная версия Node.js: 20.9 (требование Next.js 16; NestJS 11 требует Node.js 20+).
+- Версия Node.js в workspace и deployment: 24.x.
 - Минимальная версия Python: 3.12.
 
 ## 1. Результаты аудита
@@ -147,7 +147,7 @@ apps/
   api/          NestJS 11 BFF/API Gateway
   python-api/   FastAPI compute service
 packages/
-  audio-engine/ TypeScript Web Audio engine and compatibility bridge
+  audio-engine/ TypeScript Web Audio engine, DSP, workers and domain modules
   plugin-sdk/   Plugin contracts, registry and lazy loader
   shared/       DTO, result/error and domain contracts
   ui/           Shared React UI primitives
@@ -161,16 +161,18 @@ docs/           Architecture, deployment and completed migration notes
 
 ### 4.1 Сохранение функциональности
 
-Миграция выполнена через production strangler pattern:
+Миграция была выполнена через production strangler pattern:
 
 1. Исходный browser runtime был перенесён с сохранением Git history и поведения.
-2. Next.js routes `/editor` и `/editor-runtime` предоставляют рабочую same-origin границу без статического HTML entrypoint.
+2. Промежуточные Next.js routes `/editor` и `/editor-runtime` предоставили same-origin границу без статического HTML entrypoint.
 3. Интерактивные browser audio функции продолжают выполняться локально без сетевого round-trip.
-4. Между Next.js shell и editor работает типизированный `postMessage` bridge с проверкой origin и payload.
-5. Preference, locale, theme, bridge и общие DSP-операции извлечены в TypeScript; совместимые UI/DSP assets находятся в едином source-каталоге `apps/web/editor-runtime`.
-6. Публичная legacy-граница удалена. `public/editor-assets` является воспроизводимым и игнорируемым результатом сборки с parity/asset-integrity tests.
+4. На parity-этапе Next.js shell и editor использовали типизированный `postMessage` bridge с проверкой origin и payload.
+5. Нативные React/controller/audio-engine модули заменили DOM builders, globals, ordered scripts и runtime assets.
+6. Wave F удалил `/editor-runtime`, iframe bridge, 116 runtime-файлов, generated `public/editor-assets`, classic tool hosts и build/config exceptions.
 
-Это не mock и не демонстрационный iframe: редактор остаётся полноценным production runtime, а Next.js управляет routing, settings, projects, API access, error boundaries и deployment.
+Production `/editor` теперь является единственной композицией редактора. Next.js
+управляет routing, settings, PWA metadata, redirects, error boundaries и
+deployment; React и audio-engine владеют editor behavior.
 
 ### 4.2 Frontend
 
@@ -178,10 +180,10 @@ docs/           Architecture, deployment and completed migration notes
 
 - App Router;
 - Server Components для shell, projects и plugin catalog;
-- Client Components для editor host и Web Audio lifecycle;
+- Client Components для editor interaction и Web Audio lifecycle;
 - Server Actions для безопасных settings/project mutations;
 - Tailwind для нового shell и shared UI;
-- legacy CSS только внутри editor boundary;
+- CSS Modules и semantic theme tokens для editor presentation;
 - Next.js headers для AudioWorklet/WASM и SharedArrayBuffer;
 - typed BFF client; прямые обращения к FastAPI запрещены.
 
@@ -215,7 +217,7 @@ interface AudioEngine {
 - AudioWorklet transport;
 - worker protocol;
 - WAV encoder без server dependency;
-- compatibility adapter для внутреннего API `PKAudioEditor`;
+- typed controller/session adapters без browser globals;
 - capability detection для SharedArrayBuffer/WASM.
 
 ### 4.4 Plugin SDK
@@ -291,19 +293,19 @@ IndexedDB остаётся только как offline cache/device draft и н�
 
 ## 5. Карта переноса
 
-| Текущий файл/область      | Цель                                        | Действие                                              |
+| Исходная область          | Итоговый владелец                           | Результат Wave F                                      |
 | ------------------------- | ------------------------------------------- | ----------------------------------------------------- |
-| `src/index.html` и assets | `/editor-runtime` + `editor-runtime/static` | HTML генерируется Route Handler, assets собираются    |
-| `app.js` event bus        | typed bridge + internal runtime events      | Совместимый adapter и проверяемый message protocol    |
-| `engine.js`               | `packages/audio-engine`                     | Постепенно разделить transport, edit, effects, export |
-| `multitrack.js`           | `packages/audio-engine/multitrack`          | Domain/mixer/bounce перенесены; UI integration далее  |
-| `ui.js`, `ui-fx.js`       | Next client boundary + runtime assets       | Сохранить поведение за изолированной границей         |
-| `recorder-worklet.js`     | `apps/web/public/worklets` и audio package  | Сохранить и типизировать protocol                     |
-| `tempo-worker.js`         | `apps/web/workers`                          | Перенести с typed messages                            |
-| WASM/vendor codecs        | `apps/web/public/codecs`                    | Сохранить license notices и loading paths             |
-| `local.js`                | projects/storage APIs                       | Оставить offline cache, добавить cloud sync           |
-| static servers            | удалить после parity                        | Заменить Next/Nest/FastAPI scripts                    |
-| root Python placeholder   | `apps/python-api`                           | Заменить полноценным сервисом                         |
+| `src/index.html` и assets | Next.js App Router                          | Runtime route и copied asset tree удалены             |
+| `app.js` event bus        | React store + typed controller events       | Globals и message bridge удалены                      |
+| `engine.js`               | `packages/audio-engine`                     | Transport, edits, effects и export типизированы       |
+| `multitrack.js`           | `packages/audio-engine/multitrack` + React  | Domain/mixer/bounce и UI работают без host adapter    |
+| `ui.js`, `ui-fx.js`       | `apps/web/features/editor`                  | DOM builders заменены React-компонентами              |
+| `recorder-worklet.js`     | `packages/audio-engine`                     | Protocol и lifecycle типизированы                     |
+| `tempo-worker.js`         | `packages/audio-engine`                     | ESM worker и discriminated messages                   |
+| Старые vendor bundles     | удалены                                     | Unreachable gateway/assets удалены, notices сохранены |
+| `local.js`                | IndexedDB repositories + server storage API | Локальные документы и cloud contracts разделены       |
+| static servers            | Next/Nest/FastAPI                           | Старые entrypoints удалены                            |
+| root Python placeholder   | `apps/python-api`                           | Реализован FastAPI service                            |
 
 ## 6. Этапы и коммиты
 
@@ -330,7 +332,7 @@ IndexedDB остаётся только как offline cache/device draft и н�
 
 ## 7. Проверки на каждом этапе
 
-- Editor runtime opens and the sample project loads.
+- `/editor` opens and an imported audio file renders its waveform.
 - Playback, pause, seek and waveform remain functional.
 - Multitrack clips, channels and bounce remain functional.
 - Recording worklet loads.
@@ -374,7 +376,7 @@ mypy app
 
 | Риск                                     | Мера                                                            |
 | ---------------------------------------- | --------------------------------------------------------------- |
-| Регрессии при переписывании 47k строк JS | Strangler boundary и parity E2E до удаления legacy кода         |
+| Регрессии при переписывании 47k строк JS | Завершённые strangler checkpoints и parity E2E до Wave F        |
 | Browser-only API во время SSR            | `use client`, dynamic boundary и capability checks              |
 | COOP/COEP ломает external assets         | Self-host assets, добавить resource policies и E2E headers test |
 | WASM paths после перемещения             | Сохранять относительную структуру и проверять network failures  |

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: { default: 'AudioMass', template: '%s · AudioMass' },
   description: 'Browser-first multitrack audio editor and waveform workstation.',
   applicationName: 'AudioMass',
+  icons: { icon: '/icon.svg' },
 };
 
 export const viewport: Viewport = {

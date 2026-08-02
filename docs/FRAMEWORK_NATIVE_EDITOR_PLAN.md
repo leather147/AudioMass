@@ -886,19 +886,73 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   adapters, generated assets, tests, and patch CSS. Wave G then synchronizes the
   final post-deletion documentation and records release/deployment proof.
 
+### Stage 13 — Wave F atomic compatibility deletion
+
+- **Status:** complete on 2026-08-02. Scope and the measured deletion inventory
+  were committed and pushed first as `23f21a5` (`Plan compatibility runtime
+deletion`); the commit containing this report is the Wave F implementation
+  checkpoint (`Delete compatibility runtime Wave F`).
+- **Delivered:** the complete 116-file `apps/web/editor-runtime` tree
+  (16,893,660 bytes), `/editor-runtime` Route Handler, `EditorFrame`, iframe
+  bridge/document/manifest helpers, serial bridge queue, fallback React tool
+  hosts, mixer global adapter, classic runtime tests, compiler/copy tooling,
+  runtime-only ESLint/TypeScript/Turbo/gitignore rules, generated
+  `public/editor-assets`, the unused vendor gateway, and its unreachable bundled
+  assets were deleted together. The three established `/tools/*` URLs now use
+  Server Component redirects to registered native panels. App Router owns a
+  typed manifest and icon metadata; the native shell registers the root service
+  worker, excludes API responses from caching, and receives explicit completion
+  confirmation after observed Next.js resources are cached.
+- **Compatibility result:** `/editor` remains the only editor composition and
+  `/editor/native` remains a validated redirect. Existing frequency, spectral,
+  and mixer URLs preserve navigation compatibility without client hosts,
+  globals, query bridges, iframe messaging, or old HTML pages. Strict Mode
+  browser proof exposed a controller-lifecycle race in which the development
+  setup-cleanup-setup probe closed a reused audio graph; a tested deferred
+  lifetime now cancels only that immediate probe and still disposes both native
+  controllers after a real unmount.
+- **Browser proof:** the optimized Next.js build was served in Chromium at
+  1440×900 and the 320×720 minimum with no horizontal overflow, framework
+  overlay, console error, or failed application request. All three legacy tool
+  URLs reached their typed panels; `/manifest.webmanifest`, `/icon.svg`, and
+  `/sw.js` returned 200; one root service worker created `audiomass-app-v5` and
+  reloaded `/editor` successfully with the network disabled. A Russian/default
+  to English/`github-light` settings round trip changed the document locale and
+  editor tokens. An in-memory PCM WAV reached Ready, rendered a waveform,
+  selected the full range, opened the native effect dialog, and restored focus
+  after Escape. `/editor-runtime` returned the required 404.
+- **Automated proof:** repository formatting, lint, strict TypeScript, Prisma
+  generation, and every production build passed. The JavaScript/TypeScript
+  suite has 52 passing files / 167 tests: audio-engine 24/91, Web 11/35, NestJS
+  13/32, plugin SDK 3/8, and database 1/1. The production route table contains
+  `/editor`, `/editor/native`, the manifest, and all three redirects but no
+  `/editor-runtime`. Python Black and Ruff passed; strict mypy covers 47 source
+  files; all 35 pytest cases passed with 87.14% coverage and the public OpenAPI
+  contract test remained green.
+- **Architectural result:** no first-party classic editor runtime remains in the
+  repository or Web build. Next.js/React own routes and presentation,
+  controller/session modules own application lifecycle, `@audiomass/audio-engine`
+  owns browser audio behavior, and the service worker caches only the native
+  application boundary. There is no compatibility code path to revive
+  accidentally through configuration or a fallback URL.
+- **Remaining after stage:** Wave G performs the final documentation-wide
+  consistency pass, records the post-deletion source/config inventory and
+  deployment proof, then closes the structural rewrite plan.
+
 ## Overall stage summary
 
-| Wave | State       | Current result                                                                 |
-| ---- | ----------- | ------------------------------------------------------------------------------ |
-| A    | Complete    | Typed application/domain platform and React lifecycle                          |
-| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
-| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
-| D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export  |
-| E    | Complete    | Native production route, React presentation, accessibility, and browser parity |
-| F    | In progress | Server contracts exist; isolated compatibility deletion is the next checkpoint |
-| G    | In progress | Documentation is current; final post-deletion release proof remains            |
+| Wave | State       | Current result                                                                  |
+| ---- | ----------- | ------------------------------------------------------------------------------- |
+| A    | Complete    | Typed application/domain platform and React lifecycle                           |
+| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation    |
+| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI  |
+| D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export   |
+| E    | Complete    | Native production route, React presentation, accessibility, and browser parity  |
+| F    | Complete    | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted |
+| G    | In progress | Final documentation inventory and release/deployment proof remain               |
 
-Twelve structural stages and Waves A-E are complete. This is not the final
-legacy deletion: `apps/web/editor-runtime` no longer serves production
-`/editor`, but intentionally remains as an isolated compatibility boundary until
-Wave F inventories and removes it atomically.
+Thirteen structural stages and Waves A-F are complete. The first-party classic
+editor runtime and every route, bridge, global, asset build, host adapter, and
+configuration exception that could execute it are gone. Wave G is the final
+documentation and release-evidence checkpoint; it does not carry a remaining
+legacy implementation boundary.

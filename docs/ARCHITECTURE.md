@@ -22,7 +22,7 @@ The browser never calls the Python service. The current editor also does not emb
 
 | Path                    | Responsibility                                                                        |
 | ----------------------- | ------------------------------------------------------------------------------------- |
-| `apps/web`              | Next.js 16 App Router, React editor features, and temporary compatibility runtime     |
+| `apps/web`              | Next.js 16 App Router, React editor features, preferences, redirects, and PWA shell   |
 | `apps/api`              | NestJS 11 public API and Python-processing orchestrator                               |
 | `apps/python-api`       | FastAPI DSP, analysis, export, transcription, and trusted server plugins              |
 | `packages/audio-engine` | Typed Web Audio, AudioWorklet, worker, peak, PCM, and shared-buffer primitives        |
@@ -89,27 +89,28 @@ use a versioned document codec. Only the browser repository reads `Storage` and
 performs the conservative migration from unambiguous legacy positional values;
 React, DSP, and domain modules never parse comma-delimited preset strings.
 
-The eight retained codec, compression, noise-suppression, and WaveSurfer assets
-are not imported as application globals. The Next.js editor infrastructure owns
-their absolute asset allowlist, script lifecycle, worker factories, and runtime
-shape validation through `LegacyEditorVendorGateway`. Replacing one vendor no
-longer changes controller or component contracts.
+The old codec, compression, noise-suppression, and WaveSurfer bundles were
+reachable only through the compatibility gateway and were removed in Wave F.
+Their historical attributions remain in `THIRD_PARTY_NOTICES.md`; the current
+application loads no vendor globals or ordered classic scripts.
 
 `/editor` is the framework-native production composition. Its Server Component
 reads validated preferences and panel query state before rendering the React
 shell; `/editor/native` is only a validated redirect to that canonical route.
-`/editor-runtime`, its old IIFEs/globals, manifest, iframe bridge, generated
-runtime build, fallback tool adapters, and patch CSS have no `/editor` consumer
-and remain isolated only until their atomic Wave F deletion checkpoint.
+Wave F removed `/editor-runtime`, its old IIFEs/globals, manifest, iframe bridge,
+generated runtime build, fallback tool hosts, vendor gateway, and patch CSS.
+Web development, tests, and builds now compile only the native application and
+its `@audiomass/audio-engine` prerequisite.
 
 The native multitrack transport, mixer, frequency analyser, and spectral analyser
 now live directly inside the editor feature and never access a runtime global.
-Fallback tool routes remain under `/tools/*` only inside the isolated
-compatibility boundary; its same-origin mixer global access is isolated in one
-temporary adapter and is not imported by the native feature. Locale and theme
-changes use validated cookie preferences read by Server Components and passed as
-serializable data to the client shell; the production editor does not depend on
-the versioned iframe bridge.
+The three `/tools/*` URLs are Server Component redirects to typed editor panels;
+they contain no client host, mixer global access, or query bridge. Locale and
+theme changes use validated cookie preferences read by Server Components and
+passed as serializable data to the client shell. App Router owns the manifest,
+and a native hook registers the service worker and caches observed same-origin
+Next.js resources for offline reloads.
+
 The About surface and offline cache are also owned by Next.js and a root service
 worker rather than standalone HTML/AppCache entrypoints.
 

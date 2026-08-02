@@ -12,6 +12,7 @@ import {
 
 import { EditorController } from '../application/editor-controller';
 import { MultitrackController } from '../application/multitrack-controller';
+import { EditorControllerLifetime } from './editor-controller-lifetime';
 
 const EditorControllerContext = createContext<EditorController | null>(null);
 const MultitrackControllerContext = createContext<MultitrackController | null>(null);
@@ -19,12 +20,12 @@ const MultitrackControllerContext = createContext<MultitrackController | null>(n
 export function EditorProvider({ children }: { children: ReactNode }) {
   const [controller] = useState(() => new EditorController());
   const [multitrack] = useState(() => new MultitrackController());
+  const [lifetime] = useState(() => new EditorControllerLifetime([controller, multitrack]));
 
   useEffect(() => {
-    return () => {
-      void Promise.all([controller.close(), multitrack.close()]);
-    };
-  }, [controller, multitrack]);
+    lifetime.mount();
+    return () => lifetime.unmount();
+  }, [lifetime]);
 
   return (
     <EditorControllerContext.Provider value={controller}>

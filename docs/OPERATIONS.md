@@ -2,19 +2,19 @@
 
 ## Health and first response
 
-During the Wave F compatibility-deletion window, include these routes in Web
-smoke tests:
+Include these routes in Web smoke tests:
 
 - `/editor` proves the production App Router/React/audio package boundary;
 - `/editor/native` proves the compatibility redirect and validated panel query;
-- `/editor-runtime` proves the isolated generated compatibility assets until
-  that route is deleted in Wave F.
+- `/tools/frequency-analyser`, `/tools/spectral-analyser`, and
+  `/tools/multitrack-mixer` prove redirects to their native panels;
+- `/manifest.webmanifest`, `/icon.svg`, and `/sw.js` prove the native PWA shell.
 
 A failure on `/editor` usually points to Next.js chunks, browser Web Audio
-support, preference parsing, or a native feature module. A failure only on
-`/editor-runtime` points to `runtime:build`, copied vendor assets,
-service-worker caching, or the compatibility document. Delete that build only
-through the Wave F inventory and proof in `FRAMEWORK_NATIVE_EDITOR_PLAN.md`.
+support, preference parsing, or a native feature module. A redirect failure
+points to an App Router route; an offline reload failure points to service-worker
+registration, the manifest, or a missing same-origin resource. No runtime build
+or copied editor asset tree exists after Wave F.
 
 Monitor these endpoints from their appropriate network:
 
