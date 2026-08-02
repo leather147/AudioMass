@@ -299,6 +299,29 @@ editor commands, and audio processing in their owning layers:
    until Wave F removes its route, assets, compiler, and declarations as one
    verified deletion.
 
+E.2 uses the following explicit native presentation boundary:
+
+- the audio package owns deterministic FFT/STFT analysis, normalized frequency
+  and spectrogram result contracts, option validation, and numerical tests;
+- a request-correlated worker client owns copied PCM transfer, cancellation,
+  failures, and disposal. The Next.js controller creates it lazily and keys
+  analysis to the rendered-audio revision so transport updates never repeat DSP;
+- decomposed React frequency and spectrogram panels own responsive Canvas
+  rendering, accessible summaries and controls, loading/error states, and stale
+  result rejection. Canvas paints pixels only and never reads editor state;
+- an accessible React menu bar and typed panel registry compose waveform,
+  frequency, spectral, markers, effects, and multitrack mixer surfaces inside
+  the native editor. Menu actions dispatch typed controller commands or select
+  registered panels; they never construct HTML or open a classic page;
+- the framework-native feature must not import `components/tools`, legacy mixer
+  adapters, editor tool routes, runtime globals, or compatibility assets. The
+  `/tools/*` adapters required only by the behavior-complete fallback remain
+  outside the native graph until E.3 promotes `/editor`, then Wave F deletes
+  that isolated compatibility boundary atomically;
+- focused tests must cover transform accuracy, bounds and finite output, worker
+  ownership/lifecycle, revision-stable controller routing, panel/menu registry,
+  localization, accessibility structure, and the no-compatibility import rule.
+
 ### Wave F — server contracts and compatibility deletion
 
 - Complete NestJS operation DTOs and FastAPI discriminated schemas.
