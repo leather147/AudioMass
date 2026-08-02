@@ -410,6 +410,32 @@ Wave F uses the following atomic compatibility-deletion boundary:
   browser parity checks.
 - Record the final inventory and commit only with a clean worktree.
 
+Wave G uses the following release-documentation boundary:
+
+- the wave starts from clean, pushed commit `89e1d83` and covers all 12 tracked
+  Markdown files. Current-state guides must describe only the framework-native
+  repository; superseded runtime details may remain solely in explicitly
+  historical records;
+- README, architecture, migration, API, Python API, deployment, Vercel-only,
+  operations, notices, and both rewrite plans receive an explicit final-state
+  review. Routes, commands, environment variables, ownership boundaries,
+  versions, and cross-document links must agree with the repository;
+- a repository-owned documentation check validates every tracked Markdown
+  relative link and the canonical document set. CI and the root scripts run it,
+  preventing renamed or deleted files from silently leaving broken guidance;
+- final inventories record tracked source languages, remaining browser
+  JavaScript, forbidden legacy symbols/paths, App Router routes, workspace
+  packages, Vercel configurations, Prisma generation, and OpenAPI coverage.
+  Historical names do not count as executable legacy code when clearly marked;
+- release proof includes frozen dependency installation, dependency audits,
+  formatting, documentation integrity, lint, strict typecheck, all tests,
+  production builds, Python Black/Ruff/mypy/pytest, Prisma/OpenAPI contracts,
+  and a production Chromium smoke pass. Any failure must be resolved or recorded
+  precisely rather than omitted;
+- Stage 14 closes Wave G only after the plan contains per-stage and overall
+  results, the implementation commit is reviewable, the worktree is clean, and
+  the explicit `agent/repository-hardening` push is synchronized at 0/0.
+
 ## Verification matrix
 
 | Layer         | Required checks                                                                                |
@@ -440,11 +466,12 @@ Wave F uses the following atomic compatibility-deletion boundary:
 - [x] Wave E: E.1 revision-aware waveform/track presentation, E.2 native
       menus/analyzers/workspace composition, and E.3 production promotion,
       responsive/keyboard/localization parity, and browser proof are complete.
-- [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
-      are implemented; compatibility deletion is the next atomic checkpoint now
-      that Waves A-E are complete.
-- [ ] Wave G (documentation synchronized at this checkpoint; final release
-      proof remains).
+- [x] Wave F: Nest operation DTOs and FastAPI discriminated jobs are implemented;
+      the compatibility runtime, route, assets, globals, host adapters, build
+      hooks, and configuration exceptions were deleted in `89e1d83`.
+- [ ] Wave G (in progress): all tracked documentation, integrity enforcement,
+      final inventories, dependency audits, and release proof are the remaining
+      checkpoint.
 
 ## Stage reports
 
@@ -888,7 +915,7 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 
 ### Stage 13 — Wave F atomic compatibility deletion
 
-- **Status:** complete on 2026-08-02. Scope and the measured deletion inventory
+- **Status:** complete on 2026-08-03. Scope and the measured deletion inventory
   were committed and pushed first as `23f21a5` (`Plan compatibility runtime
 deletion`); the commit containing this report is the Wave F implementation
   checkpoint (`Delete compatibility runtime Wave F`).
