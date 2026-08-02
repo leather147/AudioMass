@@ -48,6 +48,65 @@ class FakeEngine implements EditorAudioEngine {
 }
 
 describe('EditorController export boundary', () => {
+  it('routes revision-scoped frequency analysis through a lazy disposable port', async () => {
+    const session = new EditorSession(new FakeEngine());
+    await session.load(new ArrayBuffer(0), 'spectrum.wav');
+    let destroyed = false;
+    let receivedFrames = 0;
+    const controller = new EditorController(
+      session,
+      new AudioExportService(),
+      { save: () => undefined },
+      () => ({ destroy: () => undefined, encode: async () => new ArrayBuffer(0) }),
+      () => ({
+        destroy: () => undefined,
+        extractAnalysis: async () => ({
+          channels: [],
+          overview: {
+            length: 0,
+            max: new Float32Array(0),
+            min: new Float32Array(0),
+            samplesPerPixel: 1,
+          },
+        }),
+      }),
+      () => ({
+        analyze: async (audio, options) => {
+          receivedFrames = options?.frameCount ?? 0;
+          return {
+            spectrogram: {
+              duration: audio.channels[0]!.length / audio.sampleRate,
+              frameCount: 2,
+              frequencies: Float32Array.from([0, 2]),
+              magnitudesDb: Float32Array.from([-120, -6, -120, -5]),
+              times: Float32Array.from([0.25, 0.75]),
+            },
+            spectrum: {
+              frequencies: Float32Array.from([0, 2]),
+              magnitudesDb: Float32Array.from([-120, -5]),
+              sampleRate: audio.sampleRate,
+            },
+          };
+        },
+        destroy: () => {
+          destroyed = true;
+        },
+      }),
+    );
+
+    await expect(
+      controller.analyzeFrequency({ fftSize: 512, frameCount: 2 }),
+    ).resolves.toMatchObject({
+      spectrogram: { frameCount: 2 },
+      spectrum: { sampleRate: 4 },
+    });
+    expect(receivedFrames).toBe(2);
+    await controller.dispatch({ name: 'playback.seek', seconds: 0.5 });
+    expect(controller.snapshot.audioRevision).toBe(1);
+    await controller.close();
+    expect(destroyed).toBe(true);
+  });
+
   it('lazily analyzes rendered PCM and disposes the waveform worker port', async () => {
     const session = new EditorSession(new FakeEngine());
     await session.load(new ArrayBuffer(0), 'waveform.wav');

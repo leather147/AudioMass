@@ -40,13 +40,15 @@ iframe. Server components read validated locale/theme preferences; client
 components render controls and translate interaction into typed commands. A
 React provider owns one `EditorController`, `useSyncExternalStore` publishes
 immutable snapshots, hooks own keyboard/drop lifecycles, and feature components
-own transport, timeline, markers, dialogs, notifications, effects, and tracks.
+own transport, timeline, markers, dialogs, notifications, effects, menus,
+analyzers, and tracks.
 
 `packages/audio-engine` is the framework-independent boundary. It contains the
-Web Audio graph, PCM edits, WAV encoding, typed WAV/tempo worker clients,
-recording/worklet protocols, loudness and tempo analysis, ID3/MP4 metadata,
-bounded history, markers, versioned project parsing, multitrack entities, and
-scheduling. Its multitrack application boundary owns copied PCM sources,
+Web Audio graph, PCM edits, WAV encoding, typed WAV/tempo/frequency worker
+clients, recording/worklet protocols, loudness, tempo, FFT, and STFT analysis,
+ID3/MP4 metadata, bounded history, markers, versioned project parsing,
+multitrack entities, and scheduling. Its multitrack application boundary owns
+copied PCM sources,
 mute/solo and channel/master gain rules, transport snapshots, a disposable Web
 Audio playback/mixer graph, equal-power crossfade pairs, and deterministic
 stereo PCM bounce. Browser infrastructure decodes files and persists complete
@@ -62,6 +64,15 @@ markers, and semantic controls, while Canvas only paints peak pixels. The native
 multitrack surface renders the immutable project snapshot as ruler, track, clip,
 fade, crossfade, and playhead layers without reading Web Audio nodes or runtime
 globals.
+
+Frequency presentation follows that ownership model. The audio package validates
+bounded FFT/STFT options and returns typed spectrum and frame-major spectrogram
+arrays from a request-correlated worker. `EditorController` creates that worker
+port lazily from rendered PCM, while React rejects stale audio-revision/config
+results and owns controls plus accessible numerical summaries. Canvas paints the
+frequency line or spectrogram pixels only. A typed panel registry and React
+File/Edit/View menu compose waveform, frequency, spectral, and mixer workspaces;
+they dispatch typed commands and never navigate to classic tool pages.
 
 Single-track editing is an application transaction, not a React state mutation.
 The session history stores immutable document/PCM states; copy, cut, paste,
@@ -90,10 +101,11 @@ This is a deliberate strangler boundary, not the target architecture. The old
 IIFEs, globals, manifest, iframe bridge, generated runtime build and patch CSS
 are deleted together only after the parity matrix passes.
 
-The native multitrack transport and mixer now live directly inside the editor
-feature and never access a runtime global. The frequency analyser, spectral
-analyser, and behavior-complete fallback mixer remain under `/tools/*`; the
-fallback mixer's same-origin global access is isolated in one temporary adapter.
+The native multitrack transport, mixer, frequency analyser, and spectral analyser
+now live directly inside the editor feature and never access a runtime global.
+Behavior-complete fallback tool routes remain under `/tools/*` only for the
+compatibility editor; its same-origin mixer global access is isolated in one
+temporary adapter and is not imported by the native feature.
 Locale and theme changes use the versioned editor bridge. Preference application
 suppresses intermediate bridge events, and the Next.js shell serializes
 validated cookie writes so an older request cannot restore a stale language.

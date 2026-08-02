@@ -363,8 +363,9 @@ E.2 uses the following explicit native presentation boundary:
       typed effects/presets, fixed-duration and specialized workflows, native
       multitrack playback/export, full local project persistence, and React
       consumers are complete and tested.
-- [ ] Wave E (in progress): E.1 revision-aware waveform/track presentation is
-      complete; E.2 menus/analyzers and E.3 production promotion remain.
+- [ ] Wave E (in progress): E.1 revision-aware waveform/track presentation and
+      E.2 native menus/analyzers/workspace composition are complete; E.3
+      production promotion remains.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
 - [ ] Wave G (documentation synchronized at this checkpoint; final release
@@ -710,6 +711,51 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   browser/responsive parity and promotes the native shell to `/editor`; Wave F
   performs the atomic compatibility-runtime deletion only after that proof.
 
+### Stage 11 — Wave E.2 menus, analyzers, and workspace composition
+
+- **Status:** complete on 2026-08-02. Scope was committed and pushed first as
+  `62ab4dc` (`Plan native editor analysis and menus`); the commit containing this
+  report is the E.2 implementation checkpoint
+  (`Complete framework-native editor Wave E.2`).
+- **Delivered:** deterministic bounded FFT/STFT analysis with frequency-spectrum
+  and frame-major spectrogram contracts; a request-correlated worker protocol
+  and lazy controller port; localized React frequency and spectral panels with
+  responsive Canvas rendering, summaries, controls, loading/error states, and
+  stale-result rejection; an accessible File/Edit/View menu bar backed by typed
+  editor commands; and a single registered workspace that composes waveform,
+  frequency, spectral, and native multitrack mixer panels. The native App Router
+  page validates its optional panel query on the server and passes only the
+  serializable registry value into the client shell.
+- **Compatibility result:** native menus and analyzers do not navigate to
+  classic HTML pages, import `/tools/*` adapters, access `PKAudioEditor`, or
+  mutate a document-global editor object. The behavior-complete compatibility
+  editor and its `/tools/*` routes remain isolated and unchanged until E.3 proves
+  production parity and Wave F deletes that entire boundary atomically. Worker
+  requests transfer owned PCM copies, correlate concurrent responses, reject
+  pending work on disposal, and never recompute from transport-only updates.
+- **Automated proof:** audio-engine has 24 passing test files / 91 tests; web has
+  27 passing test files / 97 tests; the complete JavaScript/TypeScript suite has
+  68 files / 229 tests. New tests cover sine-peak accuracy, bounded option
+  validation, Nyquist capping, phase-cancelling channel downmix, finite
+  spectrogram layout, worker PCM ownership/correlation/disposal, controller
+  lifecycle, panel query validation, and the no-compatibility-import boundary.
+  Repository formatting, lint, TypeScript typecheck, Prisma generation, all
+  tests, and all production builds passed. Python Black, Ruff, strict mypy, and
+  all 35 pytest cases passed with 87.14% coverage using isolated local
+  temp/cache directories.
+- **Architectural result:** the framework-independent audio package owns
+  numerical analysis and worker contracts; the Next.js application controller
+  owns lazy browser-worker lifecycle; the App Router owns validated initial
+  route state; React owns accessible menu/panel structure and typed commands;
+  Canvas owns pixels only. Spectrogram rendering is device-pixel-ratio correct
+  and precomputes frequency/frame lookup arrays to avoid per-pixel search and
+  tuple allocation.
+- **Remaining after stage:** E.3 completes keyboard/focus and responsive browser
+  parity, promotes the native shell to `/editor`, and records the production
+  route proof. Wave F can then delete `apps/web/editor-runtime`, bridge/manifest
+  compilation, temporary tool/mixer adapters, generated compatibility assets,
+  and patch CSS as one verified change.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
@@ -718,10 +764,10 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
 | D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export  |
-| E    | In progress | E.1 native waveform, ruler, selection, markers, and clip lanes complete        |
+| E    | In progress | E.1 waveform/tracks and E.2 native menus/analyzers/workspace are complete      |
 | F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
 | G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Ten structural stages are complete. This is not the final legacy deletion:
+Eleven structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
 Wave E passes parity and Wave F removes the entire boundary atomically.

@@ -29,6 +29,87 @@
   border-block: 1px solid var(--editor-border);
 }
 
+.menuBar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: stretch;
+  min-height: 2rem;
+  padding-inline: 0.5rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-surface);
+}
+
+.menuRoot {
+  position: relative;
+}
+
+.menuRoot > button {
+  height: 100%;
+  min-width: 4.5rem;
+  padding-inline: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--editor-text-muted);
+  text-align: start;
+}
+
+.menuRoot > button[aria-expanded='true'],
+.menuRoot > button:hover {
+  background: var(--editor-panel);
+  color: var(--editor-text);
+}
+
+.menuPopup {
+  position: absolute;
+  z-index: 30;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  display: grid;
+  width: max-content;
+  min-width: 15rem;
+  padding: 0.35rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0 0 0.55rem 0.55rem;
+  background: var(--editor-panel);
+  box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--editor-bg) 75%, transparent);
+}
+
+.menuPopup button {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 2.1rem;
+  padding-inline: 0.55rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--editor-text);
+  text-align: start;
+}
+
+.menuPopup button:not([role='menuitemradio']) {
+  display: block;
+}
+
+.menuPopup button:hover,
+.menuPopup button:focus-visible {
+  background: color-mix(in srgb, var(--editor-accent) 14%, var(--editor-surface));
+}
+
+.menuPopup button:disabled {
+  color: var(--editor-text-muted);
+  opacity: 0.55;
+}
+
+.menuPopup hr {
+  width: 100%;
+  margin-block: 0.3rem;
+  border: 0;
+  border-block-start: 1px solid var(--editor-border);
+}
+
 .toolbar button,
 .toolbar input,
 .editToolbar button,
@@ -46,6 +127,15 @@
   background: var(--editor-surface);
   color: inherit;
   padding-inline: 0.75rem;
+}
+
+.analysisControls select {
+  min-height: 2.25rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.5rem;
+  background: var(--editor-surface);
+  color: inherit;
+  padding-inline: 0.5rem;
 }
 
 .multitrackPanel {
@@ -153,6 +243,9 @@
 
 .toolbar button:focus-visible,
 .toolbar input:focus-visible,
+.menuRoot > button:focus-visible,
+.analysisControls input:focus-visible,
+.analysisControls select:focus-visible,
 .editToolbar button:focus-visible,
 .editToolbar input:focus-visible,
 .editToolbar select:focus-visible,
@@ -330,6 +423,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 18rem;
   min-height: 0;
+}
+
+.workspace[data-sidebar='false'] {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .dropzone {
@@ -540,6 +637,84 @@
   color: var(--editor-text-muted);
 }
 
+.analysisPanel {
+  display: grid;
+  min-width: 0;
+  gap: 0.65rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--editor-surface) 94%, transparent);
+  overflow: hidden;
+}
+
+.analysisControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-panel);
+}
+
+.analysisControls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--editor-text-muted);
+}
+
+.analysisControls input {
+  accent-color: var(--editor-accent);
+}
+
+.analysisCanvas {
+  min-width: 0;
+  height: 360px;
+  margin-inline: 0.75rem;
+  border: 1px solid var(--editor-border);
+  background: var(--editor-bg);
+  overflow: hidden;
+}
+
+.analysisCanvas canvas {
+  display: block;
+  width: 100%;
+  height: 360px;
+}
+
+.analysisSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding-inline: 0.75rem;
+}
+
+.analysisSummary > div {
+  padding: 0.55rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.45rem;
+  background: var(--editor-bg);
+}
+
+.analysisSummary dt {
+  color: var(--editor-text-muted);
+  font-size: 0.72rem;
+}
+
+.analysisSummary dd {
+  margin: 0.25rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.analysisStatus {
+  min-height: 1.25rem;
+  margin: 0;
+  padding-inline: 0.75rem;
+  color: var(--editor-text-muted);
+}
+
 .trackTimeline {
   display: grid;
   gap: 0.45rem;
@@ -711,5 +886,9 @@
   .sidebar {
     border-inline-start: 0;
     border-block-start: 1px solid var(--editor-border);
+  }
+
+  .analysisSummary {
+    grid-template-columns: 1fr;
   }
 }

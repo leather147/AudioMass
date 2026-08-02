@@ -6,6 +6,7 @@ export {
   gainForLoudnessTarget,
 } from './analysis/loudness.js';
 export { analyzeTempo, estimateTempo } from './analysis/tempo.js';
+export { analyzeFrequency } from './analysis/frequency.js';
 export { AudioEngineError } from './errors.js';
 export { AudioWorkletRegistry } from './audio-worklet-registry.js';
 export { encodePcmAsWav, encodeWav, interleaveWavChannels } from './codecs/wav.js';
@@ -122,10 +123,17 @@ export { AudioRecorder, mergeRecordedChunks } from './recording/audio-recorder.j
 export { RECORDER_PROCESSOR_NAME } from './recording/recorder-protocol.js';
 export { SharedAudioRingBuffer } from './shared-ring-buffer.js';
 export { TempoWorkerClient } from './workers/tempo-worker-client.js';
+export { FrequencyAnalysisWorkerClient } from './workers/frequency-analysis-worker-client.js';
 export { WavEncoderWorkerClient } from './workers/wav-encoder-client.js';
 export type { SharedRingBufferDescriptor } from './shared-ring-buffer.js';
 export type { LoudnessNormalization, LoudnessReport } from './analysis/loudness.js';
 export type { AudioBufferView, TempoOptions, TempoResult } from './analysis/tempo.js';
+export type {
+  FrequencyAnalysis,
+  FrequencyAnalysisOptions,
+  FrequencySpectrum,
+  SpectrogramAnalysis,
+} from './analysis/frequency.js';
 export type {
   MultitrackSessionEvents,
   MultitrackSessionDocument,
@@ -252,5 +260,9 @@ export type {
   MultitrackPlaybackSnapshot,
 } from './multitrack/playback.js';
 export type { TempoAnalyzeRequest, TempoAnalyzeResponse } from './workers/tempo-worker-protocol.js';
+export type {
+  FrequencyAnalysisRequest,
+  FrequencyAnalysisResponse,
+} from './workers/frequency-analysis-protocol.js';
 export type { WavEncodeRequest, WavEncodeResponse } from './workers/wav-encoder-protocol.js';
 export type { PeakWorkerRequest, PeakWorkerResponse } from './peak-worker-protocol.js';

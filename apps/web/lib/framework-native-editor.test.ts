@@ -73,6 +73,19 @@ describe('framework-native editor boundary', () => {
     expect(sources).not.toContain('components/timeline/timeline');
   });
 
+  it('owns typed analyzer panels and menu composition without compatibility tool routes', () => {
+    const root = join(process.cwd(), 'features', 'editor');
+    const sources = featureSources(root);
+
+    expect(sources).toContain('AnalysisPanel');
+    expect(sources).toContain('controller.analyzeFrequency');
+    expect(sources).toContain('EditorMenuBar');
+    expect(sources).toContain('EDITOR_PANEL_IDS');
+    expect(sources).toContain('role="menuitemradio"');
+    expect(sources).not.toMatch(/components\/tools|editorToolRoute|legacyMixerHost/);
+    expect(sources).not.toMatch(/(?:eq|sp|mix)\.html/);
+  });
+
   it('keeps direct vendor asset paths in the one infrastructure registry', () => {
     const root = join(process.cwd(), 'features', 'editor');
     const sources = featureSources(root);

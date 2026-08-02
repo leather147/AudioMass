@@ -1,4 +1,5 @@
 import { EditorShell } from '@/features/editor/components/editor-shell';
+import { parseEditorPanel } from '@/features/editor/components/workspace/editor-panels';
 import { readEditorPreferences } from '@/lib/editor-preference-cookies';
 
 export const metadata = {
@@ -6,7 +7,12 @@ export const metadata = {
   title: 'AudioMass native editor',
 };
 
-export default async function NativeEditorPage() {
+interface NativeEditorPageProps {
+  searchParams: Promise<{ panel?: string }>;
+}
+
+export default async function NativeEditorPage({ searchParams }: NativeEditorPageProps) {
+  const { panel } = await searchParams;
   const preferences = await readEditorPreferences();
-  return <EditorShell preferences={preferences} />;
+  return <EditorShell initialPanel={parseEditorPanel(panel)} preferences={preferences} />;
 }
