@@ -39,6 +39,7 @@ export function AnalysisPanel({ controller, copy, kind, snapshot }: AnalysisPane
   const error = state.key === key ? state.error : null;
   const loaded = snapshot.engine.duration > 0;
   const loading = loaded && state.key !== key;
+  const canvasHeight = Math.max(220, Math.min(360, Math.round(width * 0.55)));
   const options = useMemo<FrequencyAnalysisOptions>(
     () => ({ fftSize, frameCount }),
     [fftSize, frameCount],
@@ -56,7 +57,7 @@ export function AnalysisPanel({ controller, copy, kind, snapshot }: AnalysisPane
         if (requestSequence.current !== requestId) return;
         setState({
           analysis: null,
-          error: reason instanceof Error ? reason.message : 'Audio analysis failed.',
+          error: reason instanceof Error ? reason.message : copy('analysisFailed'),
           key,
         });
       },
@@ -64,7 +65,7 @@ export function AnalysisPanel({ controller, copy, kind, snapshot }: AnalysisPane
     return () => {
       if (requestSequence.current === requestId) requestSequence.current += 1;
     };
-  }, [controller, key, loaded, options, startTransition]);
+  }, [controller, copy, key, loaded, options, startTransition]);
 
   const peak = useMemo(() => {
     if (!analysis) return null;
@@ -118,8 +119,8 @@ export function AnalysisPanel({ controller, copy, kind, snapshot }: AnalysisPane
           </label>
         ) : null}
       </header>
-      <div className={styles.analysisCanvas} ref={reference}>
-        <AnalysisCanvas analysis={analysis} height={360} kind={kind} width={width} />
+      <div className={styles.analysisCanvas} ref={reference} style={{ height: canvasHeight }}>
+        <AnalysisCanvas analysis={analysis} height={canvasHeight} kind={kind} width={width} />
       </div>
       <dl className={styles.analysisSummary}>
         <div>

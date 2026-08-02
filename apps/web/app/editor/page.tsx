@@ -1,18 +1,21 @@
-import { EditorFrame } from '@/components/editor/editor-frame';
+import { EditorShell } from '@/features/editor/components/editor-shell';
+import { parseEditorPanel } from '@/features/editor/components/workspace/editor-panels';
 import { editorCopy } from '@/lib/editor-copy';
 import { readEditorPreferences } from '@/lib/editor-preference-cookies';
 
 export async function generateMetadata() {
   const { locale } = await readEditorPreferences();
-  return { title: editorCopy(locale, 'editorTitle') };
+  return {
+    description: editorCopy(locale, 'editorDescription'),
+    title: editorCopy(locale, 'editorTitle'),
+  };
 }
 
-export default async function EditorPage() {
-  const preferences = await readEditorPreferences();
+interface EditorPageProps {
+  searchParams: Promise<{ panel?: string }>;
+}
 
-  return (
-    <main className="editor-page">
-      <EditorFrame initialPreferences={preferences} />
-    </main>
-  );
+export default async function EditorPage({ searchParams }: EditorPageProps) {
+  const [preferences, { panel }] = await Promise.all([readEditorPreferences(), searchParams]);
+  return <EditorShell initialPanel={parseEditorPanel(panel)} preferences={preferences} />;
 }

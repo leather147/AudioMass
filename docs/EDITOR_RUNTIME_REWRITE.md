@@ -146,8 +146,7 @@ classic initialization order and global facades; structural completion requires
 deleting this runtime after React/audio-engine parity, as defined by the
 framework-native plan.
 
-At the current structural checkpoint, the native editor has completed Waves A-D
-and Wave E.1/E.2.
+At the current structural checkpoint, the native editor has completed Waves A-E.
 Its application services own PCM-aware single-track history, all primary and
 specialized effect transactions, copied multitrack sources, project scheduling,
 Web Audio routing/playback, complete local documents, and deterministic WAV
@@ -155,7 +154,7 @@ export. React owns the native transport, effects, responsive waveform, ruler,
 selection, marker overlay, clip lanes, typed menus, mixer workspace, frequency
 analyser, and spectral analyser without editor globals or classic tool routes.
 Worker-backed peaks and bounded FFT/STFT results are keyed by rendered-audio
-revision so playhead updates do not repeat analysis. The compatibility runtime
-remains only as the behavior-complete production presentation while Wave E.3
-completes browser parity and promotes the native route; Wave F then deletes that
-boundary atomically.
+revision so playhead updates do not repeat analysis. `/editor` now renders that
+native shell directly and `/editor/native` redirects to it. The compatibility
+runtime has no production editor consumer; Wave F deletes its route, compiler,
+bridge, tool adapters, generated assets, globals, and patch CSS atomically.

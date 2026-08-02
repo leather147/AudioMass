@@ -23,7 +23,7 @@ export function MultitrackPanel({ copy, onError }: MultitrackPanelProps) {
     try {
       await action();
     } catch (error) {
-      onError(error instanceof Error ? error.message : 'Multitrack operation failed.');
+      onError(error instanceof Error ? error.message : copy('multitrackFailed'));
     }
   };
 

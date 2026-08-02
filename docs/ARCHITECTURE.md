@@ -95,20 +95,21 @@ their absolute asset allowlist, script lifecycle, worker factories, and runtime
 shape validation through `LegacyEditorVendorGateway`. Replacing one vendor no
 longer changes controller or component contracts.
 
-`/editor/native` is the migration preview. `/editor` and `/editor-runtime` still
-serve the behavior-complete compatibility editor while React parity is built.
-This is a deliberate strangler boundary, not the target architecture. The old
-IIFEs, globals, manifest, iframe bridge, generated runtime build and patch CSS
-are deleted together only after the parity matrix passes.
+`/editor` is the framework-native production composition. Its Server Component
+reads validated preferences and panel query state before rendering the React
+shell; `/editor/native` is only a validated redirect to that canonical route.
+`/editor-runtime`, its old IIFEs/globals, manifest, iframe bridge, generated
+runtime build, fallback tool adapters, and patch CSS have no `/editor` consumer
+and remain isolated only until their atomic Wave F deletion checkpoint.
 
 The native multitrack transport, mixer, frequency analyser, and spectral analyser
 now live directly inside the editor feature and never access a runtime global.
-Behavior-complete fallback tool routes remain under `/tools/*` only for the
-compatibility editor; its same-origin mixer global access is isolated in one
-temporary adapter and is not imported by the native feature.
-Locale and theme changes use the versioned editor bridge. Preference application
-suppresses intermediate bridge events, and the Next.js shell serializes
-validated cookie writes so an older request cannot restore a stale language.
+Fallback tool routes remain under `/tools/*` only inside the isolated
+compatibility boundary; its same-origin mixer global access is isolated in one
+temporary adapter and is not imported by the native feature. Locale and theme
+changes use validated cookie preferences read by Server Components and passed as
+serializable data to the client shell; the production editor does not depend on
+the versioned iframe bridge.
 The About surface and offline cache are also owned by Next.js and a root service
 worker rather than standalone HTML/AppCache entrypoints.
 

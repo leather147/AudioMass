@@ -5,12 +5,12 @@ AudioMass — браузерный многодорожечный аудиоре
 изолированным FastAPI-сервисом для тяжёлого DSP и транскрипции.
 
 Редактор проходит вторую, структурную миграцию. Production-маршрут `/editor`
-пока использует совместимый same-origin runtime, а `/editor/native` содержит
-новую реализацию на React-компонентах, controller/store/hooks и импортируемом
-`@audiomass/audio-engine`. Native route уже выполняет PCM-aware copy/cut/paste,
-delete, trim, silence insertion, undo/redo и WAV export через типизированные
-worker/adapter-порты. Старый runtime нельзя удалять до полного UI/effects parity.
-Точный план, карта каждого модуля и критерии удаления находятся в
+уже напрямую рендерит App Router/React-реализацию на controller/store/hooks и
+`@audiomass/audio-engine`; `/editor/native` оставлен только как проверяемый
+redirect на тот же маршрут. Совместимый same-origin runtime больше не имеет
+production-потребителя, но его маршрут, сборка и assets удаляются одной
+проверяемой операцией в Wave F. Точный план, карта каждого модуля и критерии
+удаления находятся в
 [FRAMEWORK_NATIVE_EDITOR_PLAN.md](docs/FRAMEWORK_NATIVE_EDITOR_PLAN.md).
 
 ## Текущий production
@@ -597,19 +597,20 @@ wildcard в production.
 Vercel Project. Для этой монорепы правильный Web root — `apps/web`; старый
 статический root-деплой не соответствует текущей структуре.
 
-## Правила безопасной разработки runtime редактора
+## Временная совместимость до Wave F
 
-`apps/web/editor-runtime` — единственный source-каталог браузерного редактора.
-Ручное редактирование `apps/web/public/editor-assets` запрещено: это полностью
-генерируемый build output, который очищается и пересобирается командой
-`pnpm --filter @audiomass/web runtime:build`.
+Production-редактор находится в `apps/web/features/editor` и
+`packages/audio-engine`. `apps/web/editor-runtime` — изолированный совместимый
+контур без потребителя со стороны `/editor`; он сохраняется только до атомарного
+удаления в Wave F. Ручное редактирование `apps/web/public/editor-assets`
+запрещено: это полностью генерируемый build output, который пока очищается и
+пересобирается командой `pnpm --filter @audiomass/web runtime:build`.
 
-Поверхности не дублируются внутри runtime: анализаторы и
-микшер находятся в `apps/web/app/tools`, About — в `apps/web/app/about`, а
-синхронизация темы/языка проходит через типизированный версионированный bridge и
-`/api/editor-preferences`. Preference, locale, theme и bridge runtime-сервисы
-компилируются перед `dev`, `test` и `build`, а статические зависимости копируются
-в тот же каталог с сохранением относительных URL воркеров, кодеков и медиа.
+Нативные анализаторы, микшер, меню, About, темы и локализация принадлежат App
+Router и React feature-модулям. `/api/editor-preferences` сохраняет валидированные
+cookie-настройки; production UI не синхронизируется через iframe bridge и не
+открывает старые HTML-страницы. Временные `/tools/*` adapters, bridge и runtime
+manifest не импортируются нативным feature-графом.
 
 Операции копирования, обрезки, вставки, тишины и замены `AudioBuffer` находятся
 в `editor-runtime/audio-buffer-operations.ts`; `actions.js` сохраняет прежние
@@ -620,13 +621,13 @@ Vercel Project. Для этой монорепы правильный Web root �
 `actions.js` использует их через прежние локальные имена, поэтому существующий
 банк эффектов и формат его параметров остаются совместимыми.
 
-- Не меняйте порядок ресурсов в `editor-runtime-manifest.ts` без проверки
-  зависимостей и production-сборки `/editor-runtime`.
+- Не расширяйте временный `editor-runtime-manifest.ts`: любые новые механики
+  реализуются в нативном feature/audio-engine контуре.
 - Совместимые глобальные `PKAudioEditor`, `PKAudioFX`, bridge hooks и CSS tokens
   являются внутренним API runtime; изменение требует контрактного теста.
 - Общие цвета меняйте через theme tokens; не добавляйте новые hardcoded popup
   backgrounds.
-- Локализацию добавляйте через `editor-runtime/locale-service.ts`, без
+- Локализацию production UI добавляйте через `apps/web/lib/editor-copy.ts`, без
   параллельных словарей и прямого `localStorage + reload` в UI-модулях.
 - После UI-изменений вручную проверьте пустой проект, загруженный multitrack,
   широкий и узкий viewport, zoom браузера, темы, popup-окна и обе локали.

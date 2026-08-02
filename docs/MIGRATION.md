@@ -4,12 +4,13 @@
 
 The repository moved from a static browser application with local-only persistence to a Turborepo workspace with an incremental Next.js shell, reusable browser audio packages, a versioned NestJS gateway, PostgreSQL persistence, provider-neutral object storage, and a private FastAPI processing service.
 
-The editor is not being rewritten in one unsafe step. Its stable UI and mature
-audio behavior remain available under a same-origin isolation boundary while a
-framework-native implementation grows alongside it. The new path uses React
-feature modules in Next.js, framework-independent domain/application modules in
-`@audiomass/audio-engine`, transport DTOs and orchestration in NestJS, and
-discriminated Pydantic contracts in FastAPI. See
+The editor was not rewritten in one unsafe step. Its framework-native path now
+owns production `/editor` through React feature modules in Next.js and
+framework-independent domain/application modules in
+`@audiomass/audio-engine`; `/editor/native` redirects to the canonical route.
+The former same-origin boundary remains isolated without a production consumer
+until its atomic Wave F deletion. Transport DTOs and orchestration live in
+NestJS, and discriminated processing contracts live in FastAPI. See
 [FRAMEWORK_NATIVE_EDITOR_PLAN.md](FRAMEWORK_NATIVE_EDITOR_PLAN.md) for the live
 inventory and removal gate.
 
@@ -35,11 +36,11 @@ Each feature phase is independently reviewable and has package-level tests. The 
 - Storage adapters share one lifecycle and verification contract.
 - Project updates use optimistic concurrency, and processing creation supports idempotency.
 - Browser plugins are capability-scoped packages; Python plugins are trusted server installations.
-- Editor sources now have a single `apps/web/editor-runtime` boundary. Static compatibility modules and binary resources are versioned under `editor-runtime/static`; `public/editor-assets` is generated and ignored.
+- Production editor sources live under `apps/web/features/editor` and `packages/audio-engine`. The isolated `apps/web/editor-runtime` compatibility boundary has no `/editor` consumer; its static vendor resources remain versioned under `editor-runtime/static`, while `public/editor-assets` is generated and ignored until Wave F.
 - Frequency analysis, spectral analysis, the multitrack mixer, About, preference persistence, and offline installation now use App Router or root web-platform entrypoints; their superseded standalone HTML and AppCache files have been removed.
 - The final static editor HTML entrypoint was replaced by the `/editor-runtime` Route Handler and a tested asset-order manifest. Relative worker, worklet, codec, and sample paths remain compatible through the runtime document base URL.
 - Preference storage, locale application, theme application, and the editor bridge were moved from handwritten public scripts to typed `apps/web/editor-runtime` sources. Generated browser assets are rebuilt before web development, tests, and production builds.
-- Preference synchronization is transactional inside the iframe and serialized in the Next.js shell, eliminating stale locale writes caused by concurrent cookie requests.
+- Production preference changes are validated through the App Router API and read from cookies by Server Components, eliminating iframe synchronization and stale locale writes on `/editor`; the old bridge remains scoped to the isolated compatibility route.
 - Copy, trim, insert, silence, overwrite, and chunked-float operations were extracted from `actions.js` into the typed and unit-tested editor runtime. The existing AudioUtils method names remain as a compatibility facade.
 - Shared gain routing, fade curves, peak/RMS normalization, and playback-rate profile calculations were extracted into a second typed and unit-tested runtime module. The effect bank still consumes its established local helper names and parameter shapes.
 - A later structural wave introduced `EditorSession`, bounded typed history,

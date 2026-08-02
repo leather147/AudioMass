@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useEffect, useId, useRef } from 'react';
+import { type ReactNode, type SyntheticEvent, useEffect, useId, useRef } from 'react';
 
 export interface EditorDialogProps {
   children: ReactNode;
@@ -24,6 +24,11 @@ export function EditorDialog({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
+  const cancel = (event: SyntheticEvent<HTMLDialogElement>) => {
+    event.preventDefault();
+    onClose();
+  };
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -32,7 +37,7 @@ export function EditorDialog({
   }, [open]);
 
   return (
-    <dialog aria-labelledby={titleId} className={className} onCancel={onClose} ref={dialogRef}>
+    <dialog aria-labelledby={titleId} className={className} onCancel={cancel} ref={dialogRef}>
       <header>
         <h2 id={titleId}>{title}</h2>
         <button aria-label={closeLabel} onClick={onClose} type="button">

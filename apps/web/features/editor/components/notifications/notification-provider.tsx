@@ -25,7 +25,13 @@ interface NotificationContextValue {
 
 const NotificationContext = createContext<NotificationContextValue | null>(null);
 
-export function NotificationProvider({ children }: { children: ReactNode }) {
+export function NotificationProvider({
+  children,
+  dismissLabel,
+}: {
+  children: ReactNode;
+  dismissLabel: string;
+}) {
   const sequence = useRef(0);
   const [notifications, setNotifications] = useState<readonly EditorNotification[]>([]);
 
@@ -50,7 +56,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         {notifications.map((notification) => (
           <li data-tone={notification.tone} key={notification.id}>
             <span>{notification.message}</span>
-            <button aria-label="Dismiss" onClick={() => dismiss(notification.id)} type="button">
+            <button
+              aria-label={dismissLabel}
+              onClick={() => dismiss(notification.id)}
+              type="button"
+            >
               ×
             </button>
           </li>

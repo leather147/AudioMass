@@ -82,6 +82,11 @@ describe('framework-native editor boundary', () => {
     expect(sources).toContain('EditorMenuBar');
     expect(sources).toContain('EDITOR_PANEL_IDS');
     expect(sources).toContain('role="menuitemradio"');
+    expect(sources).toContain('movePopupMenuIndex');
+    expect(sources).toContain("event.key === 'Escape'");
+    expect(sources).toContain('window.history.replaceState');
+    expect(sources).toContain('href="/settings"');
+    expect(sources).toContain('href="/about"');
     expect(sources).not.toMatch(/components\/tools|editorToolRoute|legacyMixerHost/);
     expect(sources).not.toMatch(/(?:eq|sp|mix)\.html/);
   });

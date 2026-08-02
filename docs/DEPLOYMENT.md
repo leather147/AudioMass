@@ -52,12 +52,12 @@ Add the hostnames that appear in generated input and output URLs to `PYTHON_API_
 
 Create three independent Vercel projects from the same repository, with Root Directory values `apps/web`, `apps/api`, and `apps/python-api`. Keep `Include files outside the root directory in the Build Step` enabled so Vercel can use the root pnpm workspace and shared packages. Each application directory contains its own `vercel.json`.
 
-During the parity period, Web prebuild still compiles `apps/web/editor-runtime`
-into ignored `apps/web/public/editor-assets` for `/editor`. The React migration
-preview at `/editor/native` imports workspace code normally and does not consume
-that generated tree. Never edit or commit `public/editor-assets`, and do not
-disable `prebuild` until `/editor` has switched to the native implementation and
-the compatibility runtime has been deleted. Do not put `API_KEYS` in Web or any
+During the Wave F compatibility-deletion window, Web prebuild still compiles
+`apps/web/editor-runtime` into ignored `apps/web/public/editor-assets` for the
+isolated `/editor-runtime` route. Production `/editor` imports the native React
+feature and does not consume that generated tree; `/editor/native` redirects to
+it. Never edit or commit `public/editor-assets`, and do not disable `prebuild`
+until the compatibility boundary is deleted atomically. Do not put `API_KEYS` in Web or any
 `NEXT_PUBLIC_*` variable. For the complete Neon, Private Vercel Blob, FastAPI,
 environment-variable, deployment-order, and troubleshooting procedure, use
 [VERCEL_ONLY_DEPLOYMENT.md](VERCEL_ONLY_DEPLOYMENT.md).

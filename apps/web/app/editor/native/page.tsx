@@ -1,11 +1,6 @@
-import { EditorShell } from '@/features/editor/components/editor-shell';
-import { parseEditorPanel } from '@/features/editor/components/workspace/editor-panels';
-import { readEditorPreferences } from '@/lib/editor-preference-cookies';
+import { redirect } from 'next/navigation';
 
-export const metadata = {
-  description: 'Framework-native AudioMass editor migration preview',
-  title: 'AudioMass native editor',
-};
+import { parseEditorPanel } from '@/features/editor/components/workspace/editor-panels';
 
 interface NativeEditorPageProps {
   searchParams: Promise<{ panel?: string }>;
@@ -13,6 +8,6 @@ interface NativeEditorPageProps {
 
 export default async function NativeEditorPage({ searchParams }: NativeEditorPageProps) {
   const { panel } = await searchParams;
-  const preferences = await readEditorPreferences();
-  return <EditorShell initialPanel={parseEditorPanel(panel)} preferences={preferences} />;
+  const selectedPanel = parseEditorPanel(panel);
+  redirect(selectedPanel === 'waveform' ? '/editor' : `/editor?panel=${selectedPanel}`);
 }

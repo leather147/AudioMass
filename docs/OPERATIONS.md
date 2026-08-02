@@ -2,17 +2,19 @@
 
 ## Health and first response
 
-During the editor parity period, include both routes in Web smoke tests:
+During the Wave F compatibility-deletion window, include these routes in Web
+smoke tests:
 
-- `/editor` proves the production compatibility editor and generated assets;
-- `/editor/native` proves normal Next.js chunk loading and the new React/audio
-  package boundary.
+- `/editor` proves the production App Router/React/audio package boundary;
+- `/editor/native` proves the compatibility redirect and validated panel query;
+- `/editor-runtime` proves the isolated generated compatibility assets until
+  that route is deleted in Wave F.
 
-A failure on only `/editor` usually points to `runtime:build`, copied vendor
-assets, service-worker caching, or the iframe document. A failure on only
-`/editor/native` points to Next.js chunks, browser Web Audio support, or a new
-feature module. Do not remove the legacy build based solely on native-route
-liveness; use the parity checklist in `FRAMEWORK_NATIVE_EDITOR_PLAN.md`.
+A failure on `/editor` usually points to Next.js chunks, browser Web Audio
+support, preference parsing, or a native feature module. A failure only on
+`/editor-runtime` points to `runtime:build`, copied vendor assets,
+service-worker caching, or the compatibility document. Delete that build only
+through the Wave F inventory and proof in `FRAMEWORK_NATIVE_EDITOR_PLAN.md`.
 
 Monitor these endpoints from their appropriate network:
 

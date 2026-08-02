@@ -397,11 +397,12 @@ E.3 uses the following production-promotion boundary:
       typed effects/presets, fixed-duration and specialized workflows, native
       multitrack playback/export, full local project persistence, and React
       consumers are complete and tested.
-- [ ] Wave E (in progress): E.1 revision-aware waveform/track presentation and
-      E.2 native menus/analyzers/workspace composition are complete; E.3
-      production promotion remains.
+- [x] Wave E: E.1 revision-aware waveform/track presentation, E.2 native
+      menus/analyzers/workspace composition, and E.3 production promotion,
+      responsive/keyboard/localization parity, and browser proof are complete.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
-      are implemented; compatibility deletion waits for Waves B-E.
+      are implemented; compatibility deletion is the next atomic checkpoint now
+      that Waves A-E are complete.
 - [ ] Wave G (documentation synchronized at this checkpoint; final release
       proof remains).
 
@@ -790,6 +791,61 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   compilation, temporary tool/mixer adapters, generated compatibility assets,
   and patch CSS as one verified change.
 
+### Stage 12 — Wave E.3 production promotion and browser parity
+
+- **Status:** complete on 2026-08-02. Scope was committed and pushed first as
+  `03a2e6a` (`Plan native editor production promotion`); the commit containing
+  this report is the E.3 implementation checkpoint
+  (`Complete framework-native editor Wave E.3`).
+- **Delivered:** production `/editor` is now a Server Component entry that
+  awaits validated preferences and panel query state before rendering
+  `EditorShell` directly. `/editor/native` is a validated redirect rather than
+  a second composition. Typed panel selection writes the canonical URL through
+  the Next.js-compatible History API without remounting editor state. The React
+  menu now provides roving focus, wrapped Arrow/Home/End navigation,
+  first/last popup entry, Escape focus restoration, disabled-item skipping,
+  semantic separators, and App Router Settings/About links. English/Russian
+  catalogs now own navigation, engine states, fallback errors, and notification
+  accessibility copy. Responsive layout clamps menus at 320 CSS pixels, wraps
+  controls, gives coarse pointers usable targets, scales analyzer Canvas height,
+  and keeps effect dialogs centered and internally scrollable. Managed dialog
+  cancellation prevents the native Escape/React state race and restores focus.
+- **Compatibility result:** `/editor` no longer imports `EditorFrame`, iframe
+  bridge code, classic runtime assets, global editor facades, `/tools/*`
+  adapters, or old HTML pages. `apps/web/editor-runtime`, `/editor-runtime`, its
+  build/manifest/bridge, generated assets, fallback tools, and temporary mixer
+  adapter remain unchanged and isolated without a production editor consumer;
+  Wave F deletes that complete boundary atomically instead of mixing deletion
+  into route promotion.
+- **Browser proof:** Chromium verified `/editor` at 1440×900, 768×1024,
+  390×844, and the 320×720 minimum without page-level horizontal overflow,
+  framework overlays, console errors, or failed application requests. Keyboard
+  traversal covered File/Edit/View/Help/Settings, popup wrapping, disabled
+  commands, Escape restoration, About navigation, and every waveform,
+  frequency, spectral, and mixer panel URL. A Russian/default to English/
+  `github-light` settings round trip updated document language, metadata,
+  color scheme, and theme tokens. Loading the real `test.mp3` fixture proved
+  waveform rendering, selection, centered effect-dialog focus, and non-blocking
+  Escape close with focus returned to the Effects trigger. The native redirect
+  preserved a validated mixer panel query.
+- **Automated proof:** audio-engine has 24 passing test files / 91 tests; web has
+  29 passing test files / 102 tests; the complete JavaScript/TypeScript suite has
+  70 files / 234 tests. New tests cover production route ownership and redirect
+  isolation, typed menu wrapping/popup selection, preference localization, and
+  the no-compatibility-import boundary. Repository formatting, lint, TypeScript
+  typecheck, Prisma generation, all tests, and every production build passed.
+  Python Black, Ruff, strict mypy, and all 35 pytest cases passed with 87.14%
+  coverage using an isolated local temp/cache directory.
+- **Architectural result:** App Router owns validated initial route and
+  preference state; React owns production editor composition, accessible
+  interaction, and responsive presentation; typed controllers and the audio
+  package retain command/DSP ownership; browser history changes panel address
+  state without duplicating or rebuilding the editor. Wave E is complete.
+- **Remaining after stage:** Wave F inventories and deletes the unconsumed
+  compatibility runtime, route, compiler, iframe bridge, globals, fallback tool
+  adapters, generated assets, tests, and patch CSS. Wave G then synchronizes the
+  final post-deletion documentation and records release/deployment proof.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
@@ -798,10 +854,11 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
 | D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export  |
-| E    | In progress | E.1 waveform/tracks and E.2 native menus/analyzers/workspace are complete      |
-| F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
-| G    | In progress | Documentation is current; final browser and release proof remains              |
+| E    | Complete    | Native production route, React presentation, accessibility, and browser parity |
+| F    | In progress | Server contracts exist; isolated compatibility deletion is the next checkpoint |
+| G    | In progress | Documentation is current; final post-deletion release proof remains            |
 
-Eleven structural stages are complete. This is not the final legacy deletion:
-`apps/web/editor-runtime` intentionally remains the production fallback until
-Wave E passes parity and Wave F removes the entire boundary atomically.
+Twelve structural stages and Waves A-E are complete. This is not the final
+legacy deletion: `apps/web/editor-runtime` no longer serves production
+`/editor`, but intentionally remains as an isolated compatibility boundary until
+Wave F inventories and removes it atomically.

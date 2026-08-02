@@ -83,7 +83,7 @@ export function WaveformWorkspace({ controller, copy, snapshot }: WaveformWorksp
         if (requestSequence.current !== requestId) return;
         setAnalysisState({
           analysis: null,
-          error: error instanceof Error ? error.message : 'Waveform analysis failed.',
+          error: error instanceof Error ? error.message : copy('waveformFailed'),
           key: analysisKey,
         });
       },
@@ -91,7 +91,7 @@ export function WaveformWorkspace({ controller, copy, snapshot }: WaveformWorksp
     return () => {
       if (requestSequence.current === requestId) requestSequence.current += 1;
     };
-  }, [analysisKey, analysisWidth, controller, duration, startTransition, width]);
+  }, [analysisKey, analysisWidth, controller, copy, duration, startTransition, width]);
 
   const pointerTime = (event: PointerEvent<HTMLDivElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();

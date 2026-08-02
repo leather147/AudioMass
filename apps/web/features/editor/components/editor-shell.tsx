@@ -1,6 +1,7 @@
 'use client';
 
-import { type ChangeEvent, useEffect, useState } from 'react';
+import type { AudioEngineState } from '@audiomass/audio-engine';
+import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
 
 import { editorCopy } from '@/lib/editor-copy';
 import type { EditorPreferences } from '@/lib/editor-preferences';
@@ -22,6 +23,14 @@ import { WaveformWorkspace } from './waveform/waveform-workspace';
 import { EDITOR_PANEL_LABELS, type EditorPanelId } from './workspace/editor-panels';
 import styles from './editor-shell.module.css';
 
+const ENGINE_STATE_LABELS: Record<AudioEngineState, Parameters<typeof editorCopy>[1]> = {
+  closed: 'engineStateClosed',
+  idle: 'engineStateIdle',
+  paused: 'engineStatePaused',
+  playing: 'engineStatePlaying',
+  ready: 'engineStateReady',
+};
+
 function EditorWorkspace({
   initialPanel,
   preferences,
@@ -34,7 +43,10 @@ function EditorWorkspace({
   const [error, setError] = useState<string | null>(null);
   const [markerName, setMarkerName] = useState('');
   const [activePanel, setActivePanel] = useState<EditorPanelId>(initialPanel);
-  const copy = (key: Parameters<typeof editorCopy>[1]) => editorCopy(preferences.locale, key);
+  const copy = useCallback(
+    (key: Parameters<typeof editorCopy>[1]) => editorCopy(preferences.locale, key),
+    [preferences.locale],
+  );
 
   useEffect(() => controller.subscribeToErrors((value) => setError(value.message)), [controller]);
 
@@ -44,7 +56,7 @@ function EditorWorkspace({
     try {
       await controller.openFile(file);
     } catch (value) {
-      setError(value instanceof Error ? value.message : 'Could not open the audio file.');
+      setError(value instanceof Error ? value.message : copy('openAudioFailed'));
     }
   };
 
@@ -55,6 +67,12 @@ function EditorWorkspace({
 
   const drop = useAudioFileDrop(openFile);
   useEditorShortcuts(controller, snapshot);
+
+  const selectPanel = useCallback((panel: EditorPanelId) => {
+    setActivePanel(panel);
+    const href = panel === 'waveform' ? '/editor' : `/editor?panel=${panel}`;
+    window.history.replaceState(null, '', href);
+  }, []);
 
   return (
     <main
@@ -68,7 +86,7 @@ function EditorWorkspace({
         copy={copy}
         onError={setError}
         onFileInput={onFileInput}
-        onPanelChange={setActivePanel}
+        onPanelChange={selectPanel}
         snapshot={snapshot}
       />
       <TransportBar
@@ -134,7 +152,7 @@ function EditorWorkspace({
 
       <footer className={styles.statusbar}>
         <span>
-          {copy('state')}: {snapshot.engine.state}
+          {copy('state')}: {copy(ENGINE_STATE_LABELS[snapshot.engine.state])}
         </span>
         <span>
           {copy('sampleRate')}: {snapshot.engine.sampleRate ?? '—'}
@@ -153,7 +171,7 @@ export function EditorShell({
 }) {
   return (
     <EditorProvider>
-      <NotificationProvider>
+      <NotificationProvider dismissLabel={editorCopy(preferences.locale, 'dismiss')}>
         <EditorWorkspace initialPanel={initialPanel} preferences={preferences} />
       </NotificationProvider>
     </EditorProvider>

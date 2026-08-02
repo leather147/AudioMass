@@ -156,11 +156,12 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 
 Не публикуйте `API_KEYS` в Web. Текущий браузерный редактор не должен хранить серверный API key.
 
-Во время структурной миграции Web содержит два редактора: production
-`/editor` и preview `/editor/native`. Оба входят в один Vercel Project; отдельный
-Root Directory или отдельный deployment для preview не нужен. Пока parity gate
-не пройден, не переопределяйте Build Command так, чтобы пропустить
-`pnpm runtime:build`: это сломает production `/editor`.
+Production `/editor` уже использует нативную App Router/React-реализацию, а
+`/editor/native` перенаправляет на неё. Оба маршрута входят в один Vercel
+Project; отдельный Root Directory или deployment не нужен. До атомарного
+удаления Wave F не переопределяйте Build Command так, чтобы пропустить
+`pnpm runtime:build`: он всё ещё собирает изолированный `/editor-runtime` и его
+совместимые assets.
 
 ## 6. Порядок деплоя
 
