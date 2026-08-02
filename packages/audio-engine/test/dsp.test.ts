@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   deinterleave,
   extractPcmRange,
+  extractWaveformAnalysis,
   extractWaveformPeaks,
   fade,
   interleave,
@@ -57,6 +58,16 @@ describe('waveform peaks', () => {
     expect(peaks.samplesPerPixel).toBe(2);
     expect(Array.from(peaks.min)).toEqual([-0.5, -1]);
     expect(Array.from(peaks.max)).toEqual([0.5, 0.75]);
+  });
+
+  it('returns independent channel peaks beside the combined overview', () => {
+    const analysis = extractWaveformAnalysis(audio, 2);
+
+    expect(analysis.channels).toHaveLength(2);
+    expect(Array.from(analysis.channels[0]?.min ?? [])).toEqual([0, -1]);
+    expect(Array.from(analysis.channels[0]?.max ?? [])).toEqual([0.5, 0.25]);
+    expect(Array.from(analysis.channels[1]?.min ?? [])).toEqual([-0.5, 0]);
+    expect(Array.from(analysis.overview.max)).toEqual([0.5, 0.75]);
   });
 });
 

@@ -139,6 +139,7 @@ export type {
   AudioEngineSnapshot,
   AudioEngineState,
   PcmAudio,
+  WaveformAnalysis,
   WaveformPeaks,
 } from './types.js';
 export type { AudioBinaryEncoder, ExportedAudioFile } from './application/export-audio.js';
@@ -252,3 +253,4 @@ export type {
 } from './multitrack/playback.js';
 export type { TempoAnalyzeRequest, TempoAnalyzeResponse } from './workers/tempo-worker-protocol.js';
 export type { WavEncodeRequest, WavEncodeResponse } from './workers/wav-encoder-protocol.js';
+export type { PeakWorkerRequest, PeakWorkerResponse } from './peak-worker-protocol.js';

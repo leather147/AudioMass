@@ -4,7 +4,7 @@ import type { EditorSessionSnapshot } from '@audiomass/audio-engine';
 import type { EditorCopyKey } from '@/lib/editor-copy';
 
 import type { EditorController } from '../../application/editor-controller';
-import { formatEditorTime } from '../timeline/timeline';
+import { formatEditorTime } from '../waveform/timeline-math';
 import styles from '../editor-shell.module.css';
 
 interface MarkerPanelProps {

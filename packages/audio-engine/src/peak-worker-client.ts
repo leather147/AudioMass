@@ -1,10 +1,10 @@
 import { AudioEngineError } from './errors.js';
 import type { PeakWorkerRequest, PeakWorkerResponse } from './peak-worker-protocol.js';
-import type { PcmAudio, WaveformPeaks } from './types.js';
+import type { PcmAudio, WaveformAnalysis, WaveformPeaks } from './types.js';
 
 interface PendingRequest {
   reject: (error: Error) => void;
-  resolve: (peaks: WaveformPeaks) => void;
+  resolve: (result: WaveformAnalysis | WaveformPeaks) => void;
 }
 
 export class PeakWorkerClient {
@@ -22,11 +22,37 @@ export class PeakWorkerClient {
   }
 
   extract(audio: PcmAudio, width: number): Promise<WaveformPeaks> {
+    return this.request(audio, width, 'peaks').then((result) => {
+      if ('overview' in result) {
+        throw new AudioEngineError(
+          'INVALID_AUDIO_DATA',
+          'Peak worker returned an unexpected analysis.',
+        );
+      }
+      return result;
+    });
+  }
+
+  extractAnalysis(audio: PcmAudio, width: number): Promise<WaveformAnalysis> {
+    return this.request(audio, width, 'analysis').then((result) => {
+      if (!('overview' in result)) {
+        throw new AudioEngineError('INVALID_AUDIO_DATA', 'Peak worker returned unexpected peaks.');
+      }
+      return result;
+    });
+  }
+
+  private request(
+    audio: PcmAudio,
+    width: number,
+    type: PeakWorkerRequest['type'],
+  ): Promise<WaveformAnalysis | WaveformPeaks> {
     const requestId = ++this.nextRequestId;
     const channels = audio.channels.map((channel) => channel.slice());
     const request: PeakWorkerRequest = {
       audio: { channels, sampleRate: audio.sampleRate },
       requestId,
+      type,
       width,
     };
 
@@ -53,7 +79,8 @@ export class PeakWorkerClient {
     const request = this.pending.get(response.requestId);
     if (!request) return;
     this.pending.delete(response.requestId);
-    if (response.type === 'success') request.resolve(response.peaks);
+    if (response.type === 'analysis') request.resolve(response.analysis);
+    else if (response.type === 'peaks') request.resolve(response.peaks);
     else request.reject(new AudioEngineError('INVALID_AUDIO_DATA', response.message));
   };
 

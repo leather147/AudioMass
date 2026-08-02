@@ -48,6 +48,49 @@ class FakeEngine implements EditorAudioEngine {
 }
 
 describe('EditorController export boundary', () => {
+  it('lazily analyzes rendered PCM and disposes the waveform worker port', async () => {
+    const session = new EditorSession(new FakeEngine());
+    await session.load(new ArrayBuffer(0), 'waveform.wav');
+    let destroyed = false;
+    let analyzedWidth = 0;
+    const controller = new EditorController(
+      session,
+      new AudioExportService(),
+      { save: () => undefined },
+      () => ({ destroy: () => undefined, encode: async () => new ArrayBuffer(0) }),
+      () => ({
+        destroy: () => {
+          destroyed = true;
+        },
+        extractAnalysis: async (audio, width) => {
+          analyzedWidth = width;
+          return {
+            channels: audio.channels.map(() => ({
+              length: 4,
+              max: Float32Array.from([1]),
+              min: Float32Array.from([-1]),
+              samplesPerPixel: 4,
+            })),
+            overview: {
+              length: 4,
+              max: Float32Array.from([1]),
+              min: Float32Array.from([-1]),
+              samplesPerPixel: 4,
+            },
+          };
+        },
+      }),
+    );
+
+    await expect(controller.extractWaveform(320)).resolves.toMatchObject({
+      channels: [{ length: 4 }],
+      overview: { length: 4 },
+    });
+    expect(analyzedWidth).toBe(320);
+    await controller.close();
+    expect(destroyed).toBe(true);
+  });
+
   it('exports session PCM through injected worker and download ports', async () => {
     const session = new EditorSession(new FakeEngine());
     await session.load(new ArrayBuffer(0), 'mix.mp3');

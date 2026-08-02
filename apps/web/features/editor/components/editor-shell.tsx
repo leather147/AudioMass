@@ -15,8 +15,8 @@ import { SpecializedEffectToolbar } from './effects/specialized-effect-toolbar';
 import { MarkerPanel } from './markers/marker-panel';
 import { MultitrackPanel } from './multitrack/multitrack-panel';
 import { NotificationProvider } from './notifications/notification-provider';
-import { Timeline } from './timeline/timeline';
 import { TransportBar } from './transport/transport-bar';
+import { WaveformWorkspace } from './waveform/waveform-workspace';
 import styles from './editor-shell.module.css';
 
 function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
@@ -88,12 +88,7 @@ function EditorWorkspace({ preferences }: { preferences: EditorPreferences }) {
         >
           <h1>{copy('nativeEditorTitle')}</h1>
           <p>{copy('dropAudio')}</p>
-          <Timeline
-            controller={controller}
-            copy={copy}
-            duration={snapshot.engine.duration}
-            position={snapshot.engine.position}
-          />
+          <WaveformWorkspace controller={controller} copy={copy} snapshot={snapshot} />
           {error ? <p className={styles.error}>{error}</p> : null}
         </section>
 

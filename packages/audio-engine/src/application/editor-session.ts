@@ -56,6 +56,7 @@ interface EditorSessionState {
 }
 
 export interface EditorSessionSnapshot {
+  audioRevision: number;
   canRedo: boolean;
   canUndo: boolean;
   clipboardFrames: number;
@@ -108,6 +109,7 @@ function isSpecializedEffectCommand(command: EditorCommand): command is Speciali
 }
 
 export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
+  private audioRevisionValue = 0;
   private clipboard: PcmAudio | null = null;
   private readonly disposers: Array<() => void> = [];
   private history = new EditHistory<EditorSessionState>(emptyState());
@@ -153,8 +155,13 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     return audio ? clonePcm(audio) : null;
   }
 
+  public getRenderedAudio(): PcmAudio | null {
+    return this.history.snapshot.present.audio ? this.engineValue.toPcm() : null;
+  }
+
   public async load(input: ArrayBuffer | AudioBuffer, name = 'Untitled'): Promise<void> {
     await this.engineValue.load(input);
+    this.audioRevisionValue += 1;
     this.clipboard = null;
     this.effectPreviewId = null;
     this.effectPreviewRestorePosition = null;
@@ -267,6 +274,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   private createSnapshot(): EditorSessionSnapshot {
     const history = this.history.snapshot;
     return {
+      audioRevision: this.audioRevisionValue,
       canRedo: history.canRedo,
       canUndo: history.canUndo,
       clipboardFrames: this.clipboard?.channels[0]?.length ?? 0,
@@ -293,7 +301,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     this.clipboard = result.clipboard;
     if (result.state.audio !== current.audio || result.state.document !== current.document) {
       this.history.commit(result.state satisfies SingleTrackEditorState);
-      if (result.audioChanged) this.engineValue.loadPcm(result.state.audio);
+      if (result.audioChanged) this.loadPcm(result.state.audio);
     }
     if (result.position !== undefined) await this.engineValue.seek(result.position);
     this.publish();
@@ -319,13 +327,13 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
         this.effectPreviewRestorePosition = this.engineValue.snapshot.position;
       }
       this.effectPreviewId = command.effectId;
-      this.engineValue.loadPcm(result.audio);
+      this.loadPcm(result.audio);
       await this.engineValue.seek(position);
     } else {
       this.effectPreviewId = null;
       this.effectPreviewRestorePosition = null;
       this.history.commit(result);
-      this.engineValue.loadPcm(result.audio);
+      this.loadPcm(result.audio);
       await this.engineValue.seek(position);
     }
     this.publish();
@@ -345,13 +353,13 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
         this.effectPreviewRestorePosition = this.engineValue.snapshot.position;
       }
       this.effectPreviewId = command.workflow.kind;
-      this.engineValue.loadPcm(result.audio);
+      this.loadPcm(result.audio);
       await this.engineValue.seek(position);
     } else {
       this.effectPreviewId = null;
       this.effectPreviewRestorePosition = null;
       this.history.commit({ audio: result.audio, document: result.document });
-      this.engineValue.loadPcm(result.audio);
+      this.loadPcm(result.audio);
       await this.engineValue.seek(position);
     }
     this.publish();
@@ -364,7 +372,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     this.effectPreviewId = null;
     this.effectPreviewRestorePosition = null;
     this.engineValue.pause();
-    if (audio) this.engineValue.loadPcm(audio);
+    if (audio) this.loadPcm(audio);
     await this.engineValue.seek(Math.min(position, this.engineValue.duration));
   }
 
@@ -372,7 +380,7 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
     const before = this.history.snapshot.present;
     const restored = this.history[direction]().present;
     if (restored === before) return;
-    if (restored.audio && restored.audio !== before.audio) this.engineValue.loadPcm(restored.audio);
+    if (restored.audio && restored.audio !== before.audio) this.loadPcm(restored.audio);
     await this.engineValue.seek(
       Math.min(this.engineValue.snapshot.position, this.engineValue.duration),
     );
@@ -382,5 +390,10 @@ export class EditorSession extends TypedEventEmitter<EditorSessionEvents> {
   private publish(): void {
     this.snapshotValue = this.createSnapshot();
     this.emit('statechange', this.snapshotValue);
+  }
+
+  private loadPcm(audio: PcmAudio): void {
+    this.audioRevisionValue += 1;
+    this.engineValue.loadPcm(audio);
   }
 }

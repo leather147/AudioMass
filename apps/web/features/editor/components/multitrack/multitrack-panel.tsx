@@ -5,8 +5,8 @@ import type { ChangeEvent } from 'react';
 import type { EditorCopyKey } from '@/lib/editor-copy';
 
 import { useMultitrackController, useMultitrackSnapshot } from '../../state/editor-store';
-import { formatEditorTime } from '../timeline/timeline';
 import styles from '../editor-shell.module.css';
+import { MultitrackTimeline } from './multitrack-timeline';
 
 interface MultitrackPanelProps {
   copy: (key: EditorCopyKey) => string;
@@ -81,22 +81,11 @@ export function MultitrackPanel({ copy, onError }: MultitrackPanelProps) {
         </label>
       </header>
 
-      <div className={styles.multitrackTimeline}>
-        <input
-          aria-label={copy('playbackPosition')}
-          disabled={!loaded}
-          max={snapshot.transport.duration || 1}
-          min={0}
-          onChange={(event) => void run(() => controller.seek(Number(event.currentTarget.value)))}
-          step="0.001"
-          type="range"
-          value={snapshot.transport.position}
-        />
-        <output>
-          {formatEditorTime(snapshot.transport.position)} /{' '}
-          {formatEditorTime(snapshot.transport.duration)}
-        </output>
-      </div>
+      <MultitrackTimeline
+        copy={copy}
+        onSeek={(seconds) => void run(() => controller.seek(seconds))}
+        snapshot={snapshot}
+      />
 
       {snapshot.project.tracks.length === 0 ? (
         <p className={styles.multitrackEmpty}>{copy('multitrackEmpty')}</p>

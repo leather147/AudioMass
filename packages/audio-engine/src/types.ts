@@ -34,3 +34,8 @@ export interface WaveformPeaks {
   min: Float32Array;
   samplesPerPixel: number;
 }
+
+export interface WaveformAnalysis {
+  channels: readonly WaveformPeaks[];
+  overview: WaveformPeaks;
+}

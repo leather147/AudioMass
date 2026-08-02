@@ -1,12 +1,15 @@
 import {
   AudioExportService,
   EditorSession,
+  PeakWorkerClient,
   WavEncoderWorkerClient,
   type AudioBinaryEncoder,
   type EditorCommand,
   type EditorSessionSnapshot,
   type EffectValues,
+  type PcmAudio,
   type SpecializedEffectWorkflow,
+  type WaveformAnalysis,
   type WavBitDepth,
 } from '@audiomass/audio-engine';
 
@@ -17,12 +20,22 @@ import {
 
 export type WavEncoderFactory = () => AudioBinaryEncoder & { destroy(): void };
 
+export interface WaveformAnalysisPort {
+  destroy(): void;
+  extractAnalysis(audio: PcmAudio, width: number): Promise<WaveformAnalysis>;
+}
+
+export type WaveformAnalysisFactory = () => WaveformAnalysisPort;
+
 export class EditorController {
+  private waveformAnalysis: WaveformAnalysisPort | null = null;
+
   public constructor(
     private readonly session: EditorSession = new EditorSession(),
     private readonly exports: AudioExportService = new AudioExportService(),
     private readonly downloads: AudioDownloadPort = new BrowserAudioDownloadAdapter(),
     private readonly createWavEncoder: WavEncoderFactory = () => new WavEncoderWorkerClient(),
+    private readonly createWaveformAnalysis: WaveformAnalysisFactory = () => new PeakWorkerClient(),
   ) {}
 
   public get snapshot(): EditorSessionSnapshot {
@@ -43,6 +56,13 @@ export class EditorController {
 
   public dispatch(command: EditorCommand): Promise<void> {
     return this.session.dispatch(command);
+  }
+
+  public extractWaveform(width: number): Promise<WaveformAnalysis | null> {
+    const audio = this.session.getRenderedAudio();
+    if (!audio) return Promise.resolve(null);
+    this.waveformAnalysis ??= this.createWaveformAnalysis();
+    return this.waveformAnalysis.extractAnalysis(audio, width);
   }
 
   public get supportedEffectIds(): readonly string[] {
@@ -97,6 +117,8 @@ export class EditorController {
   }
 
   public close(): Promise<void> {
+    this.waveformAnalysis?.destroy();
+    this.waveformAnalysis = null;
     return this.session.close();
   }
 }

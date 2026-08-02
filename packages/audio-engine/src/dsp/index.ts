@@ -10,7 +10,7 @@ export {
   reverse,
   trim,
 } from './pcm.js';
-export { extractWaveformPeaks } from './peaks.js';
+export { extractWaveformAnalysis, extractWaveformPeaks } from './peaks.js';
 export {
   applyAudioBufferGains,
   clampPlaybackRate,

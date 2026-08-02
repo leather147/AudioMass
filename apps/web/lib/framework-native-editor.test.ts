@@ -61,6 +61,18 @@ describe('framework-native editor boundary', () => {
     expect(sources).not.toMatch(/editor-runtime|legacyMixerHost|MixerData\(/);
   });
 
+  it('owns revision-aware waveform and clip-lane presentation in decomposed React modules', () => {
+    const root = join(process.cwd(), 'features', 'editor');
+    const sources = featureSources(root);
+
+    expect(sources).toContain('WaveformWorkspace');
+    expect(sources).toContain('WaveformCanvas');
+    expect(sources).toContain('snapshot.audioRevision');
+    expect(sources).toContain('controller.extractWaveform');
+    expect(sources).toContain('MultitrackTimeline');
+    expect(sources).not.toContain('components/timeline/timeline');
+  });
+
   it('keeps direct vendor asset paths in the one infrastructure registry', () => {
     const root = join(process.cwd(), 'features', 'editor');
     const sources = featureSources(root);

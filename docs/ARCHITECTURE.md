@@ -53,6 +53,16 @@ stereo PCM bounce. Browser infrastructure decodes files and persists complete
 project/source/mixer/crossfade documents in IndexedDB. No package module reads
 React context, cookies, or Next.js APIs.
 
+Waveform presentation follows the same boundary. `EditorSession` exposes a
+monotonic audio revision that changes only with rendered PCM; playback position
+and document-only updates do not invalidate peaks. A lazy, request-correlated
+worker returns combined overview plus per-channel peak arrays from owned PCM
+copies. React owns responsive ruler/viewport math, zoom, scroll, selection,
+markers, and semantic controls, while Canvas only paints peak pixels. The native
+multitrack surface renders the immutable project snapshot as ruler, track, clip,
+fade, crossfade, and playhead layers without reading Web Audio nodes or runtime
+globals.
+
 Single-track editing is an application transaction, not a React state mutation.
 The session history stores immutable document/PCM states; copy, cut, paste,
 delete, trim, and silence insertion transform audio, selection, and marker time

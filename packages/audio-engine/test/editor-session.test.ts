@@ -155,6 +155,7 @@ describe('EditorSession', () => {
     const engine = new FakeAudioEngine();
     const session = new EditorSession(engine);
     await session.load(new ArrayBuffer(1), 'voice.wav');
+    const loadedRevision = session.snapshot.audioRevision;
 
     await session.dispatch({ marker: { name: 'Verse', time: 4 }, name: 'marker.add' });
     await session.dispatch({ name: 'playback.seek', seconds: 3 });
@@ -164,9 +165,29 @@ describe('EditorSession', () => {
     expect(session.snapshot.document.markers[0]?.name).toBe('Verse');
     expect(session.snapshot.engine.position).toBe(3);
     expect(session.snapshot.engine.state).toBe('playing');
+    expect(session.snapshot.audioRevision).toBe(loadedRevision);
 
     await session.dispatch({ name: 'history.undo' });
     expect(session.snapshot.document.markers).toEqual([]);
+    await session.close();
+  });
+
+  it('increments the presentation revision only when rendered PCM changes', async () => {
+    const engine = new FakeAudioEngine();
+    const session = new EditorSession(engine);
+    await session.load(new ArrayBuffer(1), 'voice.wav');
+    const loadedRevision = session.snapshot.audioRevision;
+
+    await session.dispatch({ name: 'playback.seek', seconds: 2 });
+    await session.dispatch({ marker: { name: 'Verse', time: 2 }, name: 'marker.add' });
+    expect(session.snapshot.audioRevision).toBe(loadedRevision);
+
+    await session.dispatch({ name: 'selection.set', range: { end: 2, start: 1 } });
+    await session.dispatch({ effectId: 'gain', name: 'effect.preview', values: { amount: 0.5 } });
+    expect(session.snapshot.audioRevision).toBe(loadedRevision + 1);
+
+    await session.dispatch({ name: 'effect.preview.cancel' });
+    expect(session.snapshot.audioRevision).toBe(loadedRevision + 2);
     await session.close();
   });
 

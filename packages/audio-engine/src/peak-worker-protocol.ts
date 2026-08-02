@@ -1,11 +1,13 @@
-import type { PcmAudio, WaveformPeaks } from './types.js';
+import type { PcmAudio, WaveformAnalysis, WaveformPeaks } from './types.js';
 
 export interface PeakWorkerRequest {
   audio: PcmAudio;
   requestId: number;
+  type: 'analysis' | 'peaks';
   width: number;
 }
 
 export type PeakWorkerResponse =
-  | { peaks: WaveformPeaks; requestId: number; type: 'success' }
+  | { analysis: WaveformAnalysis; requestId: number; type: 'analysis' }
+  | { peaks: WaveformPeaks; requestId: number; type: 'peaks' }
   | { message: string; requestId: number; type: 'error' };

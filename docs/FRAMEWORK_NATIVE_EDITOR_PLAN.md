@@ -340,7 +340,8 @@ editor commands, and audio processing in their owning layers:
       typed effects/presets, fixed-duration and specialized workflows, native
       multitrack playback/export, full local project persistence, and React
       consumers are complete and tested.
-- [ ] Wave E.
+- [ ] Wave E (in progress): E.1 revision-aware waveform/track presentation is
+      complete; E.2 menus/analyzers and E.3 production promotion remain.
 - [ ] Wave F (in progress): Nest operation DTOs and FastAPI discriminated jobs
       are implemented; compatibility deletion waits for Waves B-E.
 - [ ] Wave G (documentation synchronized at this checkpoint; final release
@@ -644,6 +645,48 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
   bridge/manifest/build, the temporary legacy mixer adapter, and compatibility
   CSS atomically; Wave G records browser/release proof.
 
+### Stage 10 — Wave E.1 waveform and track presentation
+
+- **Status:** complete on 2026-08-02. Scope was committed and pushed first as
+  `6b01f1e` (`Plan native editor presentation Wave E`); the commit containing
+  this report is the E.1 implementation checkpoint
+  (`Complete framework-native editor Wave E.1`).
+- **Delivered:** a revision-aware single-track presentation contract;
+  worker-backed combined and per-channel peak extraction; responsive Canvas
+  waveform renderers; pure viewport/ruler/time mapping; overview, 1x..32x zoom,
+  scroll, playhead, pointer/keyboard seek, drag selection, and marker overlays;
+  and localized semantic controls. The multitrack workspace now renders a
+  responsive ruler, track lanes, positioned clips, fades, crossfade state, and
+  playhead beside its existing typed mixer/transport consumers. The obsolete
+  range-only `Timeline` component was deleted and its reusable formatter moved
+  into a presentation-independent module.
+- **Compatibility result:** the existing combined `extractWaveformPeaks` API is
+  preserved while the new discriminated worker request adds full analysis.
+  Worker transfers use owned PCM copies, correlate responses, reject pending
+  work on destruction, and let React ignore stale revision/size/zoom results.
+  `EditorSession.audioRevision` changes only when rendered PCM changes, so
+  playback position, markers, selection, and other document updates never
+  recompute peaks. Preview PCM is intentionally visible to the waveform while
+  export/history continue to read the committed audio document.
+- **Automated proof:** audio-engine has 22 passing test files / 88 tests; web has
+  26 passing test files / 94 tests; the complete JavaScript/TypeScript suite has
+  65 files / 223 tests. New tests cover channel/overview peak parity, worker
+  correlation and PCM ownership, revision stability, preview restoration,
+  controller lazy lifecycle, viewport mapping, ruler ticks, and the native
+  presentation import boundary. Repository formatting, lint, TypeScript
+  typecheck, Prisma generation, all tests, and all production builds passed.
+  Python Black, Ruff, strict mypy, and all 35 pytest cases passed with 87.14%
+  coverage using isolated local temp/cache directories.
+- **Architectural result:** the audio package owns immutable peak analysis and
+  worker protocol; the Next.js controller owns the lazy worker lifecycle; React
+  owns responsive structure, gestures, and typed command dispatch; Canvas owns
+  pixels only. No new module imports the classic runtime, DOM builders, editor
+  globals, iframe messaging, or legacy HTML routes.
+- **Remaining after stage:** E.2 replaces production menu/analyzer/docking gaps
+  with accessible React composition and typed analysis ports. E.3 then completes
+  browser/responsive parity and promotes the native shell to `/editor`; Wave F
+  performs the atomic compatibility-runtime deletion only after that proof.
+
 ## Overall stage summary
 
 | Wave | State       | Current result                                                                 |
@@ -652,10 +695,10 @@ reviewable commit, and an explicit push to `agent/repository-hardening`.
 | B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation   |
 | C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI |
 | D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export  |
-| E    | Not started | Full React editor presentation replacement                                     |
+| E    | In progress | E.1 native waveform, ruler, selection, markers, and clip lanes complete        |
 | F    | In progress | Server contracts exist; compatibility deletion waits for browser parity        |
 | G    | In progress | Documentation is current; final browser and release proof remains              |
 
-Nine structural stages are complete. This is not the final legacy deletion:
+Ten structural stages are complete. This is not the final legacy deletion:
 `apps/web/editor-runtime` intentionally remains the production fallback until
-Waves C-E pass parity and Wave F removes the entire boundary atomically.
+Wave E passes parity and Wave F removes the entire boundary atomically.
