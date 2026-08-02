@@ -436,6 +436,38 @@ Wave G uses the following release-documentation boundary:
   results, the implementation commit is reviewable, the worktree is clean, and
   the explicit `agent/repository-hardening` push is synchronized at 0/0.
 
+### Wave H — original AudioMass interface parity
+
+Wave H corrects an invalid conclusion in Wave E/G: the production browser smoke
+proved routing, responsiveness, preferences, offline loading, and the absence
+of runtime errors, but did not prove visual equivalence with the original
+AudioMass editor. The simplified form-and-card composition is therefore not an
+acceptable final presentation layer.
+
+- Reconstruct the original editor hierarchy as framework-native React:
+  application menu, time display, transport and edit button groups, marker and
+  document controls, overview, selection readout, BPM controls, channel rail,
+  timeline ruler, waveform viewport, scrolling/zoom controls, meters, and
+  floating/docked tools.
+- Recover layout dimensions, visual tokens, responsive behavior, and interaction
+  states from the last pre-deletion implementation and the accepted reference
+  screenshots. Historic sources are read-only design evidence; no ordered
+  scripts, IIFEs, globals, iframe route, or direct-DOM runtime may return.
+- Retain the existing React controller, typed audio engine, menus, effects,
+  analyzers, markers, project persistence, localization, themes, keyboard
+  commands, and accessibility contracts. Visual parity must not reduce native
+  functionality.
+- Replace generic text controls in the persistent chrome with accessible icon
+  controls and tooltips while keeping visible text in menus and dialogs.
+- Verify desktop, wide desktop, tablet, narrow mobile, browser zoom, empty-state,
+  loaded stereo waveform, menu, dialog, dark-theme, and light-theme states.
+  Automated screenshots and structural assertions must cover the shell regions;
+  console-free rendering and no horizontal page overflow remain required but
+  are not sufficient on their own.
+- Stage 15 may close only when the production `/editor` screenshot is recognizably
+  the same AudioMass workspace as the reference interface and the complete
+  release gate still passes.
+
 ## Verification matrix
 
 | Layer         | Required checks                                                                                |
@@ -473,6 +505,9 @@ Wave G uses the following release-documentation boundary:
       integrity, final inventories, zero-vulnerability dependency audits, full
       builds/tests, Prisma/OpenAPI proof, and production browser smoke are
       complete.
+- [ ] Wave H: original AudioMass UI parity is in progress. The prior browser
+      proof did not validate the visual composition and cannot close the
+      presentation migration.
 
 ## Stage reports
 
@@ -1021,28 +1056,47 @@ editor migration Wave G`).
   remain a release-environment check; Vercel application builds/configuration
   and both service runtime contracts were verified locally.
 - **Architectural result:** Waves A–G and all fourteen structural stages are
-  complete. Documentation, CI, source inventory, dependency state, route output,
-  service schemas, and browser behavior now describe and prove one
-  framework-native editor boundary.
-- **Remaining after stage:** no migration or compatibility-runtime wave remains.
-  Future work is routine product delivery: run the same release gate, build
-  containers where Docker is available, deploy Preview for the exact commit,
-  verify provider health/data flows, and promote only that verified artifact.
+  complete at the framework and runtime boundary. Documentation, CI, source
+  inventory, dependency state, route output, and service schemas prove one
+  framework-native editor boundary, but the production React composition does
+  not yet preserve the original AudioMass interface.
+- **Remaining after stage:** Wave H restores presentation parity without
+  restoring the deleted compatibility runtime.
+
+### Stage 15 — Wave H original-interface restoration
+
+- **Status:** in progress on 2026-08-03. The user-provided production screenshot
+  showed that the framework-native editor rendered as a generic sequence of
+  forms, buttons, a waveform card, and marker sidebar instead of the established
+  AudioMass DAW workspace.
+- **Scope checkpoint:** this plan correction is committed before presentation
+  implementation. It explicitly reopens visual parity while leaving the
+  completed legacy-runtime deletion and framework ownership unchanged.
+- **Implementation slices:** (1) shell and dense top chrome; (2) channel rail,
+  ruler, timeline grid, waveform and empty state; (3) menus, dialogs, panels,
+  themes, and responsive/zoom behavior; (4) screenshot comparison and the full
+  release gate.
+- **Acceptance evidence:** pending. This report will record affected components,
+  reference-to-React mapping, desktop and narrow screenshots, interaction
+  checks, automated test totals, commit, and explicit push after completion.
 
 ## Overall stage summary
 
-| Wave | State    | Current result                                                                   |
-| ---- | -------- | -------------------------------------------------------------------------------- |
-| A    | Complete | Typed application/domain platform and React lifecycle                            |
-| B    | Complete | Leaf services, metadata, workers, persistence adapters, and vendor isolation     |
-| C    | Complete | PCM-aware history, playback proof, edit commands, recording, and WAV export UI   |
-| D    | Complete | Native multitrack/effect domain, workflows, playback, persistence, and export    |
-| E    | Complete | Native production route, React presentation, accessibility, and browser parity   |
-| F    | Complete | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted  |
-| G    | Complete | Documentation, audits, inventories, schemas, builds, and release proof are final |
+| Wave | State       | Current result                                                                   |
+| ---- | ----------- | -------------------------------------------------------------------------------- |
+| A    | Complete    | Typed application/domain platform and React lifecycle                            |
+| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation     |
+| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI   |
+| D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export    |
+| E    | Complete    | Native production route, React presentation, accessibility, and browser parity   |
+| F    | Complete    | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted  |
+| G    | Complete    | Documentation, audits, inventories, schemas, builds, and release proof are final |
+| H    | In progress | Restore the original AudioMass interface in the native React composition         |
 
-Fourteen structural stages and Waves A-G are complete. The first-party classic
+Fourteen structural stages and Waves A-G are complete at the runtime and
+framework boundary. Stage 15 / Wave H remains open for presentation parity. The first-party classic
 editor runtime and every route, bridge, global, asset build, host adapter, and
 configuration exception that could execute it are gone. The canonical
-documentation and CI release gate now describe and continuously protect that
-state; no legacy implementation boundary or planned migration wave remains.
+documentation and CI release gate continue to protect that state; the remaining
+work is a native React reconstruction of the established AudioMass interface,
+not a revival of the legacy implementation boundary.
