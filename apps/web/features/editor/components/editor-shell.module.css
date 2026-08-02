@@ -1,0 +1,969 @@
+.shell {
+  --editor-accent: #43e4dc;
+  --editor-accent-alt: #8ef1ec;
+  --editor-bg: #0d1014;
+  --editor-border: #2b3440;
+  --editor-danger: #ff4d5e;
+  --editor-panel: #15191f;
+  --editor-surface: #0f1318;
+  --editor-text: #f3f6f8;
+  --editor-text-muted: #a8b2bd;
+  --editor-waveform: var(--editor-accent);
+  width: 100%;
+  min-width: 0;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--editor-bg);
+  color: var(--editor-text);
+  display: grid;
+  grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto;
+  font-family: system-ui, sans-serif;
+}
+
+.toolbar,
+.editToolbar,
+.effectToolbar,
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  background: var(--editor-panel);
+  border-block: 1px solid var(--editor-border);
+}
+
+.menuBar {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: 100vw;
+  min-height: 2rem;
+  padding-inline: 0.5rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-surface);
+}
+
+.menuRoot {
+  position: relative;
+}
+
+.menuRoot > button,
+.menuLink {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  min-height: 2.75rem;
+  min-width: 4.5rem;
+  padding-inline: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--editor-text-muted);
+  text-decoration: none;
+  text-align: start;
+}
+
+.menuRoot > button[aria-expanded='true'],
+.menuRoot > button:hover,
+.menuLink:hover {
+  background: var(--editor-panel);
+  color: var(--editor-text);
+}
+
+.menuPopup {
+  position: absolute;
+  z-index: 30;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  display: grid;
+  width: min(20rem, calc(100vw - 1rem));
+  min-width: min(15rem, calc(100vw - 1rem));
+  padding: 0.35rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0 0 0.55rem 0.55rem;
+  background: var(--editor-panel);
+  box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--editor-bg) 75%, transparent);
+}
+
+.menuPopup button,
+.menuPopup a {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  padding-inline: 0.55rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--editor-text);
+  line-height: 2.75rem;
+  text-decoration: none;
+  text-align: start;
+}
+
+.menuPopup [role='menuitemradio'] {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: center;
+  line-height: normal;
+}
+
+.menuPopup button:hover,
+.menuPopup button:focus-visible,
+.menuPopup a:hover,
+.menuPopup a:focus-visible {
+  background: color-mix(in srgb, var(--editor-accent) 14%, var(--editor-surface));
+}
+
+.menuPopup button:disabled {
+  color: var(--editor-text-muted);
+  opacity: 0.55;
+}
+
+.menuPopup hr {
+  width: 100%;
+  margin-block: 0.3rem;
+  border: 0;
+  border-block-start: 1px solid var(--editor-border);
+}
+
+.toolbar button,
+.toolbar input,
+.editToolbar button,
+.editToolbar input,
+.editToolbar select,
+.effectToolbar button,
+.effectDialog button,
+.effectDialog input,
+.effectDialog select,
+.markerForm button,
+.markerForm input {
+  min-height: 2.25rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.55rem;
+  background: var(--editor-surface);
+  color: inherit;
+  padding-inline: 0.75rem;
+}
+
+.analysisControls select {
+  min-height: 2.25rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.5rem;
+  background: var(--editor-surface);
+  color: inherit;
+  padding-inline: 0.5rem;
+}
+
+.multitrackPanel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-panel);
+}
+
+.multitrackHeader,
+.multitrackHeader label,
+.multitrackToggles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.multitrackHeader button,
+.multitrackHeader input,
+.multitrackChannel button,
+.multitrackChannel input {
+  min-height: 2rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.5rem;
+  background: var(--editor-surface);
+  color: inherit;
+}
+
+.multitrackHeader .fileButton {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.5rem;
+  background: var(--editor-surface);
+  padding-inline: 0.65rem;
+}
+
+.multitrackTimeline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.multitrackTimeline input,
+.multitrackChannel input {
+  accent-color: var(--editor-accent);
+}
+
+.multitrackMixer {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(11rem, 1fr);
+  gap: 0.65rem;
+  overflow-x: auto;
+  padding-block-end: 0.25rem;
+}
+
+.multitrackChannel {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.6rem;
+  background: var(--editor-surface);
+}
+
+.multitrackChannel > header {
+  display: grid;
+  grid-template-columns: 0.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.multitrackChannel > header i {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+}
+
+.multitrackChannel > header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multitrackChannel > label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--editor-text-muted);
+}
+
+.multitrackChannel button[aria-pressed='true'] {
+  border-color: var(--editor-accent);
+  color: var(--editor-accent);
+}
+
+.multitrackEmpty {
+  margin: 0;
+  color: var(--editor-text-muted);
+}
+
+.toolbar button:focus-visible,
+.toolbar input:focus-visible,
+.menuRoot > button:focus-visible,
+.menuLink:focus-visible,
+.menuPopup a:focus-visible,
+.analysisControls input:focus-visible,
+.analysisControls select:focus-visible,
+.editToolbar button:focus-visible,
+.editToolbar input:focus-visible,
+.editToolbar select:focus-visible,
+.effectToolbar button:focus-visible,
+.effectDialog button:focus-visible,
+.effectDialog input:focus-visible,
+.effectDialog select:focus-visible,
+.dropzone:focus-visible {
+  outline: 2px solid var(--editor-accent);
+  outline-offset: 2px;
+}
+
+.toolbar,
+.editActions,
+.selectionForm {
+  flex-wrap: wrap;
+}
+
+.toolbar label,
+.editToolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.editToolbar {
+  display: grid;
+  gap: 0.65rem;
+  border-block-start: 0;
+}
+
+.effectToolbar {
+  border-block-start: 0;
+}
+
+.effectToolbar > span {
+  color: var(--editor-text-muted);
+}
+
+.effectDialog {
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.75rem;
+  background: var(--editor-panel);
+  color: var(--editor-text);
+  padding: 0;
+}
+
+.effectDialog[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.effectDialog::backdrop {
+  background: color-mix(in srgb, var(--editor-bg) 78%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.effectDialog > header,
+.effectDialog > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--editor-border);
+}
+
+.effectDialog > header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.effectDialog > header button {
+  margin-inline-start: auto;
+}
+
+.effectDialog > section {
+  padding: 1rem;
+  overflow: auto;
+}
+
+.effectDialog > footer {
+  justify-content: flex-end;
+  border-block-start: 1px solid var(--editor-border);
+  border-block-end: 0;
+}
+
+.effectForm {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.effectForm > label,
+.effectPresetForm label,
+.effectNumberList label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.effectCheckbox {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.effectNumberInput,
+.effectPresetForm {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+}
+
+.effectNumberList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.5rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.55rem;
+}
+
+.effectNumberList legend {
+  padding-inline: 0.35rem;
+}
+
+.effectPresetForm label {
+  flex: 1;
+}
+
+.specializedList {
+  display: grid;
+  gap: 0.75rem;
+  max-height: min(28rem, 55vh);
+  overflow: auto;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.55rem;
+}
+
+.specializedRow,
+.specializedBand {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  align-items: end;
+  gap: 0.5rem;
+  padding-block-end: 0.65rem;
+  border-block-end: 1px solid var(--editor-border);
+}
+
+.specializedRow label,
+.specializedBand label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.selectionForm,
+.editActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selectionForm input,
+.editActions input {
+  width: 7rem;
+}
+
+.fileButton {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.fileButton input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  min-width: 0;
+  min-height: 0;
+}
+
+.workspace[data-sidebar='false'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dropzone {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: 1rem;
+  padding: 2rem;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--editor-accent) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--editor-accent) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 2rem 2rem;
+}
+
+.dropzone[data-dragging='true'] {
+  background-color: color-mix(in srgb, var(--editor-accent) 12%, var(--editor-bg));
+  box-shadow: inset 0 0 0 2px var(--editor-accent);
+}
+
+.waveformPanel {
+  display: grid;
+  min-width: 0;
+  gap: 0.55rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--editor-surface) 94%, transparent);
+  overflow: hidden;
+}
+
+.waveformControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-panel);
+}
+
+.waveformControls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--editor-text-muted);
+}
+
+.waveformControls input,
+.multitrackTimeline input {
+  accent-color: var(--editor-accent);
+}
+
+.waveformControls output:last-child {
+  margin-inline-start: auto;
+}
+
+.waveformOverview,
+.waveformInteraction {
+  position: relative;
+  min-width: 0;
+}
+
+.waveformOverview {
+  height: 44px;
+  margin-inline: 0.75rem;
+  background: var(--editor-bg);
+  overflow: hidden;
+}
+
+.waveformOverview canvas,
+.waveformChannel canvas {
+  display: block;
+  width: 100%;
+}
+
+.waveformViewport {
+  position: absolute;
+  inset-block: 0;
+  border: 1px solid var(--editor-accent);
+  background: color-mix(in srgb, var(--editor-accent) 8%, transparent);
+  pointer-events: none;
+}
+
+.waveformRuler {
+  position: relative;
+  height: 1.65rem;
+  margin-inline: 0.75rem;
+  border-block-end: 1px solid var(--editor-border);
+  overflow: hidden;
+}
+
+.rulerTick,
+.rulerMajorTick {
+  position: absolute;
+  inset-block-end: 0;
+  width: 1px;
+  height: 0.35rem;
+  background: var(--editor-text-muted);
+}
+
+.rulerMajorTick {
+  height: 0.6rem;
+  background: var(--editor-text);
+}
+
+.rulerTick span,
+.rulerMajorTick span {
+  position: absolute;
+  inset-block-end: 0.65rem;
+  color: var(--editor-text-muted);
+  font-size: 0.65rem;
+  font-style: normal;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.waveformInteraction {
+  min-height: 7rem;
+  margin-inline: 0.75rem;
+  border: 1px solid var(--editor-border);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--editor-accent) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--editor-accent) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 2rem 2rem;
+  cursor: crosshair;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.waveformInteraction:focus-visible {
+  outline: 2px solid var(--editor-accent);
+  outline-offset: 2px;
+}
+
+.waveformChannel {
+  position: relative;
+  min-height: 112px;
+  border-block-end: 1px solid var(--editor-border);
+}
+
+.waveformChannel:last-of-type {
+  border-block-end: 0;
+}
+
+.waveformChannelLabel {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: 0.35rem;
+  inset-inline-start: 0.45rem;
+  color: var(--editor-text-muted);
+  font-size: 0.7rem;
+  pointer-events: none;
+}
+
+.waveformSelection {
+  position: absolute;
+  z-index: 3;
+  inset-block: 0;
+  background: color-mix(in srgb, var(--editor-accent) 20%, transparent);
+  border-inline: 1px solid var(--editor-accent);
+  pointer-events: none;
+}
+
+.waveformPlayhead,
+.trackPlayhead {
+  position: absolute;
+  z-index: 5;
+  inset-block: 0;
+  width: 1px;
+  background: var(--editor-danger);
+  box-shadow: 0 0 0.35rem color-mix(in srgb, var(--editor-danger) 65%, transparent);
+  pointer-events: none;
+}
+
+.waveformMarker {
+  position: absolute;
+  z-index: 6;
+  inset-block-start: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0.38rem solid transparent;
+  border-block-start-color: var(--marker-color);
+  background: transparent;
+  transform: translateX(-50%);
+}
+
+.waveformMarker::after {
+  content: '';
+  position: absolute;
+  inset-block-start: -0.38rem;
+  width: 1px;
+  height: 100vh;
+  background: var(--marker-color);
+  opacity: 0.65;
+}
+
+.waveformStatus {
+  min-height: 1.25rem;
+  margin: 0;
+  padding-inline: 0.75rem;
+  color: var(--editor-text-muted);
+}
+
+.analysisPanel {
+  display: grid;
+  min-width: 0;
+  gap: 0.65rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--editor-surface) 94%, transparent);
+  overflow: hidden;
+}
+
+.analysisControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-block-end: 1px solid var(--editor-border);
+  background: var(--editor-panel);
+}
+
+.analysisControls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--editor-text-muted);
+}
+
+.analysisControls input {
+  accent-color: var(--editor-accent);
+}
+
+.analysisCanvas {
+  min-width: 0;
+  margin-inline: 0.75rem;
+  border: 1px solid var(--editor-border);
+  background: var(--editor-bg);
+  overflow: hidden;
+}
+
+.analysisCanvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.analysisSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding-inline: 0.75rem;
+}
+
+.analysisSummary > div {
+  padding: 0.55rem;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.45rem;
+  background: var(--editor-bg);
+}
+
+.analysisSummary dt {
+  color: var(--editor-text-muted);
+  font-size: 0.72rem;
+}
+
+.analysisSummary dd {
+  margin: 0.25rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.analysisStatus {
+  min-height: 1.25rem;
+  margin: 0;
+  padding-inline: 0.75rem;
+  color: var(--editor-text-muted);
+}
+
+.trackTimeline {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.trackTimelineViewport {
+  min-width: 0;
+  border: 1px solid var(--editor-border);
+  border-radius: 0.6rem;
+  background: var(--editor-bg);
+  overflow-x: auto;
+}
+
+.trackRuler {
+  position: relative;
+  height: 1.45rem;
+  margin-inline-start: 8rem;
+  border-block-end: 1px solid var(--editor-border);
+}
+
+.trackRuler i {
+  position: absolute;
+  inset-block-end: 0;
+  width: 1px;
+  height: 0.45rem;
+  background: var(--editor-text-muted);
+}
+
+.trackRuler span {
+  position: absolute;
+  inset-block-end: 0.55rem;
+  color: var(--editor-text-muted);
+  font-size: 0.6rem;
+  font-style: normal;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.trackLanes {
+  position: relative;
+}
+
+.trackPlayheadGrid {
+  position: absolute;
+  z-index: 4;
+  inset-block: 0;
+  inset-inline: 8rem 0;
+  pointer-events: none;
+}
+
+.trackLane {
+  display: grid;
+  grid-template-columns: 8rem minmax(24rem, 1fr);
+  min-height: 3.25rem;
+  border-block-end: 1px solid var(--editor-border);
+}
+
+.trackLane:last-child {
+  border-block-end: 0;
+}
+
+.trackLane > strong {
+  padding: 0.75rem 0.55rem;
+  overflow: hidden;
+  color: var(--editor-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackLaneContent {
+  position: relative;
+  min-width: 24rem;
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--editor-text-muted) 7%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 5%;
+  overflow: hidden;
+}
+
+.trackClip {
+  position: absolute;
+  inset-block: 0.35rem;
+  min-width: 2px;
+  border: 1px solid color-mix(in srgb, currentColor 55%, var(--editor-border));
+  border-radius: 0.35rem;
+  color: #081014;
+  opacity: 0.9;
+  overflow: hidden;
+}
+
+.trackClip[data-crossfade='true'] {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--editor-accent-alt) 70%, transparent);
+}
+
+.trackClip > span {
+  position: relative;
+  z-index: 2;
+  display: block;
+  padding: 0.35rem;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clipFadeIn,
+.clipFadeOut {
+  position: absolute;
+  inset-block: 0;
+  max-width: 100%;
+  background: linear-gradient(135deg, var(--editor-bg) 48%, transparent 50%);
+  opacity: 0.7;
+}
+
+.clipFadeIn {
+  inset-inline-start: 0;
+}
+
+.clipFadeOut {
+  inset-inline-end: 0;
+  transform: scaleX(-1);
+}
+
+.sidebar {
+  border-inline-start: 1px solid var(--editor-border);
+  background: var(--editor-panel);
+  padding: 1rem;
+  overflow: auto;
+}
+
+.markerForm {
+  display: grid;
+  gap: 0.5rem;
+  margin-block-end: 1rem;
+}
+
+.markers {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.marker {
+  display: grid;
+  grid-template-columns: 0.65rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.markerColor {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+}
+
+.error {
+  color: var(--editor-danger);
+}
+
+@media (max-width: 760px) {
+  .menuBar {
+    padding-inline: 0;
+  }
+
+  .menuRoot {
+    position: static;
+  }
+
+  .menuRoot > button,
+  .menuLink {
+    min-width: 0;
+    padding-inline: 0.65rem;
+  }
+
+  .menuPopup {
+    inset-inline: 0.5rem;
+    width: auto;
+    min-width: 0;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .dropzone {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .sidebar {
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--editor-border);
+  }
+
+  .analysisSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .effectDialog > header,
+  .effectDialog > footer {
+    flex-wrap: wrap;
+  }
+
+  .effectDialog > footer button {
+    flex: 1 1 9rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .toolbar button,
+  .editToolbar button,
+  .effectToolbar button,
+  .markerForm button,
+  .multitrackHeader button,
+  .multitrackChannel button {
+    min-height: 2.75rem;
+  }
+}

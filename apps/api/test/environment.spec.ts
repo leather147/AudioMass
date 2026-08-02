@@ -40,9 +40,18 @@ describe('environment validation', () => {
   });
 
   it('parses an explicit CORS allowlist', () => {
-    expect(parseCorsOrigins('https://app.example.com, https://admin.example.com')).toEqual([
-      'https://app.example.com',
-      'https://admin.example.com',
-    ]);
+    expect(
+      parseCorsOrigins(
+        'https://app.example.com/, https://admin.example.com, https://app.example.com',
+      ),
+    ).toEqual(['https://app.example.com', 'https://admin.example.com']);
+  });
+
+  it('rejects unsafe or malformed CORS values', () => {
+    expect(() => parseCorsOrigins('*')).toThrow('wildcard');
+    expect(() => parseCorsOrigins('https://*.example.com')).toThrow('wildcard');
+    expect(() => parseCorsOrigins('https://app.example.com/private')).toThrow('paths');
+    expect(() => parseCorsOrigins('file:///tmp/audiomass')).toThrow('HTTP(S)');
+    expect(() => parseCorsOrigins('not a URL')).toThrow('invalid origin');
   });
 });

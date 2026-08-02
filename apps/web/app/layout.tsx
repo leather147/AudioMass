@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
+import { readEditorPreferences } from '@/lib/editor-preference-cookies';
+
 import './globals.css';
 
 export const metadata: Metadata = {
   title: { default: 'AudioMass', template: '%s · AudioMass' },
   description: 'Browser-first multitrack audio editor and waveform workstation.',
   applicationName: 'AudioMass',
+  icons: { icon: '/icon.svg' },
 };
 
 export const viewport: Viewport = {
@@ -16,9 +19,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const preferences = await readEditorPreferences();
   return (
-    <html lang="ru">
+    <html lang={preferences.locale}>
       <body>{children}</body>
     </html>
   );

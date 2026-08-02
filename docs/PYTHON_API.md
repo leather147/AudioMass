@@ -33,6 +33,17 @@ MP3 export uses FFmpeg. WAV/FLAC/OGG processing uses SoundFile. Transcription do
 
 ## Presigned job execution
 
+`POST /v1/jobs/execute` accepts a Pydantic discriminated union keyed by
+`operation`. Each variant owns its parameter model and whether an output upload
+grant is required. Unknown parameter fields are forbidden. Code outside FastAPI
+request injection can use `parse_remote_job_request`; services receive an
+already narrowed model and do not parse generic dictionaries again.
+
+The current variants are analyze, normalize, export, reverb, noise reduction,
+plugin, voice activity, and transcription. Only audio-producing variants accept
+`output`; metadata variants reject it. The response result is likewise limited
+to typed analysis, VAD, transcription, or audio-output metadata models.
+
 `POST /v1/jobs/execute` is the production integration endpoint. It accepts an operation, a signed input URL, an optional signed output URL, content metadata, and operation parameters. Supported operations are constrained by the execution registry; request data cannot import modules or execute source code.
 
 The service:
@@ -71,6 +82,28 @@ ruff check app tests
 mypy app
 pytest
 python -m pip check
+python -m pip_audit -r requirements.txt
 ```
 
 The test suite enforces at least 85% line coverage for the Python application.
+
+## Contract and deployment verification
+
+Pydantic request/response models and the operation registry under
+`apps/python-api/app` are the source of truth. The test suite creates the ASGI
+application, validates `/openapi.json`, checks authentication and remote-storage
+boundaries, and exercises real audio fixtures. After deployment, compare the
+published schema and readiness response with the same release commit:
+
+```text
+GET /openapi.json
+GET /health/live
+GET /health/ready
+```
+
+The Vercel project Root Directory is `apps/python-api`. Its `vercel.json` uses
+the FastAPI framework preset, installs `requirements.txt` into Vercel's managed
+Python virtual environment, enables Fluid compute, and caps the function at 300
+seconds. This does not remove Vercel body, memory, temporary-storage, or model
+cold-start limits; production audio continues to move through signed object
+URLs rather than large function request bodies.

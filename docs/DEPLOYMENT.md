@@ -48,11 +48,42 @@ Use a private bucket. Allow CORS for the deployed web origin and the exact uploa
 
 Add the hostnames that appear in generated input and output URLs to `PYTHON_API_ALLOWED_STORAGE_HOSTS`. S3 virtual-hosted URLs commonly include the bucket in the hostname. Supabase and Vercel may use different control-plane and object-delivery hosts; inspect real grants in staging and list every exact host. Never use a wildcard to make a failed allowlist disappear.
 
-## Vercel web deployment
+## Vercel deployment
 
-`vercel.json` builds only `@audiomass/web`. Configure the repository root as the project root, keep pnpm lockfile installation enabled, and set `NEXT_PUBLIC_API_URL` to the public NestJS `/api/v1` URL. The same-origin legacy assets live in `apps/web/public/legacy` and are included automatically.
+Create three independent Vercel projects from the same repository, with Root Directory values `apps/web`, `apps/api`, and `apps/python-api`. Keep `Include files outside the root directory in the Build Step` enabled so Vercel can use the root pnpm workspace and shared packages. Each application directory contains its own `vercel.json`.
 
-Vercel hosts only the Next.js application in this topology. Deploy NestJS and FastAPI as containers or managed services with private networking between them.
+Web prebuild compiles only the `@audiomass/audio-engine` prerequisite before the
+Next.js application. There is no runtime copy step, `/editor-assets` output, or
+`/editor-runtime` route. `/editor` owns the production React feature and
+`/editor/native` redirects to it. Do not put `API_KEYS` in Web or any
+`NEXT_PUBLIC_*` variable. For the complete Neon, Private Vercel Blob, FastAPI,
+environment-variable, deployment-order, and troubleshooting procedure, use
+[VERCEL_ONLY_DEPLOYMENT.md](VERCEL_ONLY_DEPLOYMENT.md).
+
+## Release preflight
+
+Run the release gate from a clean checkout of the exact commit that will be
+deployed:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm audit --audit-level moderate
+pnpm format:check
+pnpm docs:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Then run the Python checks from `apps/python-api` with its development
+dependencies installed: Black, Ruff, mypy, pytest, `pip check`, and `pip-audit`.
+Validate and generate Prisma from `packages/database`. Finally, deploy a Preview
+of all affected services and exercise health, API schema, signed upload,
+processing, download, editor import/playback/effect, theme/locale, redirects,
+and offline reload before promoting traffic. A local pass does not replace the
+provider-specific Preview smoke test.
 
 ## Security checklist
 

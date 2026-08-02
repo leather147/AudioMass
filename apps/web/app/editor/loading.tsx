@@ -1,3 +1,3 @@
 export default function EditorLoading() {
-  return <div className="editor-status">Загрузка аудиоредактора…</div>;
+  return <div className="editor-status">AudioMass…</div>;
 }

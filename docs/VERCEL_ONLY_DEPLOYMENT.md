@@ -18,11 +18,11 @@ Browser
 
 Создайте три проекта из одного GitHub-репозитория `leather147/AudioMass`.
 
-| Vercel Project          | Framework | Root Directory    | Production Branch                           |
-| ----------------------- | --------- | ----------------- | ------------------------------------------- |
-| `audio-mass`            | Next.js   | `apps/web`        | `production` или выбранная стабильная ветка |
-| `audio-mass-api`        | NestJS    | `apps/api`        | `agent/enterprise-migration` до слияния     |
-| `audio-mass-python-api` | FastAPI   | `apps/python-api` | `agent/enterprise-migration` до слияния     |
+| Vercel Project          | Framework | Root Directory    | Production Branch |
+| ----------------------- | --------- | ----------------- | ----------------- |
+| `audio-mass`            | Next.js   | `apps/web`        | `production`      |
+| `audio-mass-api`        | NestJS    | `apps/api`        | `production`      |
+| `audio-mass-python-api` | FastAPI   | `apps/python-api` | `production`      |
 
 Для каждого проекта откройте `Settings -> Build and Deployment`:
 
@@ -39,7 +39,7 @@ Browser
 
    Она ставит зависимости именно в virtualenv, из которого Vercel запускает FastAPI Function. Не добавляйте `--system` и не выбирайте отдельный системный Python: в Vercel это либо попадёт не в runtime-окружение, либо завершится ошибкой externally managed environment.
 
-Затем откройте `Settings -> Environments -> Production -> Branch Tracking` и выберите ветку, которая реально содержит каталоги `apps/*`. До слияния миграции это `agent/enterprise-migration`.
+Затем откройте `Settings -> Environments -> Production -> Branch Tracking` и выберите `production`. Для незавершённой feature-ветки используйте Preview Deployment, не переключая production traffic.
 
 Файлы `vercel.json` уже находятся в корнях приложений. Они фиксируют framework preset, регион `iad1`, Fluid Compute и максимальную длительность API Functions 300 секунд.
 
@@ -156,12 +156,39 @@ node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 
 Не публикуйте `API_KEYS` в Web. Текущий браузерный редактор не должен хранить серверный API key.
 
+Production `/editor` использует нативную App Router/React-реализацию, а
+`/editor/native` перенаправляет на неё. Оба маршрута входят в один Vercel
+Project; отдельный Root Directory или deployment не нужен. Wave F удалил
+`runtime:build`, `/editor-runtime` и копируемые assets, поэтому стандартный Web
+build сначала собирает только workspace-пакет audio-engine, затем выполняет
+`next build`.
+
 ## 6. Порядок деплоя
+
+Перед созданием Preview зафиксируйте точный commit SHA и выполните из корня
+чистого checkout:
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm audit --audit-level moderate
+pnpm format:check
+pnpm docs:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+Отдельно выполните Prisma validate/generate и полный Python gate из
+`apps/python-api`: Black, Ruff, mypy, pytest, `pip check` и `pip-audit`. Все три
+Vercel Project должны собирать тот же SHA; сравните поле Source в Deployment,
+а не только имя ветки.
 
 ### Шаг 1 — FastAPI
 
 1. Добавьте все переменные `audio-mass-python-api`.
-2. Откройте `Deployments` и запустите Redeploy последнего deployment ветки `agent/enterprise-migration`.
+2. Откройте `Deployments` и запустите Redeploy последнего deployment ветки `production`.
 3. Проверьте:
 
 ```text
@@ -190,7 +217,7 @@ https://audio-mass-api.vercel.app/docs
 ### Шаг 3 — Next.js Web
 
 1. Оставьте production-сайт на стабильной ветке, пока API и Python health checks не зелёные.
-2. Redeploy Preview ветки `agent/enterprise-migration` в `audio-mass`.
+2. Создайте Preview Deployment текущей feature-ветки в `audio-mass`.
 3. Откройте Preview URL и проверьте загрузку редактора, импорт аудио, Web Audio, waveform, темы и локализацию.
 4. После проверки слейте ветку в `production` или поменяйте Branch Tracking осознанно.
 
@@ -230,4 +257,9 @@ https://audio-mass-api.vercel.app/docs
 - API `/health/ready` видит Neon;
 - Prisma migrations завершились в Build Logs;
 - Preview Web открывает редактор без ошибок консоли;
+- `/editor-runtime` возвращает ожидаемый `404`, а три `/tools/*` URL приводят к
+  нативным панелям `/editor`;
+- manifest, icon и service worker доступны, а `/editor` перезагружается offline
+  после первого успешного online load;
+- deployment Web, API и Python ссылаются на один проверенный commit SHA;
 - production branch меняется только после успешного Preview.

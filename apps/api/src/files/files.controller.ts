@@ -22,11 +22,11 @@ import {
 } from '@nestjs/swagger';
 
 import type { StorageObject } from '@audiomass/database';
+import { OwnerQueryDto } from '../common/owner-query.dto.js';
 import type { Page } from '../common/pagination.dto.js';
 import type { DownloadGrant } from '../storage/storage.types.js';
 import { CreateUploadDto } from './dto/create-upload.dto.js';
 import { ListFilesDto } from './dto/list-files.dto.js';
-import { OwnerQueryDto } from './dto/owner-query.dto.js';
 import { type CreatedUpload, FilesService } from './files.service.js';
 
 @ApiTags('files')

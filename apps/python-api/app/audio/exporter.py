@@ -13,6 +13,14 @@ from app.core.errors import AudioProcessingError
 
 ExportFormat = Literal["flac", "mp3", "ogg", "wav"]
 
+__all__ = [
+    "ExportFormat",
+    "export_audio",
+    "ffmpeg_available",
+    "imageio_ffmpeg",
+    "shutil",
+]
+
 FORMAT_OPTIONS: dict[str, tuple[str, str | None]] = {
     "flac": ("FLAC", "PCM_24"),
     "ogg": ("OGG", "VORBIS"),

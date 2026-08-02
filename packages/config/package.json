@@ -8,5 +8,8 @@
     "./tsconfig/nextjs": "./tsconfig.nextjs.json",
     "./tsconfig/nestjs": "./tsconfig.nestjs.json",
     "./eslint": "./eslint.config.mjs"
+  },
+  "scripts": {
+    "clean": "node ../../tooling/clean.mjs dist"
   }
 }

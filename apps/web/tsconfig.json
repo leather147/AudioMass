@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./*"] }
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -12,5 +14,5 @@
     "**/*.ts",
     "**/*.tsx"
   ],
-  "exclude": ["node_modules", "public/legacy"]
+  "exclude": ["node_modules"]
 }

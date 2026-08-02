@@ -44,7 +44,7 @@ export class PythonProcessingService {
     pluginId?: string,
   ): Promise<PythonProcessingResult> {
     const inputFile = await this.files.getReady(dto.inputFileId, dto.ownerId);
-    const parameters = pluginId
+    const parameters: object = pluginId
       ? { parameters: dto.parameters, plugin_id: pluginId }
       : dto.parameters;
     const job = await this.jobs.create({
@@ -139,7 +139,8 @@ export class PythonProcessingService {
   ): OutputDescriptor | undefined {
     if (['analyze', 'voice-activity', 'transcribe'].includes(operation)) return undefined;
     if (operation === 'export') {
-      const format = dto.parameters.output_format ?? 'wav';
+      const { output_format: requestedFormat } = dto.parameters as { output_format?: unknown };
+      const format = requestedFormat ?? 'wav';
       if (!['flac', 'mp3', 'ogg', 'wav'].includes(String(format))) {
         throw new BadRequestException('output_format must be flac, mp3, ogg, or wav');
       }

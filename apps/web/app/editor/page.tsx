@@ -1,20 +1,21 @@
-import { cookies } from 'next/headers';
+import { EditorShell } from '@/features/editor/components/editor-shell';
+import { parseEditorPanel } from '@/features/editor/components/workspace/editor-panels';
+import { editorCopy } from '@/lib/editor-copy';
+import { readEditorPreferences } from '@/lib/editor-preference-cookies';
 
-import { LegacyEditor } from '@/components/editor/legacy-editor';
-import { DEFAULT_EDITOR_PREFERENCES, parseEditorPreferences } from '@/lib/editor-preferences';
+export async function generateMetadata() {
+  const { locale } = await readEditorPreferences();
+  return {
+    description: editorCopy(locale, 'editorDescription'),
+    title: editorCopy(locale, 'editorTitle'),
+  };
+}
 
-export const metadata = { title: 'Редактор' };
+interface EditorPageProps {
+  searchParams: Promise<{ panel?: string }>;
+}
 
-export default async function EditorPage() {
-  const cookieStore = await cookies();
-  const preferences = parseEditorPreferences({
-    locale: cookieStore.get('am-locale')?.value ?? DEFAULT_EDITOR_PREFERENCES.locale,
-    theme: cookieStore.get('am-theme')?.value ?? DEFAULT_EDITOR_PREFERENCES.theme,
-  });
-
-  return (
-    <main className="editor-page">
-      <LegacyEditor initialPreferences={preferences} />
-    </main>
-  );
+export default async function EditorPage({ searchParams }: EditorPageProps) {
+  const [preferences, { panel }] = await Promise.all([readEditorPreferences(), searchParams]);
+  return <EditorShell initialPanel={parseEditorPanel(panel)} preferences={preferences} />;
 }

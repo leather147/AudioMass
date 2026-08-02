@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 
 import type { Project } from '@audiomass/database';
+import { OwnerQueryDto } from '../common/owner-query.dto.js';
 import type { Page } from '../common/pagination.dto.js';
 import { CreateProjectDto } from './dto/create-project.dto.js';
 import { ListProjectsDto } from './dto/list-projects.dto.js';
@@ -32,7 +33,7 @@ import { ProjectsService } from './projects.service.js';
 
 @ApiTags('projects')
 @ApiSecurity('api-key')
-@ApiExtraModels(CreateProjectDto, ListProjectsDto, UpdateProjectDto)
+@ApiExtraModels(CreateProjectDto, ListProjectsDto, OwnerQueryDto, UpdateProjectDto)
 @Controller('projects')
 export class ProjectsController {
   public constructor(@Inject(ProjectsService) private readonly projects: ProjectsService) {}
@@ -52,8 +53,11 @@ export class ProjectsController {
   @Get(':id')
   @ApiOkResponse({ description: 'Project document.' })
   @ApiNotFoundResponse({ description: 'Project does not exist.' })
-  public get(@Param('id', new ParseUUIDPipe()) id: string): Promise<Project> {
-    return this.projects.get(id);
+  public get(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Query() query: OwnerQueryDto,
+  ): Promise<Project> {
+    return this.projects.get(id, query.ownerId);
   }
 
   @Patch(':id')
@@ -61,15 +65,19 @@ export class ProjectsController {
   @ApiConflictResponse({ description: 'The supplied version is stale.' })
   public update(
     @Param('id', new ParseUUIDPipe()) id: string,
+    @Query() query: OwnerQueryDto,
     @Body() dto: UpdateProjectDto,
   ): Promise<Project> {
-    return this.projects.update(id, dto);
+    return this.projects.update(id, query.ownerId, dto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({ description: 'Project deleted.' })
-  public remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
-    return this.projects.remove(id);
+  public remove(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Query() query: OwnerQueryDto,
+  ): Promise<void> {
+    return this.projects.remove(id, query.ownerId);
   }
 }

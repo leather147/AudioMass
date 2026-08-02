@@ -15,7 +15,10 @@
       "types": "./dist/dsp/index.d.ts",
       "import": "./dist/dsp/index.js"
     },
-    "./worklets/meter": "./dist/worklets/meter-processor.js"
+    "./workers/wav-encoder": "./dist/workers/wav-encoder.worker.js",
+    "./workers/tempo": "./dist/workers/tempo.worker.js",
+    "./worklets/meter": "./dist/worklets/meter-processor.js",
+    "./worklets/recorder": "./dist/worklets/recorder-processor.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

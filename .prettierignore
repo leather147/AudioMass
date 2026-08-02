@@ -4,11 +4,11 @@ coverage
 dist
 node_modules
 pnpm-lock.yaml
-apps/web/public/legacy
+apps/web/editor-runtime/static
+apps/web/public/editor-assets
 apps/web/public/codecs
 apps/web/next-env.d.ts
 packages/database/src/generated
-README copy.md
 .venv
 **/.venv
 **/__pycache__

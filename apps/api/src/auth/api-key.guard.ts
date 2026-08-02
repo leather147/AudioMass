@@ -23,12 +23,16 @@ export function isAuthorizedApiKey(candidate: string, configuredKeys: readonly s
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
+  private readonly configuredKeys: readonly string[];
+
   public constructor(
     @Inject(ConfigService)
-    private readonly config: ConfigService,
+    config: ConfigService,
     @Inject(Reflector)
     private readonly reflector: Reflector,
-  ) {}
+  ) {
+    this.configuredKeys = parseApiKeys(config.getOrThrow<string>('API_KEYS'));
+  }
 
   public canActivate(context: ExecutionContext): boolean {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_ROUTE, [
@@ -40,9 +44,8 @@ export class ApiKeyGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<HttpRequest>();
     const header = request.headers['x-api-key'];
     const candidate = Array.isArray(header) ? header[0] : header;
-    const configured = parseApiKeys(this.config.getOrThrow<string>('API_KEYS'));
 
-    if (!candidate || !isAuthorizedApiKey(candidate, configured)) {
+    if (!candidate || !isAuthorizedApiKey(candidate, this.configuredKeys)) {
       throw new UnauthorizedException('A valid x-api-key header is required');
     }
     return true;

@@ -33,21 +33,6 @@ select {
   font: inherit;
 }
 
-.editor-page {
-  width: 100dvw;
-  height: 100dvh;
-  overflow: hidden;
-  background: var(--shell-bg);
-}
-
-.editor-frame {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: var(--shell-bg);
-}
-
 .editor-status {
   position: fixed;
   inset: 0;
@@ -58,11 +43,6 @@ select {
   color: var(--shell-muted);
   letter-spacing: 0.02em;
   transition: opacity 160ms ease;
-}
-
-.editor-status[data-hidden='true'] {
-  pointer-events: none;
-  opacity: 0;
 }
 
 .settings-page {
@@ -126,6 +106,83 @@ select {
   color: var(--shell-text);
   text-decoration: none;
   cursor: pointer;
+}
+
+.about-page {
+  min-height: 100dvh;
+  padding: clamp(28px, 7vw, 88px) 20px;
+  background:
+    radial-gradient(circle at 15% 0%, rgb(67 228 220 / 12%), transparent 32rem), var(--shell-bg);
+}
+
+.about-card {
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 52px);
+  border: 1px solid var(--shell-border);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--shell-surface) 94%, transparent);
+  box-shadow: 0 30px 100px rgb(0 0 0 / 38%);
+}
+
+.about-kicker {
+  margin: 0 0 10px;
+  color: var(--shell-accent);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.about-card h1 {
+  max-width: 16ch;
+  margin: 0;
+  font-size: clamp(2.25rem, 7vw, 4.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.about-card h2 {
+  margin: 42px 0 14px;
+}
+
+.about-card p,
+.about-card li {
+  color: var(--shell-muted);
+  line-height: 1.7;
+}
+
+.about-lead {
+  max-width: 64ch;
+  margin: 28px 0 0;
+  font-size: 1.08rem;
+}
+
+.about-card ul {
+  display: grid;
+  gap: 8px;
+  padding-left: 1.25rem;
+}
+
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.about-actions a {
+  padding: 10px 16px;
+  border: 1px solid var(--shell-border);
+  border-radius: 999px;
+  color: var(--shell-text);
+  text-decoration: none;
+}
+
+.about-actions a:first-child {
+  border-color: var(--shell-accent);
+  background: var(--shell-accent);
+  color: #041211;
+  font-weight: 700;
 }
 
 .settings-actions button {
