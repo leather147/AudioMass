@@ -363,6 +363,46 @@ E.3 uses the following production-promotion boundary:
   global declarations, compatibility ESLint exceptions, and old CSS patches.
 - Replace or isolate old vendor libraries.
 
+Wave F uses the following atomic compatibility-deletion boundary:
+
+- the deletion inventory starts from the clean, pushed E.3 checkpoint and
+  includes all 116 tracked files under `apps/web/editor-runtime` (approximately
+  16.9 MB), `/editor-runtime`, `EditorFrame`, bridge/document/manifest helpers,
+  the serial preference queue used only by the iframe, fallback tool hosts,
+  classic runtime test harnesses, generated asset output, runtime compiler/copy
+  scripts, global declarations, and classic ESLint/TypeScript/Turbo exceptions;
+- `/tools/frequency-analyser`, `/tools/spectral-analyser`, and
+  `/tools/multitrack-mixer` retain URL compatibility only as Server Component
+  redirects to the registered native editor panels. Their client tool hosts,
+  same-origin mixer adapter, global access, query bridge, and CSS are deleted;
+- the unused `LegacyEditorVendorGateway`, its allowlist, and the vendor files
+  reachable only through that gateway are deleted with the runtime. Native WAV,
+  PCM, analysis, effects, waveform Canvas, recording, metadata, persistence,
+  and multitrack modules remain owned by `@audiomass/audio-engine` and the React
+  feature graph; no production module may retain an `/editor-assets` import;
+- installable offline behavior moves before deletion: App Router owns the web
+  manifest and icon metadata, a native client hook registers the root service
+  worker, and the worker precaches the canonical editor plus observed same-origin
+  Next.js resources. The cache no longer references `/editor-runtime` or copied
+  classic assets;
+- Web scripts keep only the audio-package prerequisite. `predev`, `pretest`, and
+  `prebuild` no longer compile or copy classic sources; clean/Turbo/gitignore,
+  root and Web ESLint, and Web TypeScript configuration lose runtime-only paths;
+  generic tooling is deleted only when repository search proves it has no other
+  consumer;
+- replacement tests prove the compatibility directories, routes, globals,
+  generated paths, and configuration hooks are absent; native panel redirects,
+  PWA metadata/offline registration, Server/Client boundaries, editor features,
+  server DTOs, and Python discriminated job schemas remain covered. Production
+  build route output must contain `/editor` and the three panel redirects but no
+  `/editor-runtime` route;
+- browser proof covers fresh-load and reload behavior, every redirect target,
+  English/Russian and dark/light preferences, audio import/waveform/effect
+  interaction, no missing asset requests, service-worker registration, manifest
+  reachability, and the absence of framework overlays or console errors. Only
+  after complete JS/TS, Python, Prisma, OpenAPI, build, and browser proof may the
+  deletion checkpoint be reported as complete.
+
 ### Wave G — documentation and release proof
 
 - Update every tracked Markdown document.
