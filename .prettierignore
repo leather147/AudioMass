@@ -7,6 +7,9 @@ pnpm-lock.yaml
 apps/web/editor-runtime/static
 apps/web/public/editor-assets
 apps/web/public/codecs
+# Read-only presentation contract recovered from cdd2efc; react-bridge.css is
+# checked explicitly by the Wave H verification command.
+apps/web/public/editor-classic
 apps/web/next-env.d.ts
 packages/database/src/generated
 .venv

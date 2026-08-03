@@ -505,9 +505,10 @@ acceptable final presentation layer.
       integrity, final inventories, zero-vulnerability dependency audits, full
       builds/tests, Prisma/OpenAPI proof, and production browser smoke are
       complete.
-- [ ] Wave H: original AudioMass UI parity is in progress. The prior browser
-      proof did not validate the visual composition and cannot close the
-      presentation migration.
+- [x] Wave H: the exact `cdd2efc` AudioMass interface hierarchy and stylesheet
+      stack are restored in the native React composition. Empty and loaded
+      waveform/multitrack states, themes, interactions, narrow layout, tests,
+      type checking, lint, and the production build are verified.
 
 ## Stage reports
 
@@ -1065,38 +1066,66 @@ editor migration Wave G`).
 
 ### Stage 15 — Wave H original-interface restoration
 
-- **Status:** in progress on 2026-08-03. The user-provided production screenshot
-  showed that the framework-native editor rendered as a generic sequence of
-  forms, buttons, a waveform card, and marker sidebar instead of the established
-  AudioMass DAW workspace.
-- **Scope checkpoint:** this plan correction is committed before presentation
-  implementation. It explicitly reopens visual parity while leaving the
-  completed legacy-runtime deletion and framework ownership unchanged.
-- **Implementation slices:** (1) shell and dense top chrome; (2) channel rail,
-  ruler, timeline grid, waveform and empty state; (3) menus, dialogs, panels,
-  themes, and responsive/zoom behavior; (4) screenshot comparison and the full
-  release gate.
-- **Acceptance evidence:** pending. This report will record affected components,
-  reference-to-React mapping, desktop and narrow screenshots, interaction
-  checks, automated test totals, commit, and explicit push after completion.
+- **Status:** complete on 2026-08-03. The rejected generic form-and-card editor
+  has been replaced with the exact historical AudioMass presentation contract
+  from commit `cdd2efc`, while React, the typed controllers, and the native audio
+  engine remain the only executable application/runtime owners.
+- **Recovered source contract:** the 29 first-party stylesheets referenced by
+  the historical `src/index.html` are mounted in their original order. Twenty
+  eight files are content-identical after line-ending normalization;
+  `main.css` differs only by embedding the original Icomoon WOFF payload instead
+  of using its former relative font URL. A separate, narrowly scoped
+  `react-bridge.css` supplies only React host sizing, canvas stacking, and
+  runtime-state selectors.
+- **React mapping:** `EditorMenuBar` owns the historical application header and
+  menus; `TransportBar` owns the time badge, transport/edit groups, overview,
+  marker/name, selection, and BPM chrome; `WaveformWorkspace` owns the panner,
+  channel rows, ruler, waveform/selection/playhead canvases, empty state, and
+  footer; `MultitrackPanel` owns the historical track rail, ruler, lanes, clips,
+  controls, and shared footer. Theme data, localization, keyboard commands,
+  effects, markers, audio loading, playback, project persistence, and export
+  continue through framework-native stores/controllers rather than restored
+  IIFEs, globals, ordered scripts, iframes, or direct-DOM legacy modules.
+- **Geometry and responsive proof:** at the 2048 x 1047 reference viewport the
+  restored shell reproduces the 32 px header, 66 px toolbar, 877 px workspace,
+  and 72 px footer. The empty single-track screenshot differs from the exact
+  `cdd2efc` render by 1.63% of pixels (98.37% match); the multitrack empty state
+  differs by 6.83%, with the same full workspace geometry and 178 px track rail.
+  Remaining differences are dynamic canvas/text rasterization, not a redesigned
+  layout. A 1365 x 768 viewport has zero document overflow; the historically
+  wide toolbar remains horizontally scrollable inside its own container.
+- **Interaction and theme proof:** a real mono WAV loads with a 1.000 second
+  duration and visible waveform; the same file creates a functional multitrack
+  track and clip. Selection drag produced start `00:00.127`, end `00:00.359`,
+  and duration `00:00.232`. Header effects open native React dialogs, Escape
+  closes them, transport state is connected in both modes, and `github-light`
+  recolors the complete editor before returning to the default `replicate`
+  theme. Fresh-server browser verification completed without hydration errors,
+  console errors, or page overflow.
+- **Automated acceptance:** `@audiomass/audio-engine` builds; web ESLint passes
+  with zero warnings; web Vitest passes 11 files / 35 tests; web TypeScript
+  checking passes; and the Next.js 16.2.12 production build succeeds with all
+  application and editor routes intact. The implementation checkpoint is
+  `e594db2`; the stage report and both commits are pushed explicitly to
+  `origin/agent/repository-hardening`.
 
 ## Overall stage summary
 
-| Wave | State       | Current result                                                                   |
-| ---- | ----------- | -------------------------------------------------------------------------------- |
-| A    | Complete    | Typed application/domain platform and React lifecycle                            |
-| B    | Complete    | Leaf services, metadata, workers, persistence adapters, and vendor isolation     |
-| C    | Complete    | PCM-aware history, playback proof, edit commands, recording, and WAV export UI   |
-| D    | Complete    | Native multitrack/effect domain, workflows, playback, persistence, and export    |
-| E    | Complete    | Native production route, React presentation, accessibility, and browser parity   |
-| F    | Complete    | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted  |
-| G    | Complete    | Documentation, audits, inventories, schemas, builds, and release proof are final |
-| H    | In progress | Restore the original AudioMass interface in the native React composition         |
+| Wave | State    | Current result                                                                   |
+| ---- | -------- | -------------------------------------------------------------------------------- |
+| A    | Complete | Typed application/domain platform and React lifecycle                            |
+| B    | Complete | Leaf services, metadata, workers, persistence adapters, and vendor isolation     |
+| C    | Complete | PCM-aware history, playback proof, edit commands, recording, and WAV export UI   |
+| D    | Complete | Native multitrack/effect domain, workflows, playback, persistence, and export    |
+| E    | Complete | Native production route, React presentation, accessibility, and browser parity   |
+| F    | Complete | Compatibility runtime, globals, assets, tool hosts, and build hooks are deleted  |
+| G    | Complete | Documentation, audits, inventories, schemas, builds, and release proof are final |
+| H    | Complete | Exact `cdd2efc` AudioMass presentation restored in native React                  |
 
-Fourteen structural stages and Waves A-G are complete at the runtime and
-framework boundary. Stage 15 / Wave H remains open for presentation parity. The first-party classic
-editor runtime and every route, bridge, global, asset build, host adapter, and
-configuration exception that could execute it are gone. The canonical
-documentation and CI release gate continue to protect that state; the remaining
-work is a native React reconstruction of the established AudioMass interface,
-not a revival of the legacy implementation boundary.
+All fifteen structural stages and Waves A-H are complete. The first-party
+classic editor runtime and every route, global, generated runtime asset, host
+adapter, and configuration exception that could execute it remain deleted. The
+historical `cdd2efc` presentation is now preserved as an explicit stylesheet and
+DOM contract implemented by native React components over the typed editor
+controllers. The result restores the established AudioMass interface without
+reviving the legacy implementation boundary.
