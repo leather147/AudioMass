@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { ChangeEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { EditorSessionSnapshot } from '@audiomass/audio-engine';
@@ -20,14 +20,15 @@ import {
   EDITOR_PANEL_LABELS,
   type EditorPanelId,
 } from '../workspace/editor-panels';
-import styles from '../editor-shell.module.css';
 
 interface EditorMenuBarProps {
   activePanel: EditorPanelId;
   controller: EditorController;
   copy: (key: EditorCopyKey) => string;
   onError(message: string | null): void;
-  onFileInput(event: ChangeEvent<HTMLInputElement>): void;
+  onOpenAudio(): void;
+  onOpenEffects(): void;
+  onOpenSpecializedEffects(): void;
   onPanelChange(panel: EditorPanelId): void;
   snapshot: EditorSessionSnapshot;
 }
@@ -47,7 +48,9 @@ export function EditorMenuBar({
   controller,
   copy,
   onError,
-  onFileInput,
+  onOpenAudio,
+  onOpenEffects,
+  onOpenSpecializedEffects,
   onPanelChange,
   snapshot,
 }: EditorMenuBarProps) {
@@ -55,7 +58,6 @@ export function EditorMenuBar({
   const [topLevelIndex, setTopLevelIndex] = useState(0);
   const pendingPopupFocus = useRef<PopupFocusEdge | null>(null);
   const rootReference = useRef<HTMLElement>(null);
-  const fileReference = useRef<HTMLInputElement>(null);
   const loaded = snapshot.engine.duration > 0;
   const selected = snapshot.document.selection !== null;
 
@@ -197,7 +199,7 @@ export function EditorMenuBar({
   return (
     <nav
       aria-label={copy('mainMenu')}
-      className={styles.menuBar}
+      className="pk_hdr pk_noselect"
       onKeyDown={(event) => {
         const target = event.target as HTMLElement;
         const popup = target.closest('[role="menu"]');
@@ -207,7 +209,10 @@ export function EditorMenuBar({
       ref={rootReference}
       role="menubar"
     >
-      <div className={styles.menuRoot} role="none">
+      <div
+        className={`pk_btn pk_noselect${openMenu === 'file' ? ' pk_vis pk_act' : ''}`}
+        role="none"
+      >
         <button
           aria-controls="editor-menu-file"
           aria-expanded={openMenu === 'file'}
@@ -222,17 +227,8 @@ export function EditorMenuBar({
           {copy('fileMenu')}
         </button>
         {openMenu === 'file' ? (
-          <div
-            className={styles.menuPopup}
-            data-menu-popup="file"
-            id="editor-menu-file"
-            role="menu"
-          >
-            <button
-              onClick={() => command(() => fileReference.current?.click())}
-              role="menuitem"
-              type="button"
-            >
+          <div className="pk_menu" data-menu-popup="file" id="editor-menu-file" role="menu">
+            <button onClick={() => command(onOpenAudio)} role="menuitem" type="button">
               {copy('openAudio')}
             </button>
             <button
@@ -245,10 +241,12 @@ export function EditorMenuBar({
             </button>
           </div>
         ) : null}
-        <input accept="audio/*" hidden onChange={onFileInput} ref={fileReference} type="file" />
       </div>
 
-      <div className={styles.menuRoot} role="none">
+      <div
+        className={`pk_btn pk_noselect${openMenu === 'edit' ? ' pk_vis pk_act' : ''}`}
+        role="none"
+      >
         <button
           aria-controls="editor-menu-edit"
           aria-expanded={openMenu === 'edit'}
@@ -263,12 +261,7 @@ export function EditorMenuBar({
           {copy('editMenu')}
         </button>
         {openMenu === 'edit' ? (
-          <div
-            className={styles.menuPopup}
-            data-menu-popup="edit"
-            id="editor-menu-edit"
-            role="menu"
-          >
+          <div className="pk_menu" data-menu-popup="edit" id="editor-menu-edit" role="menu">
             <button
               disabled={!snapshot.canUndo}
               onClick={() => command(() => void controller.dispatch({ name: 'history.undo' }))}
@@ -326,31 +319,88 @@ export function EditorMenuBar({
             >
               {copy('deleteSelection')}
             </button>
+            <button
+              disabled={!selected}
+              onClick={() => command(() => void controller.dispatch({ name: 'edit.trim' }))}
+              role="menuitem"
+              type="button"
+            >
+              {copy('trimSelection')}
+            </button>
+            <button
+              disabled={!loaded}
+              onClick={() =>
+                command(
+                  () => void controller.dispatch({ duration: 1, name: 'edit.insert-silence' }),
+                )
+              }
+              role="menuitem"
+              type="button"
+            >
+              {copy('insertSilence')}
+            </button>
           </div>
         ) : null}
       </div>
 
-      <div className={styles.menuRoot} role="none">
+      <div
+        className={`pk_btn pk_noselect${openMenu === 'effects' ? ' pk_vis pk_act' : ''}`}
+        role="none"
+      >
         <button
-          aria-controls="editor-menu-view"
-          aria-expanded={openMenu === 'view'}
+          aria-controls="editor-menu-effects"
+          aria-expanded={openMenu === 'effects'}
           aria-haspopup="menu"
           data-menu-index="2"
-          onClick={() => toggle('view', 2)}
+          onClick={() => toggle('effects', 2)}
           onFocus={() => setTopLevelIndex(2)}
           role="menuitem"
           tabIndex={topLevelIndex === 2 ? 0 : -1}
           type="button"
         >
+          {copy('effects')}
+        </button>
+        {openMenu === 'effects' ? (
+          <div className="pk_menu" data-menu-popup="effects" id="editor-menu-effects" role="menu">
+            <button
+              disabled={!selected}
+              onClick={() => command(onOpenEffects)}
+              role="menuitem"
+              type="button"
+            >
+              {copy('effects')}
+            </button>
+            <button
+              disabled={!selected}
+              onClick={() => command(onOpenSpecializedEffects)}
+              role="menuitem"
+              type="button"
+            >
+              {copy('specializedEffects')}
+            </button>
+          </div>
+        ) : null}
+      </div>
+
+      <div
+        className={`pk_btn pk_noselect${openMenu === 'view' ? ' pk_vis pk_act' : ''}`}
+        role="none"
+      >
+        <button
+          aria-controls="editor-menu-view"
+          aria-expanded={openMenu === 'view'}
+          aria-haspopup="menu"
+          data-menu-index="3"
+          onClick={() => toggle('view', 3)}
+          onFocus={() => setTopLevelIndex(3)}
+          role="menuitem"
+          tabIndex={topLevelIndex === 3 ? 0 : -1}
+          type="button"
+        >
           {copy('viewMenu')}
         </button>
         {openMenu === 'view' ? (
-          <div
-            className={styles.menuPopup}
-            data-menu-popup="view"
-            id="editor-menu-view"
-            role="menu"
-          >
+          <div className="pk_menu" data-menu-popup="view" id="editor-menu-view" role="menu">
             {EDITOR_PANEL_IDS.map((panel) => (
               <button
                 aria-checked={panel === activePanel}
@@ -367,27 +417,25 @@ export function EditorMenuBar({
         ) : null}
       </div>
 
-      <div className={styles.menuRoot} role="none">
+      <div
+        className={`pk_btn pk_noselect${openMenu === 'help' ? ' pk_vis pk_act' : ''}`}
+        role="none"
+      >
         <button
           aria-controls="editor-menu-help"
           aria-expanded={openMenu === 'help'}
           aria-haspopup="menu"
-          data-menu-index="3"
-          onClick={() => toggle('help', 3)}
-          onFocus={() => setTopLevelIndex(3)}
+          data-menu-index="4"
+          onClick={() => toggle('help', 4)}
+          onFocus={() => setTopLevelIndex(4)}
           role="menuitem"
-          tabIndex={topLevelIndex === 3 ? 0 : -1}
+          tabIndex={topLevelIndex === 4 ? 0 : -1}
           type="button"
         >
           {copy('helpMenu')}
         </button>
         {openMenu === 'help' ? (
-          <div
-            className={styles.menuPopup}
-            data-menu-popup="help"
-            id="editor-menu-help"
-            role="menu"
-          >
+          <div className="pk_menu" data-menu-popup="help" id="editor-menu-help" role="menu">
             <Link href="/about" onClick={() => setOpenMenu(null)} role="menuitem">
               {copy('about')}
             </Link>
@@ -396,15 +444,36 @@ export function EditorMenuBar({
       </div>
 
       <Link
-        className={styles.menuLink}
-        data-menu-index="4"
-        href="/settings"
-        onFocus={() => setTopLevelIndex(4)}
+        className="pk_btn pk_noselect pk_react_top_link"
+        data-menu-index="5"
+        href="/settings#language"
+        onFocus={() => setTopLevelIndex(5)}
         role="menuitem"
-        tabIndex={topLevelIndex === 4 ? 0 : -1}
+        tabIndex={topLevelIndex === 5 ? 0 : -1}
       >
+        {copy('language')}
+      </Link>
+
+      <Link
+        className="pk_btn pk_noselect pk_react_top_link am_settings_entry"
+        data-menu-index="6"
+        href="/settings"
+        onFocus={() => setTopLevelIndex(6)}
+        role="menuitem"
+        tabIndex={topLevelIndex === 6 ? 0 : -1}
+      >
+        <i aria-hidden="true" className="pk_react_settings_dot" />
         {copy('settingsMenu')}
       </Link>
+
+      <button
+        aria-pressed={activePanel === 'mixer'}
+        className="pk_mt_topbtn"
+        onClick={() => onPanelChange(activePanel === 'mixer' ? 'waveform' : 'mixer')}
+        type="button"
+      >
+        {copy('multitrack')}
+      </button>
     </nav>
   );
 }

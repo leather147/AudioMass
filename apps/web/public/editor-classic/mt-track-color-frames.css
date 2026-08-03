@@ -1,0 +1,150 @@
+/* Multitrack clip color accents
+   Only the clip outline and the filename footer use the track color.
+   The clip body remains neutral/dark to avoid filling the whole card with color. */
+
+.pk_mt_clip{
+	background:linear-gradient(180deg,rgba(255,255,255,.030),rgba(255,255,255,.010)),#050607!important;
+	border:1px solid var(--mt-br,#2f7b75)!important;
+	box-shadow:
+		inset 0 1px 0 rgba(255,255,255,.08),
+		inset 0 0 0 1px color-mix(in srgb,var(--mt-br,#2f7b75) 18%,transparent),
+		0 10px 28px rgba(0,0,0,.24)!important;
+}
+
+.pk_mt_clip canvas{
+	background:#050607!important;
+}
+
+.pk_mt_clip.pk_mt_clip_sel{
+	border-color:color-mix(in srgb,var(--mt-br,#2f7b75) 78%,#f6f7f8)!important;
+	box-shadow:
+		0 0 0 1px color-mix(in srgb,var(--mt-br,#2f7b75) 70%,#f6f7f8),
+		0 18px 48px color-mix(in srgb,var(--mt-br,#2f7b75) 18%,transparent),
+		inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+
+.pk_mt_clip.pk_mt_clip_xf{
+	border-color:var(--mt-br,#2f7b75)!important;
+}
+
+.pk_mt_clip span{
+	left:0!important;
+	right:0!important;
+	bottom:0!important;
+	box-sizing:border-box!important;
+	height:15px!important;
+	padding:1px 7px 0!important;
+	line-height:13px!important;
+	background:
+		linear-gradient(90deg,
+			color-mix(in srgb,var(--mt-br,#2f7b75) 58%,#050607) 0%,
+			color-mix(in srgb,var(--mt-br,#2f7b75) 30%,#050607) 52%,
+			rgba(5,6,7,.92) 100%)!important;
+	border-top:1px solid color-mix(in srgb,var(--mt-br,#2f7b75) 80%,#050607)!important;
+	color:#f6f7f8!important;
+	text-shadow:0 1px 0 rgba(0,0,0,.75)!important;
+	z-index:4!important;
+}
+
+.pk_mt_clip.pk_mt_clip_muted span{
+	filter:saturate(.65);
+}
+
+/* Final marker + lower scrollbar overrides. This file is loaded before several
+   other theme layers, so selectors below intentionally use higher specificity
+   and !important to win over later marker/scrollbar fixes. */
+.pk_app.pk_mt_on .pk_mt_region{
+	z-index:8450!important;
+	background:rgba(67,228,220,.135)!important;
+	border-left:1px solid rgba(142,241,236,.72)!important;
+	border-right:1px solid rgba(142,241,236,.72)!important;
+	box-shadow:inset 0 0 0 1px rgba(142,241,236,.18),0 0 32px rgba(67,228,220,.08)!important;
+	mix-blend-mode:normal!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_playhead{
+	z-index:8500!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_marker,
+.pk_app.pk_mt_on .pk_mt_ruler .pk_mrkrl,
+.pk_app.pk_mt_on .pk_mt_main .pk_mrkrl,
+.pk_app.pk_mt_on .pk_mt_ruler .pk_mrkr,
+.pk_app.pk_mt_on .pk_mt_main .pk_mrkr{
+	z-index:8320!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_marker{
+	--marker-color:#f59e0b;
+	border-left:2px dashed var(--marker-color)!important;
+	box-shadow:0 0 14px color-mix(in srgb,var(--marker-color) 54%,transparent)!important;
+	filter:drop-shadow(0 0 7px color-mix(in srgb,var(--marker-color) 65%,transparent))!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_marker:before{
+	background:var(--marker-color)!important;
+	box-shadow:0 0 20px color-mix(in srgb,var(--marker-color) 72%,transparent)!important;
+}
+
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 1){color:#9dff6a!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 2){color:#5af2ff!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 3){color:#f557d2!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 4){color:#ffd15c!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 5){color:#ff8c35!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 6){color:#b9c6ff!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 7){color:#ff6b8a!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 8){color:#7cffb2!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 9){color:#c084fc!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 10){color:#fb7185!important}
+.pk_app.pk_mt_on .pk_mrkr:nth-child(11n + 11){color:#38bdf8!important}
+
+.pk_app.pk_mt_on .pk_mrkr:after{
+	background:currentColor!important;
+	opacity:.88!important;
+	box-shadow:0 0 10px currentColor!important;
+}
+
+.pk_app.pk_mt_on .pk_mrkr:before{
+	border-top-color:currentColor!important;
+	filter:drop-shadow(0 0 7px currentColor)!important;
+}
+
+.pk_app.pk_mt_on .pk_mrkr b{
+	border-color:currentColor!important;
+	box-shadow:0 10px 24px rgba(0,0,0,.38),0 0 13px currentColor!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main{
+	overflow-x:scroll!important;
+	overflow-y:auto!important;
+	scrollbar-gutter:stable both-edges!important;
+	scrollbar-width:thin!important;
+	scrollbar-color:rgba(142,241,236,.55) rgba(255,255,255,.055)!important;
+	padding-bottom:20px!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar{
+	width:13px!important;
+	height:15px!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-track{
+	background:rgba(255,255,255,.045)!important;
+	border-top:1px solid rgba(255,255,255,.09)!important;
+	border-radius:999px!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb{
+	background:linear-gradient(90deg,rgba(67,228,220,.72),rgba(142,241,236,.52))!important;
+	border:4px solid rgba(7,9,11,.94)!important;
+	border-radius:999px!important;
+	box-shadow:0 0 18px rgba(67,228,220,.18)!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-thumb:hover{
+	background:linear-gradient(90deg,#43e4dc,#8ef1ec)!important;
+}
+
+.pk_app.pk_mt_on .pk_mt_main::-webkit-scrollbar-corner{
+	background:#07090b!important;
+}

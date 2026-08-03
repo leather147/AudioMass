@@ -15,7 +15,7 @@ import {
 import type { EditorCopyKey } from '@/lib/editor-copy';
 
 import type { EditorController } from '../../application/editor-controller';
-import styles from '../editor-shell.module.css';
+import { ClassicEditorFooter } from '../chrome/classic-editor-footer';
 import {
   clampTimelineZoom,
   createTimelineTicks,
@@ -30,6 +30,7 @@ import { WaveformCanvas } from './waveform-canvas';
 interface WaveformWorkspaceProps {
   controller: EditorController;
   copy: (key: EditorCopyKey) => string;
+  onOpenAudio(): void;
   snapshot: EditorSessionSnapshot;
 }
 
@@ -44,7 +45,12 @@ interface WaveformAnalysisState {
   key: string | null;
 }
 
-export function WaveformWorkspace({ controller, copy, snapshot }: WaveformWorkspaceProps) {
+export function WaveformWorkspace({
+  controller,
+  copy,
+  onOpenAudio,
+  snapshot,
+}: WaveformWorkspaceProps) {
   const { reference, width } = useElementWidth<HTMLDivElement>();
   const [analysisState, setAnalysisState] = useState<WaveformAnalysisState>({
     analysis: null,
@@ -154,142 +160,145 @@ export function WaveformWorkspace({ controller, copy, snapshot }: WaveformWorksp
   const visibleMarkers = snapshot.document.markers.filter(
     (marker) => marker.time >= viewport.start && marker.time <= viewport.end,
   );
+  const channels = analysis?.channels ?? [null, null];
 
   return (
-    <section aria-label={copy('waveform')} className={styles.waveformPanel}>
-      <header className={styles.waveformControls}>
-        <strong>{copy('waveform')}</strong>
-        <label>
-          {copy('zoom')}
-          <input
-            aria-label={copy('zoom')}
-            max={32}
-            min={1}
-            onChange={(event) => setZoom(clampTimelineZoom(Number(event.currentTarget.value)))}
-            step={1}
-            type="range"
-            value={zoom}
-          />
-          <output>{zoom}×</output>
-        </label>
-        <label>
-          {copy('scroll')}
-          <input
-            aria-label={copy('scroll')}
-            disabled={zoom === 1}
-            max={1}
-            min={0}
-            onChange={(event) => setScroll(Number(event.currentTarget.value))}
-            step={0.001}
-            type="range"
-            value={scroll}
-          />
-        </label>
-        <output>
-          {formatEditorTime(snapshot.engine.position)} / {formatEditorTime(duration)}
-        </output>
-      </header>
-
-      <div className={styles.waveformOverview}>
-        <WaveformCanvas
-          height={44}
-          peaks={analysis?.overview ?? null}
-          totalDuration={duration}
-          viewport={createTimelineViewport(duration, 1, 0)}
-          width={width}
-        />
-        <i
-          aria-hidden="true"
-          className={styles.waveformViewport}
-          style={{ left: `${scroll * (100 - 100 / zoom)}%`, width: `${100 / zoom}%` }}
-        />
-      </div>
-
-      <div className={styles.waveformRuler}>
-        {ticks.map((tick) => (
-          <i
-            aria-hidden="true"
-            className={tick.major ? styles.rulerMajorTick : styles.rulerTick}
-            key={tick.time}
-            style={{ left: `${tick.percent}%` }}
-          >
-            <span>{tick.label}</span>
-          </i>
-        ))}
-      </div>
-
-      <div
-        aria-label={copy('waveformInteraction')}
-        aria-valuemax={duration}
-        aria-valuemin={0}
-        aria-valuenow={snapshot.engine.position}
-        className={styles.waveformInteraction}
-        onKeyDown={onKeyDown}
-        onPointerCancel={cancelSelection}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={finishSelection}
-        ref={reference}
-        role="slider"
-        tabIndex={0}
-      >
-        {analysis?.channels.map((channel, index) => (
-          <div className={styles.waveformChannel} key={index}>
-            <span className={styles.waveformChannelLabel}>
-              {copy('channel')} {index + 1}
-            </span>
-            <WaveformCanvas
-              height={112}
-              peaks={channel}
-              totalDuration={duration}
-              viewport={viewport}
-              width={width}
-            />
+    <>
+      <div className="pk_av_cont">
+        <div aria-label={copy('waveform')} className="pk_av pk_noselect" id="pk_av_react">
+          <div className="pk_react_ruler">
+            {ticks.map((tick) => (
+              <i
+                aria-hidden="true"
+                className={tick.major ? 'pk_react_major' : undefined}
+                key={tick.time}
+                style={{ left: `${tick.percent}%` }}
+              >
+                <span>{tick.label}</span>
+              </i>
+            ))}
           </div>
-        ))}
-        {selected && selectionEnd >= 0 && selectionStart <= 100 ? (
-          <i
-            aria-hidden="true"
-            className={styles.waveformSelection}
-            style={{
-              left: `${Math.max(0, selectionStart)}%`,
-              width: `${Math.max(0, Math.min(100, selectionEnd) - Math.max(0, selectionStart))}%`,
-            }}
-          />
-        ) : null}
-        {visibleMarkers.map((marker) => (
-          <button
-            aria-label={`${marker.name}: ${formatEditorTime(marker.time)}`}
-            className={styles.waveformMarker}
-            key={marker.id}
-            onClick={(event) => {
-              event.stopPropagation();
-              void controller.dispatch({ name: 'playback.seek', seconds: marker.time });
-            }}
-            onPointerDown={(event) => event.stopPropagation()}
-            style={
-              {
-                left: `${timelinePercent(marker.time, viewport)}%`,
-                '--marker-color': marker.color,
-              } as CSSProperties
-            }
-            title={marker.name}
-            type="button"
-          />
-        ))}
-        {playhead >= 0 && playhead <= 100 ? (
-          <i
-            aria-hidden="true"
-            className={styles.waveformPlayhead}
-            style={{ left: `${playhead}%` }}
-          />
-        ) : null}
+
+          <div
+            aria-label={copy('waveformInteraction')}
+            aria-valuemax={duration}
+            aria-valuemin={0}
+            aria-valuenow={snapshot.engine.position}
+            className="pk_react_wave"
+            onKeyDown={onKeyDown}
+            onPointerCancel={cancelSelection}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={finishSelection}
+            ref={reference}
+            role="slider"
+            tabIndex={0}
+          >
+            {channels.map((channel, index) => (
+              <div className="pk_react_wave_channel" key={index}>
+                <WaveformCanvas
+                  height={420}
+                  peaks={channel}
+                  totalDuration={duration}
+                  viewport={viewport}
+                  width={width}
+                />
+              </div>
+            ))}
+            {selected && selectionEnd >= 0 && selectionStart <= 100 ? (
+              <i
+                aria-hidden="true"
+                className="pk_react_selection"
+                style={{
+                  left: `${Math.max(0, selectionStart)}%`,
+                  width: `${Math.max(0, Math.min(100, selectionEnd) - Math.max(0, selectionStart))}%`,
+                }}
+              />
+            ) : null}
+            {visibleMarkers.map((marker) => (
+              <button
+                aria-label={`${marker.name}: ${formatEditorTime(marker.time)}`}
+                className="pk_react_marker"
+                key={marker.id}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void controller.dispatch({ name: 'playback.seek', seconds: marker.time });
+                }}
+                onPointerDown={(event) => event.stopPropagation()}
+                style={
+                  {
+                    left: `${timelinePercent(marker.time, viewport)}%`,
+                    '--marker-color': marker.color,
+                  } as CSSProperties
+                }
+                title={marker.name}
+                type="button"
+              />
+            ))}
+            {duration > 0 && playhead >= 0 && playhead <= 100 ? (
+              <i
+                aria-hidden="true"
+                className="pk_react_playhead"
+                style={{ left: `${playhead}%` }}
+              />
+            ) : null}
+          </div>
+          {!analysis ? (
+            <div className="pk_tmpMsg pk_ed_empty">
+              {copy('dropAudio')}{' '}
+              <a
+                href="#open-audio"
+                onClick={(event) => {
+                  event.preventDefault();
+                  onOpenAudio();
+                }}
+                style={{
+                  border: '1px solid',
+                  borderRadius: 23,
+                  fontSize: '.94em',
+                  marginLeft: 5,
+                  padding: '5px 18px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {copy('useSample')}
+              </a>
+            </div>
+          ) : null}
+          {analysisError || loading ? (
+            <p aria-live="polite" className="pk_react_error">
+              {analysisError ?? copy('loadingWaveform')}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="pk_panner pk_noselect">
+          <div className="pk_pan_left">
+            <button className="pk_pan_btn" tabIndex={-1} type="button">
+              <strong>L</strong> {copy('enabled')}
+            </button>
+          </div>
+          <div className="pk_pan_right">
+            <button className="pk_pan_btn" tabIndex={-1} type="button">
+              <strong>R</strong> {copy('enabled')}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <p aria-live="polite" className={analysisError ? styles.error : styles.waveformStatus}>
-        {analysisError ??
-          (loading ? copy('loadingWaveform') : analysis ? '' : copy('waveformEmpty'))}
-      </p>
-    </section>
+      <ClassicEditorFooter
+        copy={copy}
+        onResetZoom={() => {
+          setZoom(1);
+          setScroll(0);
+        }}
+        onZoomIn={() => setZoom((current) => clampTimelineZoom(current + 1))}
+        onZoomOut={() => setZoom((current) => clampTimelineZoom(current - 1))}
+        playheadPercent={playhead}
+        scrollPercent={scroll * (100 - 100 / zoom)}
+        viewportPercent={100 / zoom}
+        zoom={zoom}
+      />
+    </>
   );
 }

@@ -1,9 +1,17 @@
-export const EDITOR_TOP_LEVEL_MENU_IDS = ['file', 'edit', 'view', 'help', 'settings'] as const;
+export const EDITOR_TOP_LEVEL_MENU_IDS = [
+  'file',
+  'edit',
+  'effects',
+  'view',
+  'help',
+  'language',
+  'settings',
+] as const;
 
 export type EditorTopLevelMenuId = (typeof EDITOR_TOP_LEVEL_MENU_IDS)[number];
-export type EditorPopupMenuId = Exclude<EditorTopLevelMenuId, 'settings'>;
+export type EditorPopupMenuId = Exclude<EditorTopLevelMenuId, 'language' | 'settings'>;
 
-const POPUP_MENU_IDS = new Set<EditorTopLevelMenuId>(['file', 'edit', 'view', 'help']);
+const POPUP_MENU_IDS = new Set<EditorTopLevelMenuId>(['file', 'edit', 'effects', 'view', 'help']);
 
 export function isEditorPopupMenu(value: EditorTopLevelMenuId): value is EditorPopupMenuId {
   return POPUP_MENU_IDS.has(value);

@@ -23,7 +23,10 @@ interface EffectToolbarProps {
   controller: EditorController;
   copy: (key: EditorCopyKey) => string;
   onError(message: string | null): void;
+  onOpenChange(open: boolean): void;
+  open: boolean;
   selected: boolean;
+  showTrigger?: boolean;
 }
 
 interface ParameterFieldProps {
@@ -163,7 +166,15 @@ function optionLabel(copy: EffectToolbarProps['copy'], optionId: string, fallbac
   return fallback;
 }
 
-export function EffectToolbar({ controller, copy, onError, selected }: EffectToolbarProps) {
+export function EffectToolbar({
+  controller,
+  copy,
+  onError,
+  onOpenChange,
+  open,
+  selected,
+  showTrigger = true,
+}: EffectToolbarProps) {
   const schemas = useMemo(
     () => EFFECT_SCHEMAS.filter((schema) => controller.supportsEffect(schema.id)),
     [controller],
@@ -171,7 +182,6 @@ export function EffectToolbar({ controller, copy, onError, selected }: EffectToo
   const [effectId, setEffectId] = useState(schemas[0]?.id ?? 'gain');
   const schema = schemas.find((candidate) => candidate.id === effectId) ?? schemas[0]!;
   const [values, setValues] = useState<EffectValues>(() => defaultEffectValues(schema));
-  const [open, setOpen] = useState(false);
   const repositoryRef = useRef<BrowserEffectPresetRepository | null>(null);
   const [customPresets, setCustomPresets] = useState<readonly EffectPreset[]>([]);
   const [presetName, setPresetName] = useState('');
@@ -184,7 +194,7 @@ export function EffectToolbar({ controller, copy, onError, selected }: EffectToo
       repositoryRef.current = null;
       setCustomPresets([]);
     }
-    setOpen(true);
+    onOpenChange(true);
   };
 
   const selectEffect = (nextEffectId: string) => {
@@ -212,7 +222,7 @@ export function EffectToolbar({ controller, copy, onError, selected }: EffectToo
   };
 
   const close = () => {
-    setOpen(false);
+    onOpenChange(false);
     void run(() => controller.cancelEffectPreview());
   };
 
@@ -230,11 +240,15 @@ export function EffectToolbar({ controller, copy, onError, selected }: EffectToo
   };
 
   return (
-    <section aria-label={copy('effects')} className={styles.effectToolbar}>
-      <button disabled={!selected} onClick={openDialog} type="button">
-        {copy('effects')}
-      </button>
-      {!selected ? <span>{copy('effectSelectRange')}</span> : null}
+    <section
+      aria-label={copy('effects')}
+      className={showTrigger ? styles.effectToolbar : styles.dialogHost}
+    >
+      {showTrigger ? (
+        <button disabled={!selected} onClick={openDialog} type="button">
+          {copy('effects')}
+        </button>
+      ) : null}
 
       <EditorDialog
         className={styles.effectDialog}
@@ -254,7 +268,7 @@ export function EffectToolbar({ controller, copy, onError, selected }: EffectToo
               onClick={() =>
                 void run(async () => {
                   await controller.applyEffect(effectId, values);
-                  setOpen(false);
+                  onOpenChange(false);
                 })
               }
               type="button"

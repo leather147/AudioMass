@@ -28,8 +28,11 @@ interface SpecializedEffectToolbarProps {
   controller: EditorController;
   copy: (key: EditorCopyKey) => string;
   onError(message: string | null): void;
+  onOpenChange(open: boolean): void;
+  open: boolean;
   selected: boolean;
   selectionDuration: number;
+  showTrigger?: boolean;
 }
 
 function effectName(
@@ -46,8 +49,11 @@ export function SpecializedEffectToolbar({
   controller,
   copy,
   onError,
+  onOpenChange,
+  open,
   selected,
   selectionDuration,
+  showTrigger = true,
 }: SpecializedEffectToolbarProps) {
   const effectIds = useMemo(
     () =>
@@ -57,7 +63,6 @@ export function SpecializedEffectToolbar({
     [controller],
   );
   const [effectId, setEffectId] = useState<SpecializedEffectId>(effectIds[0] ?? 'seamless-loop');
-  const [open, setOpen] = useState(false);
   const [seamless, setSeamless] = useState<SeamlessLoopWorkflow>({
     ...DEFAULT_SEAMLESS_LOOP_WORKFLOW,
   });
@@ -91,23 +96,27 @@ export function SpecializedEffectToolbar({
   };
 
   const close = () => {
-    setOpen(false);
+    onOpenChange(false);
     void run(() => controller.cancelEffectPreview());
   };
 
   return (
-    <section aria-label={copy('specializedEffects')} className={styles.effectToolbar}>
-      <button
-        disabled={!selected}
-        onClick={() => {
-          setAutomation(defaultAutomationWorkflow(selectionDuration));
-          setOpen(true);
-        }}
-        type="button"
-      >
-        {copy('specializedEffects')}
-      </button>
-      {!selected ? <span>{copy('effectSelectRange')}</span> : null}
+    <section
+      aria-label={copy('specializedEffects')}
+      className={showTrigger ? styles.effectToolbar : styles.dialogHost}
+    >
+      {showTrigger ? (
+        <button
+          disabled={!selected}
+          onClick={() => {
+            setAutomation(defaultAutomationWorkflow(selectionDuration));
+            onOpenChange(true);
+          }}
+          type="button"
+        >
+          {copy('specializedEffects')}
+        </button>
+      ) : null}
 
       <EditorDialog
         className={styles.effectDialog}
@@ -127,7 +136,7 @@ export function SpecializedEffectToolbar({
               onClick={() =>
                 void run(async () => {
                   await controller.applySpecializedEffect(workflow);
-                  setOpen(false);
+                  onOpenChange(false);
                 })
               }
               type="button"

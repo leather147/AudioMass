@@ -1,0 +1,151 @@
+/* =============================================================
+   Time badge no-crop / compact flex fix
+   Purpose:
+   - keep the main timecode visible;
+   - remove the oversized empty spacing between the big timer and side labels;
+   - reserve separate, non-shrinking columns for primary and secondary time.
+   ============================================================= */
+
+:root{
+	--am-time-main-w:150px;
+	--am-time-side-w:74px;
+	--am-time-column-gap:8px;
+	--am-time-badge-w:250px;
+}
+
+.pk_timecontainer,
+.pk_mt_on .pk_timecontainer{
+	position:relative!important;
+	flex:0 0 var(--am-time-badge-w)!important;
+	width:var(--am-time-badge-w)!important;
+	min-width:var(--am-time-badge-w)!important;
+	max-width:var(--am-time-badge-w)!important;
+	height:48px!important;
+	min-height:48px!important;
+	max-height:48px!important;
+	padding:4px 8px!important;
+	box-sizing:border-box!important;
+	display:grid!important;
+	grid-template-columns:minmax(0,var(--am-time-main-w)) var(--am-time-side-w)!important;
+	grid-template-rows:1fr 1fr!important;
+	align-items:center!important;
+	justify-content:start!important;
+	column-gap:var(--am-time-column-gap)!important;
+	overflow:hidden!important;
+	contain:none!important;
+}
+
+/* Chrome renders the large digits into a fixed 150x40 canvas. Match those
+   intrinsic dimensions so browser zoom cannot push pixels into column two. */
+.pk_timecontainer .pk_timingcnv,
+.pk_mt_on .pk_timecontainer .pk_timingcnv{
+	position:static!important;
+	left:auto!important;
+	top:auto!important;
+	transform:none!important;
+	display:block!important;
+	grid-column:1!important;
+	grid-row:1 / span 2!important;
+	justify-self:start!important;
+	align-self:center!important;
+	width:var(--am-time-main-w)!important;
+	min-width:0!important;
+	max-width:var(--am-time-main-w)!important;
+	height:40px!important;
+	min-height:40px!important;
+	max-height:40px!important;
+	margin:0!important;
+	overflow:visible!important;
+}
+
+/* Fallback text timer for non-Chrome engines. */
+.pk_timecontainer .pk_timing,
+.pk_mt_on .pk_timecontainer .pk_timing{
+	position:static!important;
+	left:auto!important;
+	top:auto!important;
+	transform:none!important;
+	display:block!important;
+	grid-column:1!important;
+	grid-row:1 / span 2!important;
+	justify-self:start!important;
+	align-self:center!important;
+	width:var(--am-time-main-w)!important;
+	min-width:0!important;
+	max-width:var(--am-time-main-w)!important;
+	padding:0!important;
+	margin:0!important;
+	font-size:clamp(21px, 1.45vw, 27px)!important;
+	letter-spacing:-.09em!important;
+	line-height:1!important;
+	white-space:nowrap!important;
+	overflow:hidden!important;
+	text-overflow:clip!important;
+}
+
+.pk_timecontainer .pk_total_dur,
+.pk_timecontainer .pk_hover_dur,
+.pk_mt_on .pk_timecontainer .pk_total_dur,
+.pk_mt_on .pk_timecontainer .pk_hover_dur{
+	position:static!important;
+	right:auto!important;
+	top:auto!important;
+	display:block!important;
+	grid-column:2!important;
+	width:var(--am-time-side-w)!important;
+	min-width:0!important;
+	max-width:var(--am-time-side-w)!important;
+	padding:0!important;
+	margin:0!important;
+	font-size:11.5px!important;
+	line-height:1.05!important;
+	text-align:left!important;
+	white-space:nowrap!important;
+	overflow:hidden!important;
+	text-overflow:clip!important;
+}
+
+.pk_timecontainer .pk_total_dur,
+.pk_mt_on .pk_timecontainer .pk_total_dur{
+	grid-row:1!important;
+	align-self:end!important;
+}
+
+.pk_timecontainer .pk_hover_dur,
+.pk_mt_on .pk_timecontainer .pk_hover_dur{
+	grid-row:2!important;
+	align-self:start!important;
+}
+
+/* Keep the next toolbar card from visually cutting into the timer without
+   creating an exaggerated left gutter. */
+.pk_tb,
+.pk_mt_on .pk_tb{
+	padding-left:8px!important;
+	gap:8px!important;
+}
+
+@media (max-width:760px){
+	:root{
+		--am-time-side-w:70px;
+		--am-time-column-gap:6px;
+		--am-time-badge-w:242px;
+	}
+
+	.pk_timecontainer,
+	.pk_mt_on .pk_timecontainer{
+		flex:0 0 var(--am-time-badge-w)!important;
+		width:var(--am-time-badge-w)!important;
+		min-width:var(--am-time-badge-w)!important;
+		max-width:var(--am-time-badge-w)!important;
+		padding:4px 7px!important;
+		column-gap:var(--am-time-column-gap)!important;
+	}
+
+	.pk_timecontainer .pk_total_dur,
+	.pk_timecontainer .pk_hover_dur,
+	.pk_mt_on .pk_timecontainer .pk_total_dur,
+	.pk_mt_on .pk_timecontainer .pk_hover_dur{
+		font-size:10.5px!important;
+	}
+}

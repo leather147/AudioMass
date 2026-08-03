@@ -20,6 +20,10 @@
   font-family: system-ui, sans-serif;
 }
 
+.dialogHost {
+  display: contents;
+}
+
 .toolbar,
 .editToolbar,
 .effectToolbar,

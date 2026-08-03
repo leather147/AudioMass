@@ -1,0 +1,357 @@
+/* =============================================================
+   Configurable animation system
+   ============================================================= */
+
+:root{
+	--anim-speed:.82;
+	--anim-fast:calc(120ms * var(--anim-speed));
+	--anim-med:calc(190ms * var(--anim-speed));
+	--anim-slow:calc(320ms * var(--anim-speed));
+	--anim-ease:cubic-bezier(.2,.8,.2,1);
+	--anim-ease-pop:cubic-bezier(.16,1,.3,1);
+	--anim-distance:8px;
+}
+
+html.pk_anim_off,
+html.pk_anim_off *,
+html.pk_anim_off *:before,
+html.pk_anim_off *:after{
+	animation:none!important;
+	transition:none!important;
+	scroll-behavior:auto!important;
+}
+
+html.pk_anim_on.pk_anim_scroll,
+html.pk_anim_on.pk_anim_scroll body,
+html.pk_anim_on.pk_anim_scroll .pk_tbc,
+html.pk_anim_on.pk_anim_scroll .pk_hdr,
+html.pk_anim_on.pk_anim_scroll .pk_mt_main,
+html.pk_anim_on.pk_anim_scroll .pk_mt_tracks_wrap,
+html.pk_anim_on.pk_anim_scroll .pk_av_cont,
+html.pk_anim_on.pk_anim_scroll .pk_ftr{
+	scroll-behavior:smooth!important;
+}
+
+html.pk_anim_on.pk_anim_ui button,
+html.pk_anim_on.pk_anim_ui .pk_btn,
+html.pk_anim_on.pk_anim_ui .pk_modal_a_top,
+html.pk_anim_on.pk_anim_ui .pk_modal_a_bottom,
+html.pk_anim_on.pk_anim_ui input,
+html.pk_anim_on.pk_anim_ui select,
+html.pk_anim_on.pk_anim_ui textarea,
+html.pk_anim_on.pk_anim_ui .pk_mt_knob,
+html.pk_anim_on.pk_anim_ui .pk_lcla,
+html.pk_anim_on.pk_anim_ui .pk_lcla2,
+html.pk_anim_on.pk_anim_ui .pk_pan_btn,
+html.pk_anim_on.pk_anim_ui .pk_selection,
+html.pk_anim_on.pk_anim_ui .pk_timecontainer{
+	transition:
+		background-color var(--anim-fast) var(--anim-ease),
+		background var(--anim-fast) var(--anim-ease),
+		border-color var(--anim-fast) var(--anim-ease),
+		box-shadow var(--anim-med) var(--anim-ease),
+		color var(--anim-fast) var(--anim-ease),
+		opacity var(--anim-fast) var(--anim-ease),
+		transform var(--anim-fast) var(--anim-ease)!important;
+}
+
+html.pk_anim_on.pk_anim_ui button:hover,
+html.pk_anim_on.pk_anim_ui .pk_btn:hover,
+html.pk_anim_on.pk_anim_ui .pk_modal_a_top:hover,
+html.pk_anim_on.pk_anim_ui .pk_modal_a_bottom:hover,
+html.pk_anim_on.pk_anim_ui .pk_pan_btn:hover{
+	transform:translateY(-1px)!important;
+}
+
+html.pk_anim_on.pk_anim_ui button:active,
+html.pk_anim_on.pk_anim_ui .pk_btn:active,
+html.pk_anim_on.pk_anim_ui .pk_modal_a_top:active,
+html.pk_anim_on.pk_anim_ui .pk_modal_a_bottom:active,
+html.pk_anim_on.pk_anim_ui .pk_pan_btn:active{
+	transform:translateY(0) scale(.985)!important;
+}
+
+@keyframes pkFadePop{
+	from{opacity:0;transform:translateY(var(--anim-distance)) scale(.985)}
+	to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@keyframes pkFadeDown{
+	from{opacity:0;transform:translateY(calc(var(--anim-distance) * -1)) scale(.992)}
+	to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@keyframes pkSoftIn{
+	from{opacity:0}
+	to{opacity:1}
+}
+
+html.pk_anim_on.pk_anim_surfaces .pk_modal,
+html.pk_anim_on.pk_anim_surfaces .pk_contextMenu,
+html.pk_anim_on.pk_anim_surfaces .pk_ctx,
+html.pk_anim_on.pk_anim_surfaces .pk_pgeq_freq,
+html.pk_anim_on.pk_anim_surfaces .pk_hdr .pk_btn .pk_menu,
+html.pk_anim_on.pk_anim_surfaces .pk_anim_popover{
+	animation:pkFadePop var(--anim-med) var(--anim-ease-pop) both!important;
+	transform-origin:top center;
+}
+
+html.pk_anim_on.pk_anim_surfaces .pk_modal_back{
+	animation:pkSoftIn var(--anim-med) var(--anim-ease) both!important;
+}
+
+html.pk_anim_on.pk_anim_surfaces .pk_ttip,
+html.pk_anim_on.pk_anim_surfaces .pk_tb .pk_btn span,
+html.pk_anim_on.pk_anim_surfaces .pk_ftr .pk_btn span{
+	animation:pkFadeDown var(--anim-fast) var(--anim-ease-pop) both!important;
+}
+
+html.pk_anim_on.pk_anim_drag .pk_mt_clip:not(.pk_drag),
+html.pk_anim_on.pk_anim_drag .pk_clip:not(.pk_drag),
+html.pk_anim_on.pk_anim_drag .pk_mt_track:not(.pk_drag),
+html.pk_anim_on.pk_anim_drag .pk_mt_lane,
+html.pk_anim_on.pk_anim_drag .pk_mt_region,
+html.pk_anim_on.pk_anim_drag .pk_wavedrag,
+html.pk_anim_on.pk_anim_drag .pk_wave_cursor,
+html.pk_anim_on.pk_anim_drag .pk_wavepoint,
+html.pk_anim_on.pk_anim_drag .pk_mrkr,
+html.pk_anim_on.pk_anim_drag .pk_mrkrl *{
+	transition:
+		left var(--anim-med) var(--anim-ease),
+		top var(--anim-med) var(--anim-ease),
+		width var(--anim-med) var(--anim-ease),
+		height var(--anim-med) var(--anim-ease),
+		transform var(--anim-med) var(--anim-ease),
+		opacity var(--anim-fast) var(--anim-ease),
+		background var(--anim-med) var(--anim-ease),
+		box-shadow var(--anim-med) var(--anim-ease),
+		border-color var(--anim-med) var(--anim-ease)!important;
+}
+
+html.pk_anim_on.pk_anim_drag .pk_drag,
+html.pk_anim_on.pk_anim_drag .pk_drag *,
+html.pk_anim_on.pk_anim_drag .pk_mt_resize:active{
+	transition:none!important;
+}
+
+html.pk_anim_on.pk_anim_surfaces .pk_mt_track,
+html.pk_anim_on.pk_anim_surfaces .pk_mt_clip,
+html.pk_anim_on.pk_anim_surfaces .pk_mt_channel,
+html.pk_anim_on.pk_anim_surfaces .pk_sloop,
+html.pk_anim_on.pk_anim_surfaces .pk_lcla,
+html.pk_anim_on.pk_anim_surfaces .pk_lcla2{
+	animation:pkSoftIn var(--anim-slow) var(--anim-ease) both;
+}
+
+/* ---------- Track height resize affordance ---------- */
+.pk_mt_resize{
+	position:absolute!important;
+	left:0!important;
+	right:0!important;
+	bottom:0!important;
+	height:16px!important;
+	z-index:20!important;
+	cursor:ns-resize!important;
+	pointer-events:auto!important;
+	background:linear-gradient(180deg,transparent,rgba(56,216,255,.055))!important;
+	opacity:.16;
+	transition:opacity var(--anim-fast) var(--anim-ease),background var(--anim-fast) var(--anim-ease)!important;
+}
+
+.pk_mt_resize:before{
+	content:'';
+	position:absolute;
+	left:50%;
+	bottom:5px;
+	width:34px;
+	height:3px;
+	margin-left:-17px;
+	border-radius:999px;
+	background:rgba(56,216,255,.42);
+	box-shadow:0 0 10px rgba(56,216,255,.18);
+}
+
+.pk_mt_resize:after{
+	content:'';
+	position:absolute;
+	left:50%;
+	bottom:10px;
+	width:18px;
+	height:1px;
+	margin-left:-9px;
+	border-radius:999px;
+	background:rgba(255,255,255,.16);
+}
+
+.pk_mt_track:hover .pk_mt_resize,
+.pk_mt_track.pk_mt_sel .pk_mt_resize,
+.pk_mt_resize:hover,
+.pk_mt_resize:active{
+	opacity:1;
+	background:linear-gradient(180deg,transparent,rgba(56,216,255,.11))!important;
+}
+
+.pk_mt_track.pk_mt_compact .pk_mt_resize,
+.pk_mt_track.pk_mt_tiny .pk_mt_resize{
+	height:14px!important;
+}
+
+/* ---------- Animation settings menu ---------- */
+.pk_anim_menu{
+	position:relative;
+	flex:0 0 auto;
+}
+
+.pk_anim_menu>button{
+	display:inline-flex!important;
+	align-items:center!important;
+	gap:6px!important;
+}
+
+.pk_anim_menu>button:before{
+	content:'';
+	width:6px;
+	height:6px;
+	border-radius:999px;
+	background:var(--ring);
+	box-shadow:0 0 12px rgba(56,216,255,.52);
+}
+
+html.pk_anim_off .pk_anim_menu>button:before{
+	background:#71717a;
+	box-shadow:none;
+}
+
+.pk_anim_popover{
+	position:fixed;
+	z-index:100000;
+	width:292px;
+	padding:10px;
+	box-sizing:border-box;
+	background:rgba(17,17,20,.96);
+	border:1px solid var(--border);
+	border-radius:16px;
+	box-shadow:0 24px 70px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.05);
+	backdrop-filter:blur(18px) saturate(140%);
+	-webkit-backdrop-filter:blur(18px) saturate(140%);
+	color:var(--foreground);
+	font-family:var(--ff-mono);
+}
+
+.pk_anim_popover h3{
+	margin:0 0 10px;
+	font-family:var(--ff-heading);
+	font-size:14px;
+	line-height:20px;
+	letter-spacing:-.04em;
+}
+
+.pk_anim_row{
+	display:grid;
+	grid-template-columns:1fr auto;
+	align-items:center;
+	gap:10px;
+	min-height:34px;
+	padding:6px 0;
+	border-top:1px solid rgba(255,255,255,.06);
+}
+
+.pk_anim_row:first-of-type{border-top:0}
+
+.pk_anim_row label,
+.pk_anim_row span{
+	font-size:12px;
+	line-height:16px;
+	color:var(--muted-foreground);
+}
+
+.pk_anim_row strong{
+	display:block;
+	font-size:12px;
+	line-height:16px;
+	color:var(--foreground);
+	font-weight:600;
+}
+
+.pk_anim_popover select,
+.pk_anim_popover input[type='range']{
+	width:132px;
+}
+
+.pk_anim_popover select{
+	height:30px;
+	padding:0 8px;
+	background:#0b0b0e;
+	border:1px solid var(--border);
+	border-radius:10px;
+	color:var(--foreground);
+	font-family:var(--ff-mono);
+	font-size:11px;
+}
+
+.pk_anim_switch{
+	position:relative;
+	width:42px;
+	height:24px;
+	border:1px solid var(--border);
+	border-radius:999px;
+	background:#18181b;
+	box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+	cursor:pointer;
+}
+
+.pk_anim_switch input{
+	position:absolute;
+	inset:0;
+	opacity:0;
+	cursor:pointer!important;
+}
+
+.pk_anim_switch i{
+	position:absolute;
+	left:3px;
+	top:3px;
+	width:18px;
+	height:18px;
+	border-radius:999px;
+	background:#71717a;
+	transition:transform var(--anim-fast) var(--anim-ease),background var(--anim-fast) var(--anim-ease),box-shadow var(--anim-fast) var(--anim-ease);
+}
+
+.pk_anim_switch input:checked+i{
+	transform:translateX(18px);
+	background:var(--ring);
+	box-shadow:0 0 16px rgba(56,216,255,.38);
+}
+
+.pk_anim_actions{
+	display:flex;
+	justify-content:flex-end;
+	gap:8px;
+	padding-top:10px;
+	border-top:1px solid rgba(255,255,255,.06);
+}
+
+.pk_anim_actions button{
+	height:30px;
+	padding:0 10px;
+	border:1px solid var(--border);
+	border-radius:10px;
+	background:#18181b;
+	color:var(--foreground);
+	font-family:var(--ff-mono);
+	font-size:11px;
+}
+
+.pk_anim_actions button:hover{
+	background:#202027;
+	border-color:#3f3f46;
+}
+
+@media (max-width:420px){
+	.pk_anim_popover{
+		left:8px!important;
+		right:8px!important;
+		width:auto!important;
+	}
+}

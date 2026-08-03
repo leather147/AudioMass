@@ -1,0 +1,260 @@
+/* React layout bridge for the cdd2efc visual contract. No legacy runtime rules live here. */
+.pk_app.pk_react_app {
+  display: grid;
+  grid-template-rows: 32px 66px minmax(0, 1fr) 72px;
+  width: 100%;
+  height: 100dvh;
+  min-width: 0;
+  min-height: 620px;
+  overflow: hidden;
+}
+
+.pk_react_app > .pk_hdr,
+.pk_react_app > .pk_tbc,
+.pk_react_app > .pk_av_cont,
+.pk_react_app > .pk_ftr {
+  min-width: 0;
+}
+
+.pk_react_app > .pk_av_cont {
+  height: auto !important;
+  min-height: 0;
+}
+
+.pk_react_app > .pk_mt {
+  height: auto !important;
+  min-height: 0;
+}
+
+.pk_react_app .pk_av {
+  height: 100% !important;
+}
+
+.pk_react_app .pk_react_wave {
+  position: absolute;
+  inset: 28px 0 0;
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.pk_react_app .pk_react_wave_channel {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--grid-strong);
+}
+
+.pk_react_app .pk_react_wave_channel:last-child {
+  border-bottom: 0;
+}
+
+.pk_react_app .pk_react_wave_channel canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  filter: drop-shadow(0 0 2px var(--accent-muted)) drop-shadow(0 0 7px var(--accent-soft));
+}
+
+.pk_react_app .pk_react_ruler {
+  position: absolute;
+  z-index: 4;
+  inset: 0 0 auto;
+  height: 28px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background: var(--timeline-bg);
+}
+
+.pk_react_app .pk_react_ruler > i {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 6px;
+  background: var(--timeline-fg);
+  opacity: 0.72;
+}
+
+.pk_react_app .pk_react_ruler > i.pk_react_major {
+  height: 10px;
+}
+
+.pk_react_app .pk_react_ruler span {
+  position: absolute;
+  bottom: 10px;
+  color: var(--timeline-fg);
+  font: 9px/1 var(--ff-mono, ui-monospace, monospace);
+  font-style: normal;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.pk_react_app .pk_react_selection {
+  position: absolute;
+  z-index: 5;
+  inset-block: 0;
+  border-inline: 1px solid var(--ring);
+  background: var(--accent-muted);
+  pointer-events: none;
+}
+
+.pk_react_app .pk_react_playhead {
+  position: absolute;
+  z-index: 7;
+  inset-block: 0;
+  width: 1px;
+  background: var(--ring);
+  box-shadow: 0 0 12px var(--ac-glow);
+  pointer-events: none;
+}
+
+.pk_react_app .pk_react_marker {
+  position: absolute;
+  z-index: 8;
+  top: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 6px solid transparent;
+  border-top-color: var(--marker-color);
+  background: transparent;
+  transform: translateX(-50%);
+}
+
+.pk_react_app .pk_react_marker::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  width: 1px;
+  height: 100vh;
+  background: var(--marker-color);
+  opacity: 0.65;
+}
+
+.pk_react_app .pk_tmpMsg.pk_ed_empty {
+  z-index: 12;
+  pointer-events: none;
+}
+
+.pk_react_app .pk_tmpMsg.pk_ed_empty a,
+.pk_react_app .pk_tmpMsg.pk_mt_empty a {
+  white-space: nowrap;
+  border: 1px solid;
+  border-radius: 23px;
+  padding: 5px 18px;
+  margin-left: 5px;
+  background: transparent;
+  color: var(--ring);
+  font-size: 0.94em;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.pk_react_app .pk_mt_main {
+  min-width: 0;
+}
+
+.pk_react_app .pk_mt_empty {
+  pointer-events: none;
+}
+
+.pk_react_app .pk_mt_empty a {
+  pointer-events: auto;
+}
+
+.pk_react_app .pk_mt_clip canvas {
+  background:
+    linear-gradient(180deg, transparent 48%, var(--mt-br) 49% 51%, transparent 52%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 5px,
+      color-mix(in srgb, var(--mt-br) 72%, transparent) 5px 7px,
+      transparent 7px 11px
+    ) !important;
+  opacity: 0.78;
+}
+
+.pk_react_app .pk_timingcnv {
+  display: block;
+}
+
+.pk_react_app .pk_hdr .pk_btn > a,
+.pk_react_app .pk_hdr > a.pk_react_top_link {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 9px;
+  color: inherit;
+  font-family: var(--ff-mono, ui-monospace, monospace);
+  font-size: 12px;
+  letter-spacing: -0.035em;
+  text-decoration: none;
+}
+
+.pk_react_app .pk_hdr .pk_btn:hover > a,
+.pk_react_app .pk_hdr > a.pk_react_top_link:hover {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.pk_react_app .pk_hdr .pk_menu > button,
+.pk_react_app .pk_hdr .pk_menu > a {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--popover-foreground);
+  font: 12px/1.25 var(--ff-mono, ui-monospace, monospace);
+  text-align: left;
+  text-decoration: none;
+}
+
+.pk_react_app .pk_hdr .pk_menu > button:hover,
+.pk_react_app .pk_hdr .pk_menu > button:focus-visible,
+.pk_react_app .pk_hdr .pk_menu > a:hover,
+.pk_react_app .pk_hdr .pk_menu > a:focus-visible {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.pk_react_app .pk_hdr .pk_menu > hr {
+  height: 13px;
+  margin: 1px 6px;
+  border: 0;
+  background: linear-gradient(transparent 6px, var(--border) 6px 7px, transparent 7px);
+}
+
+.pk_react_app .pk_menu_el > .pk_opt:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pk_react_app .pk_react_visually_hidden {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pk_react_app .pk_react_error {
+  position: absolute;
+  z-index: 100;
+  left: 50%;
+  bottom: 90px;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--destructive);
+  border-radius: 9px;
+  background: var(--popover);
+  color: var(--destructive);
+  transform: translateX(-50%);
+}

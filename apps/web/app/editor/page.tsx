@@ -1,4 +1,5 @@
 import { EditorShell } from '@/features/editor/components/editor-shell';
+import { ClassicEditorStyles } from '@/features/editor/components/chrome/classic-editor-styles';
 import { parseEditorPanel } from '@/features/editor/components/workspace/editor-panels';
 import { editorCopy } from '@/lib/editor-copy';
 import { readEditorPreferences } from '@/lib/editor-preference-cookies';
@@ -17,5 +18,10 @@ interface EditorPageProps {
 
 export default async function EditorPage({ searchParams }: EditorPageProps) {
   const [preferences, { panel }] = await Promise.all([readEditorPreferences(), searchParams]);
-  return <EditorShell initialPanel={parseEditorPanel(panel)} preferences={preferences} />;
+  return (
+    <>
+      <ClassicEditorStyles />
+      <EditorShell initialPanel={parseEditorPanel(panel)} preferences={preferences} />
+    </>
+  );
 }

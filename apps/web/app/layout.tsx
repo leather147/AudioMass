@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import { readEditorPreferences } from '@/lib/editor-preference-cookies';
+import { editorThemeStyle, getEditorTheme } from '@/features/editor/theme/editor-themes';
 
 import './globals.css';
 
@@ -21,8 +22,14 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const preferences = await readEditorPreferences();
+  const theme = getEditorTheme(preferences.theme);
   return (
-    <html lang={preferences.locale}>
+    <html
+      data-theme={preferences.theme}
+      data-theme-mode={theme.mode}
+      lang={preferences.locale}
+      style={editorThemeStyle(preferences.theme)}
+    >
       <body>{children}</body>
     </html>
   );
